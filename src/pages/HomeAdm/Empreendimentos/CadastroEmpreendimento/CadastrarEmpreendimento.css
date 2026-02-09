@@ -1,0 +1,119 @@
+/* empreendimentos.css */
+
+/* Reset básico */
+* {
+  box-sizing: border-box;
+}
+
+.admin-page-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px 15px;
+}
+
+.titulo-centralizado {
+  text-align: center;
+  font-size: 2rem;
+  color: #004080;
+  margin-bottom: 30px;
+}
+
+.back-arrow {
+  background: none;
+  border: none;
+  color: #004080;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.back-arrow:hover {
+  text-decoration: underline;
+}
+
+.form-container {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.form-group {
+  flex: 1 1 220px;
+  display: flex;
+  flex-direction: column;
+}
+
+.full-width-field {
+  flex: 1 1 100%;
+}
+
+.form-group label {
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: #004080;
+}
+
+.form-group input,
+.form-group select {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.form-group input[type="file"] {
+  padding: 4px;
+}
+
+.form-section-title {
+  width: 100%;
+  margin-top: 30px;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  color: #004080;
+  border-bottom: 2px solid #004080;
+  padding-bottom: 5px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-cancelar,
+.btn-salvar {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-cancelar {
+  background-color: #ccc;
+  color: #333;
+}
+
+.btn-cancelar:hover {
+  background-color: #999;
+}
+
+.btn-salvar {
+  background-color: #004080;
+  color: white;
+}
+
+.btn-salvar:hover {
+  background-color: #003366;
+}
+
+/* Responsivo */

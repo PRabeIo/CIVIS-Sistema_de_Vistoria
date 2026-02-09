@@ -1,0 +1,335 @@
+/* Ensure body has no default margins/paddings and uses dark background */
+body.inicial-body {
+  margin: 0;
+  padding: 0;
+  background-color: #1a2a41; 
+  overflow-x: hidden; /* Evita rolagem horizontal indesejada */
+  font-family: 'Arial', sans-serif;
+}
+
+/* Page container for overall layout */
+.inicial-page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  color: white;
+  background: 
+    linear-gradient(rgba(26, 42, 65, 0.7), rgba(26, 42, 65, 0.7)), 
+    url('/imagens/vistoria.png') no-repeat center center fixed; 
+  background-size: cover; 
+}
+
+/* Header styles */
+.inicial-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px; /* Padding padrão */
+  position: relative;
+  z-index: 10;
+}
+
+.inicial-header .logo-section {
+  display: flex;
+  align-items: center;
+  align-items: flex-start;
+}
+
+.inicial-header .header-logo {
+  height: 250px; /* Mantido como está. Se for muito grande em mobile, ajustar via media query */
+  width: auto;
+  margin-bottom: 0;
+}
+
+/* Hamburger menu (visível em todas as telas para este padrão) */
+.hamburger-menu {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 30px;
+  cursor: pointer;
+  z-index: 20;
+  display: block; 
+}
+
+/* Overlay do menu mobile */
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(26, 42, 65, 0.95);
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 50px;
+}
+
+.mobile-menu-overlay .close-menu {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 40px;
+  cursor: pointer;
+}
+
+.mobile-nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  text-align: center;
+  width: 80%;
+  margin-top: 50px;
+}
+
+.mobile-nav-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 24px;
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  transition: color 0.3s ease;
+}
+
+.mobile-nav-links a:last-child {
+  border-bottom: none;
+}
+
+.mobile-nav-links a:hover {
+  color: #87CEEB;
+}
+
+/* Hero Section Styles */
+.hero-section {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px 25px; /* Padding padrão */
+  padding-bottom: 100px; /* Reduzido um pouco para ser mais responsivo */
+  text-align: left;
+}
+
+.hero-section .hero-title {
+  font-size: 3em; /* Use em para ser mais responsivo ao tamanho da fonte base */
+  font-weight: bold;
+  line-height: 1.1;
+  margin-bottom: 15px; /* Ajustado */
+  color: #fff;
+}
+
+.hero-section .hero-title span {
+  color: #87CEEB;
+}
+
+/* Estilo para o subtítulo principal */
+.hero-section .hero-subtitle {
+  font-size: 1.2em; /* Ajustado */
+  color: #87CEEB; 
+  margin-top: -5px; /* Ajustado */
+  margin-bottom: 20px; /* Ajustado */
+  font-weight: 500; 
+  max-width: 90%; /* Mais flexível */
+  text-align: left; /* Garante alinhamento esquerdo mesmo em mobile */
+}
+
+.hero-section .hero-description {
+  font-size: 1em; /* Ajustado */
+  line-height: 1.5;
+  margin-bottom: 25px; /* Ajustado */
+  max-width: 90%; /* Mais flexível */
+  color: #e0e0e0;
+  text-align: left; /* Garante alinhamento esquerdo mesmo em mobile */
+}
+
+.hero-section .agendar-button {
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  padding: 12px 25px; /* Ajustado */
+  border-radius: 8px;
+  font-size: 1em; /* Ajustado */
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.hero-section .agendar-button:hover {
+  background-color: #155cb8;
+  transform: translateY(-2px);
+}
+
+/* Bottom Info Section */
+.bottom-info-section {
+  background-color: #1a2a41; 
+  padding: 60px 25px; /* Padding padrão */
+  text-align: center; 
+  color: white;
+  position: relative;
+  z-index: 5;
+}
+
+.bottom-info-section .bottom-info-title {
+  font-size: 28px;
+  font-weight: bold;
+  line-height: 1.3;
+  margin-bottom: 40px; 
+}
+
+/* Container for info cards */
+.info-cards-container {
+  display: grid; 
+  grid-template-columns: 1fr; /* Padrão mobile: uma coluna */
+  gap: 25px; 
+  max-width: 1200px; 
+  margin:  auto; 
+}
+
+/* Individual info cards */
+.info-card {
+  background-color: #304A66; 
+  padding: 1px;
+  border-radius: 10px; 
+  text-align: center; 
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); 
+  transition: transform 0.3s ease, background-color 0.3s ease; 
+  height: 100%; /* Garante que todos os cards na linha tenham altura igual, se usando grid/flex no pai */
+  display: flex; /* Para centralizar conteúdo verticalmente se houver variação de altura */
+  flex-direction: column;
+  justify-content: flex-start; /* Alinha o conteúdo ao topo */
+  align-items: center; /* Centraliza horizontalmente */
+  overflow:   hidden; /* Garante que nada transborde */
+}
+
+.info-card:hover {
+  transform: translateY(-5px); 
+  background-color: #405A75; 
+}
+
+/* Estilos para os ícones das caixinhas */
+.info-card .card-icon {
+    width: 300px; /* Ajustado */
+    height: auto;
+}
+
+.info-card h3 {
+  font-size: 22px; /* Ajustado */
+  color: #a7ffeb; 
+  margin-bottom: 10px; /* Ajustado */
+}
+
+/* Estilo para o "sub-subtítulo" dentro das caixinhas (Quem Somos) */
+.info-card h4 {
+    font-size: 16px; /* Ajustado */
+    color: #a7ffeb; 
+    margin-bottom: 10px; /* Ajustado */
+    font-weight: 600;
+}
+
+.info-card p {
+  font-size: 15px; /* Ajustado */
+  color: #e0e0e0; 
+  line-height: 1.6;
+}
+
+
+/* Responsive Adjustments */
+@media (max-width: 599px) { /* Breakpoint para celulares pequenos */
+  .inicial-header {
+    padding: 15px 20px;
+  }
+  .inicial-header .header-logo {
+    height: 180px; /* Reduz o tamanho do logo em telas muito pequenas */
+  }
+  .hero-section {
+    padding: 20px 20px;
+    padding-bottom: 80px; /* Mais compacto */
+  }
+  .hero-section .hero-title {
+    font-size: 2.5em; /* Título menor */
+  }
+  .hero-section .hero-subtitle {
+    font-size: 1em; /* Subtítulo menor */
+  }
+  .hero-section .hero-description {
+    font-size: 0.9em; /* Descrição menor */
+  }
+  .hero-section .agendar-button {
+    padding: 10px 20px;
+    font-size: 0.9em;
+  }
+  .bottom-info-section {
+    padding: 10px 10px;
+  }
+  .bottom-info-section .bottom-info-title {
+    font-size: 24px;
+  }
+  .info-card {
+    padding: 20px;
+    min-height: auto; /* Deixa a altura flexível */
+  }
+  .info-card h3 {
+    font-size: 20px;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 1023px) { /* Breakpoint para tablets */
+  .inicial-header {
+    padding: 20px 40px;
+  }
+  .hero-section {
+    padding: 60px 40px;
+    padding-bottom: 120px;
+  }
+  .hero-section .hero-title {
+    font-size: 4em;
+  }
+  .hero-section .hero-subtitle {
+    font-size: 1.5em;
+  }
+  .hero-section .hero-description {
+    font-size: 1.1em;
+  }
+  .bottom-info-section {
+    padding: 50px 40px;
+  }
+  .bottom-info-section .bottom-info-title {
+    font-size: 32px;
+  }
+  .info-cards-container {
+    grid-template-columns: repeat(2, 1fr); /* Duas colunas em tablets */
+  }
+}
+
+@media (min-width: 1024px) { /* Breakpoint para desktops maiores */
+  .inicial-header {
+    padding: 20px 60px;
+  }
+  .hero-section {
+    padding: 80px 60px;
+    padding-bottom: 150px;
+  }
+  .hero-section .hero-title {
+    font-size: 4em; /* Mantido como estava, se quiser maior, ajuste aqui */
+  }
+  .hero-section .hero-subtitle {
+    font-size: 1.8em;
+  }
+  .hero-section .hero-description {
+    font-size: 1.2em;
+  }
+  .bottom-info-section {
+    padding: 80px 60px;
+  }
+  .info-cards-container {
+    grid-template-columns: repeat(4, 1fr); /* Quatro colunas em desktops */
+    gap: 30px; /* Aumenta o gap para desktops */
+  }
+}

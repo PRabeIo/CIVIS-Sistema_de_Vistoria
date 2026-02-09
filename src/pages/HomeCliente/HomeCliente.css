@@ -1,0 +1,255 @@
+/* HomeCliente.css - Estilos iguais ao do Vistoriador */
+
+.navbar .nav-links a {
+  text-decoration: none;
+  color: white !important; /* cor branca no texto */
+  font-weight: 500;
+  font-size: 1.1em;
+  transition: color 0.3s ease;
+}
+
+.navbar .nav-links a:hover {
+    color: #0056b3;
+}
+
+.possible-surveys-section {
+    padding: 40px 60px;
+    background-color: #f8f8f8;
+    margin-top: 20px;
+}
+
+.menu-header-surveys {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.menu-header-surveys h2 {
+    font-size: 2.2em;
+    color: #333;
+    margin: 0;
+}
+
+.search-bar-and-add-surveys {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    padding: 10px 15px 10px 40px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    font-size: 1em;
+    width: 280px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: #007bff;
+}
+
+.search-icon {
+    position: absolute;
+    left: 15px;
+    color: #999;
+    font-size: 1.1em;
+}
+
+.survey-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.survey-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+    text-align: center;
+    background-color: #ffffff;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+}
+
+.survey-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+}
+
+.survey-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+.survey-card h3 {
+    font-size: 1.4em;
+    color: #333;
+    margin: 0 15px 10px;
+    flex-grow: 1;
+}
+
+.survey-card p {
+    color: #777;
+    font-size: 0.95em;
+    margin: 0 15px 20px;
+}
+
+.view-survey-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+    margin-bottom: 15px;
+    width: calc(100% - 30px);
+    align-self: center;
+}
+
+.view-survey-button:hover {
+    background-color: #0056b3;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.pagination a {
+    text-decoration: none;
+    color: #007bff;
+    padding: 10px 15px;
+    border: 1px solid #007bff;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-weight: 600;
+    min-width: 40px;
+    text-align: center;
+}
+
+.pagination a.active,
+.pagination a:hover:not(.active) {
+    background-color: #007bff;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .possible-surveys-section {
+        padding: 30px 20px;
+    }
+
+    .menu-header-surveys {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .search-input {
+        width: 100%;
+    }
+
+    .survey-cards-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px 15px;
+    }
+
+    .navbar .nav-links {
+        gap: 15px;
+    }
+
+    .main-content {
+        flex-direction: column;
+        padding: 30px 20px;
+    }
+
+    .main-content .imagem img {
+        max-width: 100%;
+    }
+
+    .menu-header-surveys h2 {
+        font-size: 1.8em;
+    }
+}
+
+.botao-central-container {
+  display: flex;
+  justify-content: flex-start;
+  padding-left: 80px; /* Ajusta o quanto vai pra direita */
+  margin: 30px 0;
+}
+
+.botao-central {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 25px;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.botao-central:hover {
+  background-color: #0056b3;
+}
+
+.botao-validar {
+  background-color: #fd7e14; /* Verde só pra diferenciar, se quiser deixar igual ao azul, troque */
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 25px;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-left: 20px; /* Distância extra pra direita */
+}
+
+.botao-validar:hover {
+  background-color: #e86c00;
+}
+.login-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%; /* ou ajuste para 'fit-content' se quiser mais compacto */
+  max-width: 45 0px;
+  text-align: center;
+}
+
+.login-button:hover {
+  background-color: #0056b3;
+}
+

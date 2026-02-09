@@ -1,0 +1,366 @@
+/* esse .css reutiliza a maioria dos estilos de home.css */
+
+
+
+/* Reset */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+}
+
+/* Navbar */
+.navbar {
+  background-color: #004080;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+}
+
+.logo {
+  font-size: 26px;
+  font-weight: bold;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav-links a:hover {
+  color: #ffcc00;
+}
+
+.logout-button {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background-color: #cc0000;
+}
+
+/* Conteúdo Principal */
+.main-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 50px;
+  flex-wrap: wrap;
+}
+
+.texto h1 {
+  font-size: 2.8rem;
+  color: #001f3f;
+}
+
+.texto h1 span {
+  color: #ff9900;
+}
+
+.texto p {
+  margin: 20px 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.imagem img {
+  width: 350px;
+  max-width: 100%;
+}
+
+/* Atalhos */
+.atalhos {
+  background-color: #e6f0fa;
+  padding: 40px;
+  text-align: center;
+  display: flex; /* Adicionado para centralizar a seção inteira */
+  flex-direction: column; /* Adicionado para centralizar a seção inteira */
+  align-items: center; /* Adicionado para centralizar a seção inteira */
+}
+
+.atalhos h2 {
+  color: #004080;
+  margin-bottom: 30px;
+}
+
+.atalhos-cards {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+  align-items: stretch; /* Alinha itens flexíveis para ter a mesma altura da linha */
+}
+
+.card {
+  background-color: white;
+  border-radius: 16px;
+  padding: 20px;
+  flex-basis: 180px;
+  min-width: 160px;
+  max-width: 200px;
+  min-height: 180px; /* Garante altura mínima para os cards */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center; /* Centraliza o conteúdo verticalmente dentro do card */
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card img {
+  width: 50px;
+  margin-bottom: 10px;
+}
+
+.card h3 {
+  color: #004080;
+  font-size: 1rem;
+  width: 100%;
+  text-align: center; /* Garante centralização do texto do h3 */
+}
+
+
+/* --- ESTILOS DE ADMINISTRAÇÃO (ADICIONE AQUI NO SEU home.css) --- */
+
+/* Estilos Gerais para Páginas de Administração */
+.admin-page-container {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background-color: #f0f4f8; /* Fundo mais suave */
+  min-height: calc(100vh - 70px);
+  font-family: 'Roboto', sans-serif; /* Fonte moderna */
+  color: #333;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.admin-header h1 {
+  color: #2c3e50; /* Azul acinzentado */
+  font-size: 2.2rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.admin-action-button {
+  background-color: #3498db; /* Azul vibrante */
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admin-action-button:hover {
+  background-color: #2980b9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilos para Listagens (Funcionários, Imóveis, Empreendimentos, Clientes, Vistorias) */
+.lista-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.lista-tabela th,
+.lista-tabela td {
+  padding: 16px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.lista-tabela th {
+  background-color: #f5f5f5;
+  color: #555;
+  font-weight: 600;
+}
+
+.lista-tabela tr:last-child td {
+  border-bottom: none;
+}
+
+.lista-tabela tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.lista-tabela .acoes-botoes button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 12px;
+  font-size: 1.2rem;
+  padding: 8px;
+  border-radius: 6px;
+  transition: color 0.3s ease;
+}
+
+.lista-tabela .acoes-botoes .btn-editar {
+  color: #3498db;
+}
+
+.lista-tabela .acoes-botoes .btn-editar:hover {
+  color: #2980b9;
+}
+
+.lista-tabela .acoes-botoes .btn-excluir {
+  color: #e74c3c;
+}
+
+.lista-tabela .acoes-botoes .btn-excluir:hover {
+  color: #c0392b;
+}
+
+/* Estilos para Formulários (Cadastrar/Editar) */
+.form-container {
+  background-color: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 500;
+  color: #444;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea { /* Adicionado textarea para estilização */
+  width: calc(100% - 24px);
+  padding: 12px;
+  border: 1px solid #bdc3c7;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus { /* Adicionado textarea para estilização */
+  outline: none;
+  border-color: #3498db; /* Destaque ao focar */
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.form-actions button {
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: none;
+}
+
+.form-actions .btn-salvar {
+  background-color: #3498db;
+  color: white;
+}
+
+.form-actions .btn-salvar:hover {
+  background-color: #2980b9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.form-actions .btn-cancelar {
+  background-color: #7f8c8d;
+  color: white;
+}
+
+.form-actions .btn-cancelar:hover {
+  background-color: #6a7374;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-excluir-form { /* Botão de excluir dentro do formulário de edição */
+  background-color: #e74c3c;
+  color: white;
+  margin-left: auto; /* Para empurrar para a direita */
+}
+
+.btn-excluir-form:hover {
+  background-color: #c0392b;
+  box-shadow: 0 4px 8px rgba
+}
+
+/* Padroniza tamanho dos inputs no formulário */
+.form-container input[type="text"],
+.form-container input[type="email"],
+.form-container input[type="tel"],
+.form-container input[type="password"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+form.form-container .form-group {
+  margin-bottom: 10px; /* Reduzido o espaçamento entre campos */
+}
+
+form.form-container input {
+  height: 40px;
+  font-size: 16px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 5px;
+}
+
+
+.form-container {
+  max-width: 500px; /* ⬅️ ajuste aqui para deixar mais fino */
+  margin: 0 auto;
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+

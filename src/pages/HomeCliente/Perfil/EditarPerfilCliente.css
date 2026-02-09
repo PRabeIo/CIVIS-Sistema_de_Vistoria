@@ -1,0 +1,240 @@
+/* PERFIL VISTORIADOR - SEGUINDO PADRÃO HOME */
+
+/* Layout base */
+.perfil-container {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f8f8f8;
+  min-height: 100vh;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #004080;
+  color: white;
+  padding: 15px 20px;
+  position: relative;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #cce4ff;
+}
+
+/* Botão logout */
+.logout-button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #d32f2f;
+}
+
+/* Mobile logout */
+.mobile-logout {
+  display: none;
+}
+
+/* Botão hamburguer */
+.menu-toggle {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.8rem;
+  display: none;
+  cursor: pointer;
+}
+
+/* Main content */
+.main-content {
+  padding: 40px 20px;
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 30px;
+}
+
+.main-content h1 {
+  font-size: 2rem;
+  color: #004080;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Foto */
+.profile-image-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.profile-image {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #007bff;
+}
+
+.no-photo {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background-color: #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #555;
+  font-weight: bold;
+  font-size: 0.9rem;
+  border: 3px dashed #aaa;
+}
+
+/* Informações */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  font-size: 1rem;
+  margin-top: 20px;
+  color: white;
+  font-weight: bold;
+  text-align: left;
+}
+
+.info-grid div {
+  background-color: #f1f5fb;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #dce4ec;
+}
+
+.info-grid div strong {
+  color: #a8d0ff;
+  font-weight: bold;
+  margin-right: 4px;
+}
+
+/* Inputs padronizados */
+.info-grid > div {
+  display: flex;
+  flex-direction: column;
+  background-color: #f1f5fb;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #dce4ec;
+}
+
+.info-grid > div > strong {
+  color: #0056b3;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 1rem;
+  color: #333;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.input-field:focus {
+  border-color: #007bff;
+}
+
+.info-grid > div input[type="file"] {
+  margin-top: 6px;
+}
+
+/* Botão editar */
+.actions {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.edit-button {
+  background-color: #007bff;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.edit-button:hover {
+  background-color: #0056b3;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 65px;
+    right: 20px;
+    background-color: #004080;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+    z-index: 10;
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .mobile-logout {
+    display: block;
+  }
+
+  .desktop-logout {
+    display: none;
+  }
+
+  .main-content {
+    padding: 30px 15px;
+    margin-top: 20px;
+  }
+}
+

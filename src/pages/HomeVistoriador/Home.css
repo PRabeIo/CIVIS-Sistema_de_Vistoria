@@ -1,0 +1,213 @@
+/* home.css - Focused and Organized CSS for the new sections */
+
+/* --- Navbar Link Colors (Modify Existing Rules) --- */
+/*
+  Find this rule in your home.css (or similar):
+  .navbar .nav-links a { ... }
+
+  Modify its 'color' property.
+  Example:
+*/
+.navbar .nav-links a {
+  text-decoration: none;
+  color: white !important; /* cor branca no texto */
+  font-weight: 500;
+  font-size: 1.1em;
+  transition: color 0.3s ease;
+}
+
+.navbar .nav-links a:hover {
+    color: #0056b3;
+}
+
+
+/* --- Section: Vistorias Disponíveis (New Rules) --- */
+
+.possible-surveys-section {
+    padding: 40px 60px; /* Top/Bottom padding, Left/Right padding */
+    background-color: #f8f8f8; /* A light background to separate it from other sections */
+    margin-top: 20px; /* Space from the section above (your main-content) */
+}
+
+/* Header for the Vistorias section */
+.menu-header-surveys {
+    display: flex;
+    justify-content: space-between; /* Pushes H2 to left, Search to right */
+    align-items: center;
+    margin-bottom: 30px; /* Space below the header */
+    flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+    gap: 20px; /* Space between elements when wrapped */
+}
+
+.menu-header-surveys h2 {
+    font-size: 2.2em; /* Larger title */
+    color: #333; /* Darker text color */
+    margin: 0; /* Remove default margins */
+}
+
+/* Search Bar Wrapper */
+.search-bar-and-add-surveys {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between search and (if any) future buttons */
+    flex-wrap: wrap; /* Allow wrapping of search input */
+}
+
+.search-input-wrapper {
+    position: relative; /* For positioning the icon */
+    display: flex; /* To align input and icon */
+    align-items: center;
+}
+
+.search-input {
+    padding: 10px 15px 10px 40px; /* Top/Bottom, Right, Bottom, Left (for icon) */
+    border: 1px solid #ddd; /* Light grey border */
+    border-radius: 25px; /* Fully rounded corners */
+    font-size: 1em;
+    width: 280px; /* A good default width */
+    outline: none; /* Remove outline on focus */
+    transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: #007bff; /* Highlight border on focus */
+}
+
+.search-icon {
+    position: absolute;
+    left: 15px; /* Position icon inside input */
+    color: #999; /* Grey icon color */
+    font-size: 1.1em;
+}
+
+/* Cards Container (Grid Layout) */
+.survey-cards-container {
+    display: grid;
+    /* Responsive grid: Min width 300px per card, fills available space */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px; /* Space between cards */
+    margin-bottom: 40px; /* Space below the cards before pagination */
+}
+
+/* Individual Survey Card */
+.survey-card {
+    border: 1px solid #e0e0e0; /* Light border */
+    border-radius: 12px; /* Rounded corners for cards */
+    overflow: hidden; /* Ensures image corners are rounded with card */
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08); /* Soft shadow for depth */
+    text-align: center;
+    background-color: #ffffff; /* White background for cards */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    display: flex; /* Flex to stack contents vertically */
+    flex-direction: column;
+}
+
+.survey-card:hover {
+    transform: translateY(-5px); /* Subtle lift effect on hover */
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15); /* Stronger shadow on hover */
+}
+
+.survey-image {
+    width: 100%;
+    height: 180px; /* Fixed height for consistency */
+    object-fit: cover; /* Crops image to fit without distortion */
+    margin-bottom: 15px; /* Space below image */
+}
+
+.survey-card h3 {
+    font-size: 1.4em;
+    color: #333;
+    margin: 0 15px 10px; /* Top 0, Left/Right 15px, Bottom 10px */
+    flex-grow: 1; /* Allows title to take vertical space */
+}
+
+.survey-card p {
+    color: #777; /* Softer text color for description */
+    font-size: 0.95em;
+    margin: 0 15px 20px; /* Space around description */
+}
+
+.view-survey-button {
+    background-color: #007bff; /* Blue button color */
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px; /* Rounded button */
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+    margin-bottom: 15px; /* Space from bottom of card */
+    width: calc(100% - 30px); /* Full width minus padding (15px left + 15px right) */
+    align-self: center; /* Centers the button horizontally */
+}
+
+.view-survey-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center; /* Center the pagination links */
+    gap: 12px; /* Space between numbers/arrows */
+    margin-top: 20px; /* Space above pagination */
+}
+
+.pagination a {
+    text-decoration: none;
+    color: #007bff; /* Blue links */
+    padding: 10px 15px;
+    border: 1px solid #007bff; /* Blue border */
+    border-radius: 6px; /* Slightly rounded corners */
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-weight: 600; /* Bolder text */
+    min-width: 40px; /* Ensures consistent size for single digits */
+    text-align: center;
+}
+
+.pagination a.active,
+.pagination a:hover:not(.active) {
+    background-color: #007bff;
+    color: white;
+}
+
+/* --- Basic Responsive Adjustments (Optional but Recommended) --- */
+@media (max-width: 768px) {
+    .possible-surveys-section {
+        padding: 30px 20px;
+    }
+
+    .menu-header-surveys {
+        flex-direction: column;
+        align-items: flex-start; /* Align header items to start */
+    }
+
+    .search-input {
+        width: 100%; /* Full width for search on small screens */
+    }
+
+    .survey-cards-container {
+        grid-template-columns: 1fr; /* Stack cards vertically on small screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px 15px;
+    }
+    .navbar .nav-links {
+        gap: 15px;
+    }
+    .main-content {
+        flex-direction: column;
+        padding: 30px 20px;
+    }
+    .main-content .imagem img {
+        max-width: 100%;
+    }
+    .menu-header-surveys h2 {
+        font-size: 1.8em;
+    }
+}

@@ -1,0 +1,182 @@
+/* ReagendamentoVistoria.css */
+
+/* Re-use existing navbar styles if they are global or import them */
+/* If your navbar styles are in home.css, ensure home.css is linked in your App.js
+   or import relevant parts here if home.css is not globally applied.
+   For this example, I'm assuming a basic navbar styling already exists and matches. */
+
+.reschedule-page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f0f2f5; /* Light background for the whole page */
+}
+
+.reschedule-main-content {
+    flex-grow: 1; /* Allows content to take up remaining space */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px; /* Padding around the form card */
+}
+
+.reschedule-form-card {
+    background-color: #ffffff;
+    padding: 30px 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px; /* Max width for the form card */
+    box-sizing: border-box; /* Include padding in width */
+}
+
+.reschedule-form-card h1 {
+    font-size: 2em;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.reschedule-form-card .current-details {
+    font-size: 1.1em;
+    color: #555;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 500;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 1em;
+    color: #333;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.form-group input[type="date"],
+.form-group input[type="time"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1em;
+    color: #333;
+    box-sizing: border-box; /* Include padding in width */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+.form-group textarea {
+    resize: vertical; /* Allow vertical resizing of textarea */
+    min-height: 80px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 15px; /* Space between buttons */
+    margin-top: 30px;
+}
+
+.submit-button,
+.cancel-button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.submit-button {
+    background-color: #28a745; /* Green for submit */
+    color: white;
+}
+
+.submit-button:hover:not(:disabled) {
+    background-color: #218838;
+    transform: translateY(-2px);
+}
+
+.submit-button:disabled {
+    background-color: #a0d9b5; /* Lighter green when disabled */
+    cursor: not-allowed;
+}
+
+.cancel-button {
+    background-color: #6c757d; /* Grey for cancel */
+    color: white;
+}
+
+.cancel-button:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
+.error-message {
+    color: #dc3545; /* Red for error messages */
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.success-message {
+    color: #28a745; /* Green for success messages */
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-size: 1.2em;
+    color: #555;
+}
+
+/* --- Media Queries for Responsiveness --- */
+@media (max-width: 768px) {
+    .reschedule-form-card {
+        padding: 25px 30px;
+    }
+    .reschedule-form-card h1 {
+        font-size: 1.8em;
+    }
+    .form-actions {
+        flex-direction: column; /* Stack buttons vertically */
+        gap: 10px;
+    }
+    .submit-button, .cancel-button {
+        width: 100%; /* Full width buttons */
+    }
+}
+
+@media (max-width: 480px) {
+    .reschedule-form-card {
+        padding: 20px;
+    }
+    .reschedule-form-card h1 {
+        font-size: 1.5em;
+    }
+}
