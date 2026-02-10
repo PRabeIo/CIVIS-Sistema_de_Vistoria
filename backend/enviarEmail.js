@@ -1,30 +1,27 @@
 const nodemailer = require("nodemailer");
-require("dotenv").config();
 
-// Transporter com host + porta 587 + secure false
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // STARTTLS
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+let transporter;
 
-// Teste de conexão SMTP
-transporter.verify(function (error, success) {
-  if (error) {
-    console.error("Erro na configuração do e-mail:", error);
-  } else {
-    console.log("Servidor de e-mail pronto para envio.");
-  }
-});
+// 🔹 Cria o transporter Ethereal automaticamente
+async function criarTransporter() {
+  const testAccount = await nodemailer.createTestAccount();
+
+  transporter = nodemailer.createTransport({
+    host: "smtp.ethereal.email",
+    port: 587,
+    auth: {
+      user: testAccount.user,
+      pass: testAccount.pass,
+    },
+  });
+
+  console.log("Ethereal pronto para envio de e-mails.");
+}
 
 // Envia o relatório técnico com anexo
 async function enviarEmailRelatorio(destino, nomeArquivo, caminhoDoArquivo) {
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: '"Sistema CIVIS" <no-reply@civis.com>',
     to: destino,
     subject: "Relatório de Vistoria",
     text: "Segue em anexo o relatório gerado.",
@@ -38,7 +35,7 @@ async function enviarEmailRelatorio(destino, nomeArquivo, caminhoDoArquivo) {
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log("Email de relatório enviado:", info.response);
+    console.log("Ver email em:", nodemailer.getTestMessageUrl(info));
   } catch (error) {
     console.error("Erro ao enviar e-mail de relatório:", error);
     throw error;
@@ -77,7 +74,7 @@ Sistema CIVIS`;
   }
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: '"Sistema CIVIS" <no-reply@civis.com>',
     to: para,
     subject,
     text,
@@ -85,14 +82,14 @@ Sistema CIVIS`;
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log("Email de agendamento enviado:", info.response);
+    console.log("Ver email em:", nodemailer.getTestMessageUrl(info));
   } catch (error) {
     console.error("Erro ao enviar e-mail de agendamento:", error);
     throw error;
   }
 }
 
-// ✅ Novo: Envia e-mail ao vistoriador quando o cliente solicita vistoria
+// Envia e-mail ao vistoriador quando o cliente solicita vistoria
 async function enviarEmailSolicitacaoVistoria({ para, nomeCliente, endereco }) {
   const subject = "Solicitação de Vistoria Recebida";
   const text = `Olá,
@@ -105,7 +102,7 @@ Atenciosamente,
 Sistema CIVIS`;
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: '"Sistema CIVIS" <no-reply@civis.com>',
     to: para,
     subject,
     text,
@@ -113,7 +110,7 @@ Sistema CIVIS`;
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log("Email de solicitação de vistoria enviado:", info.response);
+    console.log("Ver email em:", nodemailer.getTestMessageUrl(info));
   } catch (error) {
     console.error("Erro ao enviar e-mail de solicitação de vistoria:", error);
     throw error;
@@ -121,7 +118,8 @@ Sistema CIVIS`;
 }
 
 module.exports = {
+  criarTransporter,
   enviarEmailRelatorio,
   enviarEmailAgendamento,
-  enviarEmailSolicitacaoVistoria, // nova função exportada
+  enviarEmailSolicitacaoVistoria,
 };

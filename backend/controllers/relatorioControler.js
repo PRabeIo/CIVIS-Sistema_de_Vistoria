@@ -1,17 +1,41 @@
 const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
-const OpenAI = require("openai");
-const nodemailer = require("nodemailer");
 const db = require("../db");
 const fetch = require("node-fetch");
 require("dotenv").config();
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
+/* -------- GERADOR DE TEXTO -------- */
+function gerarTextoRelatorio(comodos) {
+  let texto = "";
+
+  for (const [nomeComodo, dados] of Object.entries(comodos)) {
+    if (!dados || dados === "0" || dados === "N/A") continue;
+
+    texto += `\nCÔMODO: ${nomeComodo.toUpperCase()}\n`;
+
+    for (const [item, valor] of Object.entries(dados)) {
+      if (!valor || valor === "0" || valor === "N/A") continue;
+      texto += `• ${item}: ${valor}.\n`;
+    }
+
+    texto += "\n";
+  }
+
+  texto += `
+CONCLUSÃO TÉCNICA:
+
+Com base nas observações realizadas durante a vistoria, o imóvel apresenta as condições descritas acima para cada cômodo analisado.
+Recomenda-se a correção dos pontos observados para garantir a integridade estrutural, funcional e estética do imóvel.
+
+Este relatório reflete fielmente o estado do imóvel no momento da vistoria.
+`;
+
+  return texto;
+}
 
 async function gerarRelatorio(req, res) {
-  
-  const { idVistoria, CPFVistoriador } = req.body;
+  const { idVistoria } = req.body;
   const comodos = JSON.parse(req.body.comodos || "{}");
 
   const data = new Date();
@@ -29,7 +53,6 @@ async function gerarRelatorio(req, res) {
   }
 
   try {
-    // Corrigido: cep está na tabela 'empreendimento'
     const [detalhes] = await db`
       SELECT
         e.cep,
@@ -45,31 +68,7 @@ async function gerarRelatorio(req, res) {
     `;
 
     const localizacaoFormatada = `CEP: ${detalhes.cep}, ${detalhes.nomeempreendimento}, Bloco: ${detalhes.bloco}, N°: ${detalhes.numero}`;
-
-    const prompt = `
-Gere um relatório técnico claro e objetivo com base nas informações abaixo:
-
-Informações dos cômodos vistoriados:
-${JSON.stringify(comodos, null, 2)}
-
-Organize as informações por cômodo, detalhe cada aspecto técnico (estrutura, pintura, instalações, piso, telhado, etc.), enumere e explique objetivamente (caso o comodo for "0" ou " " ou "N/A" não coloque ele no relatório).
-
-No final, inclua uma conclusão com observações gerais, recomendações técnicas e considerações relevantes com base no estado geral do imóvel.
-
-Não inclua assinatura, cabeçalho ou rodapé.`;
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: "Você é um engenheiro civil que escreve relatórios técnicos claros, objetivos e bem estruturados.",
-        },
-        { role: "user", content: prompt },
-      ],
-    });
-
-    const texto = response.choices[0].message.content;
+    const texto = gerarTextoRelatorio(comodos);
 
     const nomeArquivo = `relatorio_${Date.now()}.pdf`;
     const caminho = path.join(__dirname, "../relatorios", nomeArquivo);
@@ -132,44 +131,11 @@ Não inclua assinatura, cabeçalho ou rodapé.`;
 
     stream.on("finish", async () => {
       try {
-        const [dados] = await db`
-          SELECT c.email AS email_cliente, f.email AS email_vistoriador
-          FROM vistoria v
-          JOIN cliente c ON v.idcliente = c.idcliente
-          JOIN funcionario f ON v.idvistoriador = f.id
-          WHERE v.idvistoria = ${idVistoria}
-        `;
-
-        const transporter = nodemailer.createTransport({
-          service: "gmail",
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-          },
-        });
-
-        await transporter.sendMail({
-          from: process.env.EMAIL_USER,
-          to: dados.email_cliente,
-          subject: "Relatório Técnico de Vistoria",
-          text: "Segue em anexo o relatório técnico da sua vistoria.",
-          attachments: [{ filename: nomeArquivo, path: caminho }],
-        });
-
-        await transporter.sendMail({
-          from: process.env.EMAIL_USER,
-          to: dados.email_vistoriador,
-          subject: "Relatório Técnico de Vistoria",
-          text: "Segue em anexo o relatório técnico gerado.",
-          attachments: [{ filename: nomeArquivo, path: caminho }],
-        });
-
         const storageUrl = "https://sictbgrpkhacrukvpopz.supabase.co/storage/v1/object";
-        const bucketName = "relatorios";
         const filePath = `relatorios/${nomeArquivo}`;
         const pdfBuffer = fs.readFileSync(caminho);
 
-        const uploadResponse = await fetch(`${storageUrl}/${filePath}`, {
+        await fetch(`${storageUrl}/${filePath}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/pdf",
@@ -177,10 +143,6 @@ Não inclua assinatura, cabeçalho ou rodapé.`;
           },
           body: pdfBuffer,
         });
-
-        if (!uploadResponse.ok) {
-          return res.status(500).json({ erro: "Erro ao subir PDF para Supabase" });
-        }
 
         const publicUrl = `${storageUrl}/public/${filePath}`;
 
@@ -190,22 +152,14 @@ Não inclua assinatura, cabeçalho ou rodapé.`;
           WHERE idvistoria = ${idVistoria}
         `;
 
-        await db`
-          UPDATE imovel
-          SET vistoriasrealizadas = vistoriasrealizadas + 1
-          WHERE idimovel = (
-            SELECT idimovel FROM vistoria WHERE idvistoria = ${idVistoria}
-          )
-        `;
-
         res.json({
-          mensagem: "Relatório gerado e enviado com sucesso.",
+          mensagem: "Relatório gerado com sucesso.",
           arquivo: nomeArquivo,
           url: publicUrl,
         });
-      } catch (emailError) {
-        console.error("Erro no envio de e-mails:", emailError);
-        res.status(500).json({ erro: "Erro ao enviar e-mail com o relatório" });
+      } catch (err) {
+        console.error("Erro ao enviar para o Supabase:", err);
+        res.status(500).json({ erro: "Erro ao salvar relatório" });
       }
     });
   } catch (err) {

@@ -1,6 +1,5 @@
 # CIVIS – Sistema de Gestão de Vistorias
 
-![Build Status](https://github.com/bkauan099/G2_CONSTRUTORA/actions/workflows/main.yml/badge.svg)
 ## Sumário 
 
 - [📌 Visão Geral](#-visão-geral)
@@ -8,7 +7,6 @@
 - [🚀 Como rodar o projeto localmente](#-como-rodar-o-projeto-localmente)
 - [🧱 Stack Tecnológico](#-stack-tecnológico)
 - [🧪 Status da Build](#-status-da-build)
-- [📄 Anexo A – Licença de Uso](#-anexo-a--licença-de-uso)
 
 ## 📌 Visão Geral
 
@@ -127,8 +125,7 @@ Requisitos:
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/PeepT/CIVIS-Sistema_de_Construtora.git
-cd CIVIS
+git clone https://github.com/PeepT/CIVIS-Sistema_de_Vistoria.git
 ```
 
 ### 2. Instale as dependências do frontend/backend
@@ -142,8 +139,11 @@ npm install
 Crie um arquivo `.env` com as credenciais do seu projeto no Supabase:
 
 ```env
-SUPABASE_URL=https://xxxxxxxx.supabase.co
-SUPABASE_KEY=your-public-anon-key
+DATABASE_URL=postgresql://postgres:xxxxxxxxx@db.xxxxxxxxxxxxxx.supabase.co:5432/postgres
+PORT=3001
+SUPABASE_SERVICE_ROLE_KEY=sua-public-anon-key
+
+OBS: O servidor usa a porta definida como 3001 para desenvolvimento local
 ```
 
 ### 4. Inicie a aplicação
@@ -157,7 +157,7 @@ O sistema estará acessível por padrão em `http://localhost:5432`
 
 Inicie o backend: 
 
-No terminal, navegue até a pasta do backend:  
+Em outro terminal, navegue até a pasta do backend:  
 ```bash
 cd backend  
 
@@ -182,8 +182,7 @@ node server.js
 
 ## 🧪 Status da Build
 
-> O sistema utiliza GitHub Actions para CI/CD.
-> Verifique o status da última build acima através do badge.
+> O sistema está funcional, mas necessita de futuras atualizações.
 
 ---
 
