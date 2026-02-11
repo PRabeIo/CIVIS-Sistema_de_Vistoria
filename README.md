@@ -125,7 +125,7 @@ Requisitos:
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/PeepT/CIVIS-Sistema_de_Vistoria.git
+git clone https://github.com/PRabeIo/CIVIS-Sistema_de_Vistoria
 ```
 
 ### 2. Instale as dependências do frontend/backend
@@ -182,7 +182,10 @@ node server.js
 
 ## 🧪 Status da Build
 
-> O sistema está funcional, mas necessita de futuras atualizações.
+> O sistema está funcional, mas ainda há futuras atualizações que eu pretendo fazer.
+> Anteriormente o sistema enviava email diretamente pros emails cadastrados no .env, mas acabei removendo a função pois o SMTP do google parou de funcionar.
+> Solução futura pra isso será colocar outro sistema, e enviar diretamente para os emails do cliente e vistoriador, e não um email fixo (como eu havia feito anteriormente para teste).
+> Também foram feito diagramas de casos de uso, diagramas de classe, diagramas de atividade, apenas preferi não subir junto.
 
 ---
 
