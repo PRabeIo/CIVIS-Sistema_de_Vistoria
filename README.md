@@ -31,12 +31,12 @@ O sistema utiliza **React.js** no frontend, **Node.js (Express)** no backend e *
 
 ### Demonstração do Login e Cadastro
 <div align="center">
-  <video src="[cadastro e login.webm](https://github.com/user-attachments/assets/fba8fe24-4518-475e-9ff3-b155f94e9f49)" width="100%" autoplay loop muted playsinline></video>
+  <video src="https://github.com/user-attachments/assets/fba8fe24-4518-475e-9ff3-b155f94e9f49" width="100%" autoplay loop muted playsinline></video>
 </div>
 
 ### Demonstração da Realização da Vistoria
 <div align="center">
-  <video src="[Vistoria.webm](https://github.com/user-attachments/assets/9b95549a-d5cf-4849-a208-ea7d552f44eb)" width="100%" autoplay loop muted playsinline></video>
+  <video src="https://github.com/user-attachments/assets/9b95549a-d5cf-4849-a208-ea7d552f44eb" width="100%" autoplay loop muted playsinline></video>
 </div>
 
 ## 📐 Diagramas do Sistema
