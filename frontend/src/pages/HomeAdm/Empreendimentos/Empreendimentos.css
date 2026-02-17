@@ -1,0 +1,434 @@
+/* Estilos base do navbar e container */
+.home-container {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* Navbar */
+.navbar {
+  background-color: #004080;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  position: relative;
+}
+
+.logo {
+  font-size: 26px;
+  font-weight: bold;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav-links a:hover {
+  color: #ffcc00;
+}
+
+.logout-button {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background-color: #cc0000;
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: white;
+  cursor: pointer;
+}
+
+.mobile-logout {
+  display: none;
+}
+.desktop-logout {
+  display: inline-block;
+}
+
+/* Conteúdo principal */
+.admin-page-container {
+  padding: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.titulo-centralizado {
+  text-align: center;
+  font-size: 2.2rem;
+  color: #004080 !important;
+  margin-bottom: 20px;
+}
+
+.admin-action-button {
+  background-color: #135ea5 !important;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.admin-action-button:hover {
+  background-color: #004080 !important;
+}
+
+.sem-registros {
+  text-align: center;
+  margin-top: 50px;
+  color: #555;
+  font-size: 1.2rem;
+}
+
+/* Estilos da tabela */
+.table-responsive {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+.lista-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.lista-tabela th, 
+.lista-tabela td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.lista-tabela th {
+  background-color: #004080;
+  color: white;
+  font-weight: bold;
+}
+
+.lista-tabela tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* Estilos dos botões de ação */
+.acoes-botoes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-editar, 
+.btn-excluir,
+.btn-ver-imoveis {
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  border: none;
+  color: rgb(255, 255, 255);
+  white-space: nowrap;
+}
+
+.btn-editar {
+  background-color: #007bff;
+}
+
+.btn-editar:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+.btn-excluir {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+.btn-excluir:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+}
+
+.btn-ver-imoveis {
+  background-color: #135ea5 !important;
+}
+
+.btn-ver-imoveis:hover {
+  background-color: #138496;
+  transform: translateY(-2px);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  .nav-links {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background-color: #004080;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 200px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    gap: 10px;
+    padding: 0 15px;
+    z-index: 99;
+  }
+
+  .nav-links.open {
+    max-height: 500px;
+    padding: 15px;
+  }
+
+  .desktop-logout {
+    display: none;
+  }
+  .mobile-logout {
+    display: block;
+    margin-top: 10px;
+  }
+
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .lista-tabela {
+    display: block;
+  }
+  
+  .lista-tabela thead {
+    display: none;
+  }
+  
+  .lista-tabela tr {
+    display: block;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .lista-tabela td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    text-align: right;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .lista-tabela td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    margin-right: 15px;
+    color: #004080;
+  }
+  
+  .mobile-hidden {
+    display: none;
+  }
+  
+  .acoes-botoes {
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .acoes-botoes {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .btn-editar, 
+  .btn-excluir,
+  .btn-ver-imoveis {
+    width: 100%;
+    padding: 10px;
+  }
+  
+  .admin-page-container {
+    padding: 15px;
+  }
+  
+  .titulo-centralizado {
+    font-size: 1.8rem;
+  }
+}
+
+/* =========================
+   BOTÕES AÇÕES - ESTILO PRO
+   ========================= */
+
+.acoes-botoes {
+  display: flex !important;
+  gap: 10px !important; /* pequeno espaço entre eles */
+}
+
+/* estilo base dos botões */
+.btn-ver-imoveis,
+.btn-excluir {
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15) !important;
+  transition: all 0.25s ease !important;
+  transform: translateY(0px) !important;
+}
+
+/* hover com leve subida */
+.btn-ver-imoveis:hover,
+.btn-excluir:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25) !important;
+}
+
+/* clique efeito pressionado */
+.btn-ver-imoveis:active,
+.btn-excluir:active {
+  transform: translateY(0px) !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+/* =========================
+   TIPOGRAFIA MAIS PROFISSIONAL
+   ========================= */
+
+/* título azul principal */
+.titulo-centralizado {
+  font-size: 2.6rem !important;   /* maior */
+  font-weight: 700 !important;
+  letter-spacing: -0.5px !important;
+  margin-bottom: 10px !important; /* menos espaço abaixo */
+  color: #004080 !important;
+}
+
+/* cabeçalhos da tabela */
+.lista-tabela th {
+  font-size: 1.05rem !important;
+  letter-spacing: 0.3px !important;
+}
+
+/* textos normais da tabela */
+.lista-tabela td {
+  font-size: 0.95rem !important;
+  color: #1f2937 !important;   /* cinza escuro elegante */
+  font-weight: 500 !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+/* remove sensação "apagada" */
+.lista-tabela td span,
+.lista-tabela td {
+  opacity: 1 !important;
+}
+
+/* menos espaçamento vertical entre linhas */
+.lista-tabela tr {
+  line-height: 1.2 !important;
+}
+
+/* nome do empreendimento mais destacado */
+.lista-tabela td:first-child {
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  color: #0f172a !important;
+}
+
+/* =========================
+   MOBILE: força cor do VALOR (sem afetar botões)
+   ========================= */
+
+@media (max-width: 768px) {
+  /* label azul */
+  .lista-tabela td::before {
+    color: #0b4f94 !important;
+    font-weight: 700 !important;
+    font-size: 1.15rem !important;
+    margin-bottom: 2px !important;
+  }
+
+  /* VALOR (texto real do td) */
+  .lista-tabela td:not(.acoes-botoes) {
+    color: #1f2937 !important;
+    font-weight: 500 !important;
+    font-size: 1rem !important;
+    opacity: 1 !important;
+  }
+}
+
+/* =========================
+   THUMB (SEM <img>) - IMUNE A CSS GLOBAL
+   ========================= */
+
+.lista-tabela .emp-nome-wrap{
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  align-items: flex-start !important;
+}
+
+.lista-tabela .emp-thumb{
+  width: 170px !important;
+  height: 95px !important;
+  max-height: 95px !important;
+
+  border-radius: 10px !important;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15) !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
+
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* Mobile: thumb maior e responsiva */
+@media (max-width: 768px){
+  .lista-tabela td[data-label="Nome"]{
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+    gap: 8px !important;
+  }
+
+  .lista-tabela .emp-thumb{
+    width: 100% !important;
+    max-width: 320px !important;
+    height: 140px !important;
+    max-height: 140px !important;
+  }
+}

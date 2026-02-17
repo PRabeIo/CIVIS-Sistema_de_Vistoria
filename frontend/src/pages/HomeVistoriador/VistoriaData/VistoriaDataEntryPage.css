@@ -1,0 +1,278 @@
+.vistoria-data-entry-container {
+  padding: 30px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  height: auto;
+  padding-bottom: 100px;
+  font-family: Arial, sans-serif;
+  color: #333;
+  max-width: 500px; /* Caixa mais estreita */
+  margin: 30px ;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.vistoria-data-entry-container h1 {
+  text-align: center;
+  color: #0056b3;
+  margin-bottom: 20px;
+  font-size: 34px;
+}
+
+.vistoria-form {
+  font-size: 22px;
+  line-height: 1.6;
+}
+
+.info-line {
+  margin-bottom: 18px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.label {
+  color: #0056b3;
+  font-weight: bold;
+  margin-right: 4px;
+  min-width: 30px;
+  text-align: left;
+}
+
+.value {
+  color: #000;
+}
+
+/* LINHAS DUPLAS PARA CAMPOS LADO A LADO */
+.double-line-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.double-line-group .info-line {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+/* garante mesmo tamanho pros botões de ação */
+.form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 25px;
+}
+
+/* força largura igual para os 2 botões dentro da área de ações */
+.form-actions .back-to-list-button {
+  width: 180px;          /* ajuste se quiser maior/menor */
+  height: 40px;          /* altura fixa = aparência igual */
+  margin: 0;             /* remove margin auto que existe no back-to-list-button */
+  display: inline-flex;  /* centraliza texto vertical/horizontal */
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+
+.action-button:hover {
+  transform: translateY(-2px);
+}
+
+.action-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+
+
+.back-to-list-button.finalize-button{
+  background-color: #dc3545;
+}
+
+.action-button.finalize-button:hover {
+  background-color: #c82333 !important;
+}
+
+.back-to-list-button {
+  display: block;
+  width: fit-content;
+  margin: 40px auto 0;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.back-to-list-button:hover {
+  background-color: #004080;
+}
+
+.imagem-empreendimento {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+@media (max-width: 700px) {
+  .vistoria-data-entry-container {
+    padding: 20px;
+    margin: 20px auto;
+  }
+
+  .vistoria-data-entry-container h1 {
+    font-size: 28px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .action-button {
+    width: 100%;
+  }
+
+  .label {
+    min-width: unset;
+    margin-bottom: 5px;
+  }
+
+  .double-line-group {
+    flex-direction: column;
+  }
+}
+
+
+/* Badge (chip) do status */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  border: 1px solid transparent;
+}
+
+/* BADGE STATUS PADRÃO CIVIS */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  border: 2px solid transparent;
+}
+
+.status--agendada {
+  background: rgba(0, 64, 128, 0.12);
+  border-color: #004080;
+  color: #004080;
+}
+
+.status--reagendada {
+  background: rgba(255, 153, 0, 0.18);
+  border-color: #ff9900;
+  color: #cc7a00;
+}
+
+.status--andamento {
+  background: rgba(40, 167, 69, 0.18);
+  border-color: #28a745;
+  color: #1e7e34;
+}
+
+.status--aguardando-validacao {
+  background: linear-gradient(
+    180deg,
+    rgba(52, 58, 64, 0.18) 0%,
+    rgba(52, 58, 64, 0.10) 100%
+  );
+  border: 1px solid #343a40;
+  color: #1a1d21;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+
+
+.status--validada {
+  background: rgba(40, 167, 69, 0.18);
+  border-color: #28a745;
+  color: #1e7e34;
+}
+
+.status--rejeitada {
+  background: rgba(220, 53, 69, 0.18);
+  border-color: #dc3545;
+  color: #b02a37;
+}
+
+.status--finalizada {
+  background: #e9ecef;
+  border-color: #adb5bd;
+  color: #343a40;
+}
+
+.status--aguardando-agendamento {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 193, 7, 0.28) 0%,
+    rgba(255, 193, 7, 0.15) 100%
+  );
+  border: 1px solid #e0a800;
+  color: #7a5c00;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+
+.vistoria-form {
+  text-align: left; /* força alinhamento à esquerda */
+}
+
+
+/* botão/link do relatório */
+.visualizar-relatorio-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #0066cc;
+  color: #fff;
+  text-decoration: none;
+
+  padding: 10px 18px;
+  border-radius: 8px;
+
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.visualizar-relatorio-btn:hover {
+  background: #2957ad;
+}
+/* Container do botão do relatório (abaixo da imagem, alinhado à esquerda) */
+.relatorio-actions {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start; /* esquerda */
+  margin-top: 8px;            /* pouco espaço da imagem */
+  margin-bottom: 18px;        /* separa do restante */
+}
+
+.info-line {
+  margin-bottom: 8px;   /* era 16 */
+  font-size: 18px;
+  line-height: 1.1;
+}
+

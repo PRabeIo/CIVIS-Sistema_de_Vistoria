@@ -1,0 +1,190 @@
+/* =========================
+   CADASTRAR EMPREENDIMENTO - VISUAL PRO
+   ========================= */
+
+/* container da página */
+.home-container {
+  background: linear-gradient(180deg, #f3f6fb 0%, #ffffff 65%) !important;
+  min-height: 100vh !important;
+}
+
+/* área principal */
+.admin-page-container {
+  max-width: 920px !important;
+  margin: 0 auto !important;
+  padding: 28px 18px !important;
+}
+
+/* título */
+.titulo-centralizado {
+  font-size: 2.4rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.6px !important;
+  color: #004080 !important;
+  margin: 12px 0 22px !important;
+}
+
+/* botão voltar */
+.back-arrow {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 10px 12px !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(19, 94, 165, 0.25) !important;
+  background: #ffffff !important;
+  color: #135ea5 !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.back-arrow:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.08) !important;
+  border-color: rgba(19, 94, 165, 0.35) !important;
+}
+
+/* card do formulário */
+.form-container {
+  background: #ffffff !important;
+  border-radius: 16px !important;
+  padding: 22px !important;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.10) !important;
+  border: 1px solid rgba(0,0,0,0.06) !important;
+}
+
+/* grid */
+.form-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 16px !important;
+}
+
+/* campo full width */
+.full-width-field {
+  grid-column: 1 / -1 !important;
+}
+
+/* labels */
+.form-group label {
+  font-weight: 700 !important;
+  color: #0b4f94 !important;
+  margin-bottom: 6px !important;
+  font-size: 0.98rem !important;
+}
+
+/* inputs e selects */
+.form-group input,
+.form-group select {
+  width: 100% !important;
+  padding: 11px 12px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(31, 41, 55, 0.18) !important;
+  background: #fbfdff !important;
+  color: #111827 !important;
+  font-size: 0.98rem !important;
+  outline: none !important;
+  transition: all 0.2s ease !important;
+}
+
+/* foco bonito */
+.form-group input:focus,
+.form-group select:focus {
+  border-color: rgba(19, 94, 165, 0.65) !important;
+  box-shadow: 0 0 0 4px rgba(19, 94, 165, 0.14) !important;
+  background: #ffffff !important;
+}
+
+/* input file */
+.form-group input[type="file"] {
+  padding: 10px !important;
+  background: #ffffff !important;
+  cursor: pointer !important;
+}
+
+/* título da seção */
+.form-section-title {
+  grid-column: 1 / -1 !important;
+  margin: 14px 0 0 !important;
+  color: #004080 !important;
+  font-weight: 00 !important;
+
+}
+
+/* ações */
+.form-actions {
+  grid-column: 1 / -1 !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  margin-top: 8px !important;
+}
+
+/* botões */
+.btn-cancelar,
+.btn-salvar {
+  padding: 11px 16px !important;
+  border-radius: 12px !important;
+  border: none !important;
+  cursor: pointer !important;
+  font-weight: 500 !important;
+  transition: all 0.25s ease !important;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.12) !important;
+}
+
+/* cancelar */
+.btn-cancelar {
+  background: #ce2c3c !important;
+  color: #ffffff !important;
+}
+
+.btn-cancelar:hover {
+  transform: translateY(-2px) !important;
+  background: #c01929 !important;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.16) !important;
+}
+
+/* salvar */
+.btn-salvar {
+  background: #135ea5 !important;
+  color: #ffffff !important;
+}
+
+.btn-salvar:hover {
+  transform: translateY(-2px) !important;
+  background: #004080 !important;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.18) !important;
+}
+
+/* active (pressionado) */
+.btn-cancelar:active,
+.btn-salvar:active {
+  transform: translateY(0px) !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.14) !important;
+}
+
+/* =========================
+   RESPONSIVO
+   ========================= */
+@media (max-width: 768px) {
+  .titulo-centralizado {
+    font-size: 2.05rem !important;
+    margin-bottom: 18px !important;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .form-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .btn-cancelar,
+  .btn-salvar {
+    width: 100% !important;
+  }
+}

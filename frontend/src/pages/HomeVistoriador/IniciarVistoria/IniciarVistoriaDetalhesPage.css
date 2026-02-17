@@ -1,0 +1,222 @@
+/* Container principal da página */
+.iniciar-vistoria-detalhes-container {
+  padding: 60px;
+  background-color: #f8f9fa; /* Fundo cinza claro */
+  min-height: 100vh; /* Altura mínima de 100% da viewport */
+  font-family: Arial, sans-serif; /* Fonte padrão */
+  color: #333; /* Cor do texto principal */
+  max-width: 500px; /* Largura máxima do container para centralizar */
+  margin: 0 auto; /* Centraliza o container horizontalmente */
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  border-radius: 10px; /* Bordas arredondadas */
+  position: relative; /* Necessário para posicionar o botão de voltar */
+}
+
+/* Título da página */
+.iniciar-vistoria-detalhes-container h1 {
+  text-align: center; /* Centraliza o texto do título */
+  color: #004080; /* Azul CIVIS */
+   margin-top: 30px;
+  margin-bottom: 30px;
+  font-size: 32px; /* Tamanho do título aumentado */
+}
+
+/* Descrição da página */
+.iniciar-vistoria-detalhes-container .description {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #666; /* Tom de cinza mais suave */
+  font-size: 16px; /* Tamanho da descrição */
+}
+
+/* Estilo para os rótulos dos campos (labels) */
+.iniciar-vistoria-form label {
+  display: block; /* Cada label ocupa sua própria linha */
+  font-weight: bold; /* Texto em negrito */
+  margin-bottom: 8px;
+  color: #555; /* Cor do texto da label */
+  font-size: 18px;
+}
+
+/* Estilo para campos de input de texto, data/hora e textarea */
+.iniciar-vistoria-form input[type="text"],
+.iniciar-vistoria-form input[type="datetime-local"],
+.iniciar-vistoria-form textarea,
+.iniciar-vistoria-form .status-display-input, /* Adicionado para inputs de exibição de status */
+.iniciar-vistoria-form .report-id-display-input { /* Adicionado para inputs de exibição de ID de relatório */
+  width: calc(100% - 20px); /* Ocupa quase 100% da largura, descontando padding */
+  padding: 12px; /* Espaçamento interno um pouco maior */
+  margin-bottom: 25px; /* Margem abaixo um pouco maior */
+
+  border: 1px solid #ccc; /* Borda cinza clara */
+  border-radius: 5px; /* Bordas levemente arredondadas */
+  font-size: 16px;
+  box-sizing: border-box; /* Garante que padding e borda não aumentem a largura total */
+}
+
+/* Estilo específico para textarea para permitir redimensionamento vertical */
+.iniciar-vistoria-form textarea {
+  resize: vertical; /* Permite redimensionar apenas verticalmente */
+  min-height: 150px; /* Altura mínima para o campo de texto longo */
+}
+
+/* Container para os botões de ação */
+.form-actions-extended {
+  display: flex; /* Usa flexbox para organizar os botões */
+  flex-wrap: wrap; /* Permite que os botões quebrem para a próxima linha em telas pequenas */
+  justify-content: center; /* Centraliza os botões horizontalmente */
+  gap: 15px; /* Espaço entre os botões */
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+/* Estilo base para todos os botões de ação */
+.form-actions-extended .action-button {
+  background-color: #007bff; /* Azul padrão */
+  color: white; /* Texto branco */
+  border: none; /* Sem borda */
+  padding: 12px 25px; /* Espaçamento interno */
+  border-radius: 5px; /* Bordas arredondadas */
+  cursor: pointer; /* Cursor de "mãozinha" */
+  font-size: 16px;
+  min-width: 160px; /* Largura mínima para os botões */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Transições suaves */
+}
+
+/* Efeito ao passar o mouse sobre os botões de ação */
+.form-actions-extended .action-button:hover {
+  transform: translateY(-2px); /* Efeito de "levantar" */
+}
+
+/* Estilo para botões desabilitados */
+.form-actions-extended .action-button:disabled {
+  background-color: #cccccc; /* Fundo cinza */
+  cursor: not-allowed; /* Cursor de "proibido" */
+  opacity: 0.7; /* Opacidade reduzida */
+}
+
+/* Estilos específicos para cada tipo de botão */
+.action-button.save-button {
+  background-color: #004080; /* Azul CIVIS */
+}
+.action-button.save-button:hover {
+  background-color: #0066cc;
+}
+
+.action-button.finalize-button {
+  background-color: #cc0000; 
+}
+.action-button.finalize-button:hover {
+  background-color: #a80000;
+}
+
+.action-button.report-button {
+  background-color: #e68900; 
+}
+.action-button.report-button:hover {
+  background-color: #ff9900;
+}
+
+/* Estilo para o botão de voltar (seta) */
+.iniciar-vistoria-detalhes-container .back-arrow {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #004080;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+.iniciar-vistoria-detalhes-container .back-arrow:hover {
+  color: #0066cc;
+}
+
+
+/* Estilos para mensagens de carregamento e erro */
+.loading, .error {
+  text-align: center;
+  padding: 20px;
+  font-size: 18px;
+  color: #004d40;
+}
+.error {
+  color: #dc3545; /* Cor de erro (vermelho) */
+}
+
+/* Ajustes responsivos para telas menores */
+@media (min-width: 600px) { /* Em telas maiores, layout de duas colunas */
+  .iniciar-vistoria-form {
+    grid-template-columns: 1fr 1fr; /* Duas colunas */
+    gap: 15px 30px; /* Espaçamento entre campos */
+  }
+  /* Campos que devem ocupar uma linha inteira (ex: Observações, Status, Relatório, Anexos) */
+  .iniciar-vistoria-form .full-width-field {
+    grid-column: 1 / -1; /* Faz ocupar todas as colunas disponíveis */
+  }
+}
+
+@media (max-width: 599px) { /* Para telas pequenas, garante uma coluna e padding adequado */
+  .iniciar-vistoria-detalhes-container {
+    padding: 15px; /* Reduz padding em telas pequenas */
+    margin: 15px auto; /* Reduz margem em telas pequenas */
+  }
+  .iniciar-vistoria-detalhes-container h1 {
+    font-size: 24px;
+  }
+  .form-actions-extended {
+    grid-template-columns: 1fr; /* Botões empilhados verticalmente */
+  }
+  .iniciar-vistoria-form {
+    gap: 15px; /* Apenas espaçamento vertical */
+  }
+}
+
+.iniciar-vistoria-form .campo-imprevistos {
+  min-height: 72px; /* Aproximadamente 3 linhas de texto */
+  resize: vertical; /* Permite o usuário redimensionar verticalmente */
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.iniciar-vistoria-detalhes-container h1 {
+  text-align: center;
+  color: #004080;
+  margin-bottom: 8px; /* menor espaçamento abaixo do título */
+  font-size: 32px;
+}
+
+.subtitulo-bloco-numero {
+  text-align: center;
+  color: #004080;
+  margin-top: 0;
+  margin-bottom: 30px;
+  font-size: 24px;
+  font-weight: bold; /* deixa o texto em negrito */
+}
+
+
+/* Campo "Imprevistos" com altura para ~3 linhas e resize vertical */
+.iniciar-vistoria-form .campo-imprevistos {
+  min-height: 72px; /* cerca de 3 linhas */
+  resize: vertical;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+/* Padroniza fonte em todos os campos */
+.iniciar-vistoria-form input,
+.iniciar-vistoria-form textarea {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+}
+
+/* Placeholder mais escuro e padrão CIVIS */
+.iniciar-vistoria-form input::placeholder,
+.iniciar-vistoria-form textarea::placeholder {
+  color: #999;        /* antes era cinza muito claro */
+  opacity: 1;         /* remove transparência padrão */
+  font-weight: 400;
+}
