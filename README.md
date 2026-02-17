@@ -6,26 +6,26 @@ Desenvolvido com foco em organização, rastreabilidade e automação do process
 
 ## 📑 Sumário
 
-- [Visão Geral](#-visão-geral)
-- [Prints do Sistema](#-prints-do-sistema)
-- [Diagramas do Sistema](#-diagramas-do-sistema)
-- [Tipos de Usuário](#-tipos-de-usuário)
-- [Fluxo completo da vistoria](#-fluxo-completo-da-vistoria)
-- [Status da vistoria](#-status-da-vistoria-enum-banco)
-- [Arquitetura do Sistema](#️-arquitetura-do-sistema)
-- [Autenticação e Segurança](#-autenticação-e-segurança)
-- [Estrutura do Projeto](#️-estrutura-do-projeto)
-- [Banco de Dados](#️-banco-de-dados)
-- [API REST](#-api-rest)
-- [Variáveis de ambiente](#️-variáveis-de-ambiente)
-- [Como rodar localmente](#-como-rodar-localmente)
-- [Uploads e Relatórios](#-uploads-e-relatórios)
-- [Regras de negócio](#️-regras-de-negócio-implementadas)
-- [Roadmap](#️-roadmap-próximas-melhorias)
-- [Stack Tecnológico](#-stack-tecnológico)
-- [Status do Projeto](#-status-do-projeto)
-- [Objetivo do Projeto](#-objetivo-do-projeto)
-- [Considerações Finais](#-considerações-finais)
+- [📌Visão Geral](#-visão-geral)
+- [🖼️ Prints do Sistema](#-prints-do-sistema)
+- [📐 Diagramas do Sistema](#-diagramas-do-sistema)
+- [👥 Tipos de Usuário](#-tipos-de-usuário)
+- [🔁 Fluxo completo da vistoria](#-fluxo-completo-da-vistoria)
+- [🧠 Status da vistoria](#-status-da-vistoria-enum-banco)
+- [🏗️ Arquitetura do Sistema](#️-arquitetura-do-sistema)
+- [🔐 Autenticação e Segurança](#-autenticação-e-segurança)
+- [🗂️ Estrutura do Projeto](#️-estrutura-do-projeto)
+- [🗄️ Banco de Dados](#️-banco-de-dados)
+- [🌐 API REST](#-api-rest)
+- [⚙️ Variáveis de ambiente](#️-variáveis-de-ambiente)
+- [🚀 Como rodar localmente](#-como-rodar-localmente)
+- [📂 Uploads e Relatórios](#-uploads-e-relatórios)
+- [✔️ Regras de negócio](#️-regras-de-negócio-implementadas)
+- [🛣️ Roadmap](#️-roadmap-próximas-melhorias)
+- [🧱 Stack Tecnológico](#-stack-tecnológico)
+- [📊 Status do Projeto](#-status-do-projeto)
+- [💼 Objetivo do Projeto](#-objetivo-do-projeto)
+- [📌 Considerações Finais](#-considerações-finais)
 
 ---
 
@@ -286,10 +286,11 @@ No painel do Supabase:
 4. Copie a URI PostgreSQL exibida
 
 Cole no `.env` na variável:
-
+```bash
 DATABASE_URL=postgresql://USER:SENHA@HOST:5432/postgres
+```
 
-Observação: O USER:SENHA são definidos na criação do projeto Supabase.
+> Observação: O USER:SENHA são definidos na criação do projeto Supabase.
 Caso não lembre, é possível redefinir a senha em: Database → Settings → Reset database password.
 
 
@@ -328,7 +329,7 @@ npm run dev
 ``` 
 
 Backend disponível em:
-http://localhost:3001
+`http://localhost:3001`
 
 3. Frontend
 ```bash  
@@ -338,7 +339,7 @@ npm run dev
 ``` 
 
 Frontend disponível em:
-http://localhost:5173
+`http://localhost:5173`
 
 ---
 
@@ -352,7 +353,7 @@ backend/relatorios/
 Após a geração, o backend envia o PDF para o Supabase Storage (bucket público) e salva a URL em `vistoria.relatorio_url`.
 
 Exemplo de URL pública retornada:
-https://SEU-PROJETO.supabase.co/storage/v1/object/public/relatorios/arquivo.pdf
+`https://SEU-PROJETO.supabase.co/storage/v1/object/public/relatorios/arquivo.pdf`
 
 > Observação: a pasta `backend/relatorios/` é versionada vazia no GitHub (via `.gitkeep`), mas os arquivos gerados em runtime não são versionados.
 
@@ -398,9 +399,9 @@ https://SEU-PROJETO.supabase.co/storage/v1/object/public/relatorios/arquivo.pdf
 
 ## 📊 Status do Projeto
 
-Sistema funcional end-to-end  
-Arquitetura refatorada e organizada  
-Pronto para uso e expansão  
+- Sistema funcional end-to-end  
+- Arquitetura refatorada e organizada  
+- Pronto para uso e expansão  
 
 ---
 
