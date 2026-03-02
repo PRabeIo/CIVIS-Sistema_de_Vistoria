@@ -1,0 +1,245 @@
+/* =========================================================
+   EDITAR PERFIL (PADRÃO) — ESCOPADO EM .perfil-page
+   Serve para Cliente / ADM / Vistoriador
+   Base = DESKTOP, Mobile em @media (max-width)
+   ========================================================= */
+
+.perfil-page {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* container padrão */
+.perfil-page .admin-page-container {
+  padding: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header do topo (título) */
+.perfil-page .perfil-header {
+  margin-bottom: 18px;
+}
+
+.perfil-page .titulo-centralizado {
+  margin: 0;
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: #004080;
+}
+
+/* Stack (2 cards: perfil + segurança) */
+.perfil-page .editar-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+}
+
+/* Card base (reaproveita visual do Perfil) */
+.perfil-page .perfil-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  padding: 22px;
+  width: 100%;
+  max-width: 520px;
+}
+
+/* Avatar */
+.perfil-page .perfil-avatar-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.perfil-page .perfil-avatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #135ea5;
+  background: #f3f6fb;
+}
+
+/* Labels / Values (padrão azul do sistema) */
+.perfil-page .perfil-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0b4f94;
+}
+
+.perfil-page .perfil-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  word-break: break-word;
+}
+
+/* GRID de campos — sempre em coluna (desktop e mobile) */
+.perfil-page .perfil-info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.perfil-page .perfil-info-item {
+  background: #f1f5fb;
+  border: 1px solid #dce4ec;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Upload */
+.perfil-page .editar-upload {
+  margin: 6px 0 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.perfil-page .editar-file {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px dashed #c8d7ee;
+  background: #ffffff;
+  color: #1f2937;
+}
+
+.perfil-page .editar-hint {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+/* Inputs */
+.perfil-page .editar-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 12px;
+  border-radius: 10px;
+  border: 1px solid #dce4ec;
+  background: #ffffff;
+  outline: none;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.perfil-page .editar-input:focus {
+  border-color: #135ea5;
+  box-shadow: 0 0 0 3px rgba(19, 94, 165, 0.14);
+}
+
+/* Título do card Segurança */
+.perfil-page .editar-section-title {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.perfil-page .editar-h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #004080;
+  font-weight: 800;
+}
+
+.perfil-page .editar-sub {
+  margin: 0;
+  color: #64748b;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* Actions — sempre em coluna (como você pediu) */
+.perfil-page .editar-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.perfil-page .editar-actions button {
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Botão primário (mesmo padrão do CIVIS) */
+.perfil-page .admin-action-button {
+  background-color: #135ea5;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.perfil-page .admin-action-button:hover {
+  background-color: #004080;
+  transform: translateY(-1px);
+}
+
+.perfil-page .admin-action-button:disabled {
+  background-color: #cfd6df;
+  color: #ffffff;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.9;
+}
+
+/* Botão secundário */
+.perfil-page .btn-secundario {
+  background: #f0f4fa;
+  border: 1px solid #d6e2f5;
+  color: #004080;
+  font-weight: 800;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* =========================
+   MOBILE (até 768px)
+   ========================= */
+@media (max-width: 768px) {
+  .perfil-page .admin-page-container {
+    padding: 15px;
+  }
+
+  .perfil-page .titulo-centralizado {
+    font-size: 1.9rem;
+  }
+
+  .perfil-page .perfil-card {
+    padding: 18px;
+    max-width: 420px;
+  }
+
+  .perfil-page .perfil-avatar {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+
+@media (min-width: 769px) {
+
+  .perfil-page .editar-actions button {
+    width: auto;        /* deixa de ocupar 100% */
+    min-width: 180px;   /* largura mínima elegante */
+    max-width: 180px;   /* limite máximo */
+  }
+
+}

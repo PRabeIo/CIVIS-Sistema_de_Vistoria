@@ -1,0 +1,159 @@
+.cadastrar-imovel-page {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* ===== Título ===== */
+.cadastrar-imovel-page .titulo-centralizado {
+  text-align: center;
+  font-size: 2.4rem;
+  color: #004080;
+  font-weight: 700;
+  margin-top: 15px;
+  margin-bottom: 18px;
+}
+
+/* ===== Container do formulário ===== */
+.cadastrar-imovel-page .form-container {
+  max-width: 720px;
+  margin: 0 auto;
+  background: #ffffff;
+  padding: 28px;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.cadastrar-imovel-page .form-group input,
+.cadastrar-imovel-page .form-group select {
+  color: #111827;              /* texto visível (quase preto) */
+  -webkit-text-fill-color: #111827; /* resolve casos estranhos no Chrome */
+}
+
+.cadastrar-imovel-page .form-group input::placeholder {
+  color: #6b7280;              /* placeholder cinza */
+  opacity: 1;                  /* evita placeholder apagado no Firefox */
+}
+
+/* ===== GRID ===== */
+.cadastrar-imovel-page .form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.cadastrar-imovel-page .full-width-field {
+  grid-column: 1 / -1;
+}
+
+.cadastrar-imovel-page .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cadastrar-imovel-page .form-group label {
+  font-weight: 700;
+  color: #0b4f94;
+  font-size: 1.15rem;
+}
+
+/* ===== Inputs ===== */
+.cadastrar-imovel-page .form-group input,
+.cadastrar-imovel-page .form-group select {
+  padding: 11px 12px;
+  border: 1px solid #d7dde6;
+  border-radius: 10px;
+  font-size: 1rem;
+  outline: none;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  background: #fff;
+}
+
+.cadastrar-imovel-page .form-group input:focus,
+.cadastrar-imovel-page .form-group select:focus {
+  border-color: #0b4f94;
+  box-shadow: 0 0 0 4px rgba(11, 79, 148, 0.15);
+}
+
+/* ===== BOTÕES ===== */
+.cadastrar-imovel-page .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.cadastrar-imovel-page .btn-salvar,
+.cadastrar-imovel-page .btn-cancelar {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+}
+
+.cadastrar-imovel-page .btn-salvar {
+  background-color: #135ea5;
+  color: #fff;
+  min-width: 140px;
+  padding: 12px 26px; /* um pouco mais “parrudo” */
+  font-size: 1.05rem;
+}
+
+.cadastrar-imovel-page .btn-salvar:hover {
+  background-color: #004080;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.16);
+}
+
+.cadastrar-imovel-page .btn-cancelar {
+  background-color: #6c757d;
+  color: #fff;
+  min-width: 100px;
+  
+}
+
+.cadastrar-imovel-page .btn-cancelar:hover {
+  background-color: #5a6268;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.16);
+}
+
+/* força especificamente o input de descrição */
+.cadastrar-imovel-page #descricao {
+  display: block;
+  width: 100% ;
+  max-width: none ;   /* mata qualquer max-width global */
+  min-width: 0 ;      /* evita “encolher” em grid/flex */
+  box-sizing: border-box;
+}
+/* =========================================================
+   RESPONSIVO
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  .cadastrar-imovel-page .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cadastrar-imovel-page .form-container {
+    padding: 20px;
+  }
+
+  .cadastrar-imovel-page .form-actions {
+    flex-direction: column;
+  }
+
+  .cadastrar-imovel-page .btn-salvar,
+  .cadastrar-imovel-page .btn-cancelar {
+    width: 100%;
+  }
+
+  .cadastrar-imovel-page .titulo-centralizado {
+    font-size: 1.8rem;
+    margin-top: 15px;
+  }
+}

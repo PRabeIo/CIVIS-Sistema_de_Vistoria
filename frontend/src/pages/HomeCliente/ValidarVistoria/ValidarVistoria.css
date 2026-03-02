@@ -1,0 +1,206 @@
+/* =========================================================
+   VALIDAR VISTORIA (ESCOPADO) — PADRÃO CIVIS
+   Tudo aqui só afeta .validar-vistoria-page
+   ========================================================= */
+
+.validar-vistoria-page {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+
+}
+
+
+/* Container padrão do conteúdo */
+.validar-vistoria-page .admin-page-container {
+  padding: 30px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Header / título */
+.validar-vistoria-page .page-header {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.validar-vistoria-page .titulo-centralizado {
+  margin: 0;
+  color: #004080;
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  margin-bottom: 30px;
+  margin-top: 20px;
+}
+
+/* Card do formulário */
+.validar-vistoria-page .form-card {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 22px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.10);
+}
+
+/* Grupos */
+.validar-vistoria-page .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.validar-vistoria-page .form-group label {
+  font-weight: 700;
+  color: #0b4f94;
+  font-size: 1rem;
+}
+
+/* Inputs */
+.validar-vistoria-page .form-group select,
+.validar-vistoria-page .form-group input {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 11px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(31, 41, 55, 0.18);
+  background: #ffffff;
+  color: #111827;
+  font-size: 1rem;
+
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.validar-vistoria-page .form-group select:focus,
+.validar-vistoria-page .form-group input:focus {
+  border-color: rgba(19, 94, 165, 0.70);
+  box-shadow: 0 0 0 4px rgba(11, 79, 148, 0.14);
+}
+
+/* Link do PDF */
+.validar-vistoria-page .pdf-row {
+  margin: 6px 0 14px;
+}
+
+.validar-vistoria-page .btn-pdf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  background: #5b3cc4;
+  color: #ffffff;
+}
+
+.validar-vistoria-page .btn-pdf:hover {
+  background: #452aa3;
+}
+
+/* Ações */
+.validar-vistoria-page .actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+  align-items: center; /* centraliza no desktop */
+}
+
+/* Base de botão (padrão CIVIS) */
+.validar-vistoria-page .btn {
+  border: none;
+  border-radius: 10px; /* padrão CIVIS (não super pill) */
+  padding: 11px 16px;
+
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+
+  /* DESKTOP: tamanho fixo agradável */
+  width: 100%;
+  max-width: 380px;
+}
+
+.validar-vistoria-page .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.16);
+}
+
+.validar-vistoria-page .btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14);
+}
+
+/* Cores */
+.validar-vistoria-page .btn-primary {
+  background: #135ea5;
+  color: #ffffff;
+}
+.validar-vistoria-page .btn-primary:hover {
+  background: #004080;
+}
+
+.validar-vistoria-page .btn-secondary {
+  background: #6c757d; /* cinza padrão CIVIS */
+  color: #ffffff;
+}
+.validar-vistoria-page .btn-secondary:hover {
+  background: #5a6268;
+}
+
+.validar-vistoria-page .btn-danger {
+  background: #c94a55; /* vermelho menos chamativo */
+  color: #ffffff;
+}
+.validar-vistoria-page .btn-danger:hover {
+  background: #b73a44;
+}
+
+/* Disabled (apagado) */
+.validar-vistoria-page .btn-primary:disabled,
+.validar-vistoria-page .btn-danger:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Para link PDF "desabilitado" (já que <a> não tem disabled nativo) */
+.validar-vistoria-page .is-disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* =========================
+   MOBILE
+   ========================= */
+@media (max-width: 768px) {
+  .validar-vistoria-page .admin-page-container {
+    padding: 18px;
+  }
+
+  .validar-vistoria-page .titulo-centralizado {
+    font-size: 1.9rem;
+  }
+
+  .validar-vistoria-page .form-card {
+    padding: 18px;
+  }
+
+  /* Mobile: botões ocupam tudo */
+  .validar-vistoria-page .actions {
+    align-items: stretch;
+  }
+
+  .validar-vistoria-page .btn {
+    max-width: none;
+    width: 100%;
+  }
+}

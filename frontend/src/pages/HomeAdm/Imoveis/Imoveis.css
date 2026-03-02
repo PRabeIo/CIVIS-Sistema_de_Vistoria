@@ -1,0 +1,360 @@
+/* =========================================================
+   IMÓVEIS (ESCOPADO) — BASE DESKTOP
+   Tudo aqui só afeta a página .imoveis-page
+   ========================================================= */
+
+.imoveis-page {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* -------------------------
+   CONTEÚDO PRINCIPAL (DESKTOP - base)
+   ------------------------- */
+.imoveis-page .admin-page-container {
+  padding: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.imoveis-page .admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 26px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* bloco do título + subtítulo */
+.imoveis-page .imoveis-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.imoveis-page .titulo-centralizado {
+  text-align: left;
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  margin: 0;
+  color: #004080;
+}
+
+.imoveis-page .subtitulo-pagina {
+  margin: 0;
+  color: #334155;
+  font-size: 1rem;
+}
+
+.imoveis-page .admin-action-button {
+  background-color: #135ea5;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.imoveis-page .admin-action-button:hover {
+  background-color: #004080;
+  transform: translateY(-1px);
+}
+
+.imoveis-page .sem-registros {
+  text-align: center;
+  margin-top: 40px;
+  color: #555;
+  font-size: 1.05rem;
+}
+
+/* -------------------------
+   TABELA (DESKTOP - base)
+   ------------------------- */
+.imoveis-page .table-responsive {
+  overflow-x: auto;
+  margin-top: 12px;
+}
+
+.imoveis-page .lista-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.imoveis-page .lista-tabela thead {
+  display: table-header-group;
+}
+
+.imoveis-page .lista-tabela th,
+.imoveis-page .lista-tabela td {
+  padding: 13px 13px;
+  text-align: center;
+  border-bottom: none;     /* a borda fica no TR */
+  vertical-align: center;
+}
+
+/* borda única por linha (reta e consistente) */
+.imoveis-page .lista-tabela tbody tr {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.imoveis-page .lista-tabela tbody tr:last-child {
+  border-bottom: none;
+}
+
+.imoveis-page .lista-tabela th {
+  background-color: #004080;
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.3px;
+  text-align: center; /* cabeçalho centralizado */
+}
+
+.imoveis-page .lista-tabela td {
+  font-size: 0.95rem;
+  color: #1f2937;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.imoveis-page .lista-tabela tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* no desktop não tem label antes */
+.imoveis-page .lista-tabela td::before {
+  content: none;
+}
+
+/* centralizações pontuais em colunas numéricas/status */
+.imoveis-page .lista-tabela td:nth-child(2),
+.imoveis-page .lista-tabela td:nth-child(3),
+.imoveis-page .lista-tabela td:nth-child(4),
+.imoveis-page .lista-tabela td:nth-child(5) {
+  text-align: center;
+}
+
+/* Observações: quebra bem pra não estourar */
+.imoveis-page .lista-tabela td:nth-child(6) {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* -------------------------
+   BOTÕES (DESKTOP - base)
+   ------------------------- */
+.imoveis-page .acoes-botoes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.imoveis-page .acoes-botoes button {
+  min-width: 140px;
+  height: 38px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.imoveis-page .btn-ver-imoveis,
+.imoveis-page .btn-excluir,
+.imoveis-page .btn-editar {
+  width: auto;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border: none;
+  color: #fff;
+  white-space: nowrap;
+
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+/* Editar (usa .btn-ver-imoveis no seu JSX) */
+.imoveis-page .lista-tabela .acoes-botoes .btn-ver-imoveis {
+  background-color: #135ea5;
+  color: #fff;
+}
+
+.imoveis-page .lista-tabela .acoes-botoes .btn-ver-imoveis:hover {
+  background-color: #0b4f94;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+.imoveis-page td.acoes-botoes button.btn-excluir {
+  background-color: #dc3545;
+  color: #ffffff;
+}
+
+.imoveis-page td.acoes-botoes button.btn-excluir:hover {
+  background-color: #c82333;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+.imoveis-page .btn-ver-imoveis:active,
+.imoveis-page .btn-excluir:active,
+.imoveis-page .btn-editar:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.20);
+}
+
+/* =========================================================
+   MOBILE (até 768px) — tabela vira cards
+   ========================================================= */
+@media (max-width: 768px) {
+  .imoveis-page .admin-page-container {
+    padding: 15px;
+  }
+
+  .imoveis-page .admin-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .imoveis-page .titulo-centralizado {
+    text-align: center;
+    font-size: 1.8rem;
+  }
+    /* subtítulo */
+  .imoveis-page .subtitulo-pagina {
+    text-align: center;
+    font-size: 1.3rem;
+  }
+
+  .imoveis-page .admin-action-button {
+    width: 100%;          /* ocupa largura total */
+    max-width: 420px;     /* opcional: limite elegante */
+    align-self: center;   /* centraliza o bloco */
+  }
+
+  /* tabela vira cards */
+  .imoveis-page .lista-tabela {
+    background-color: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
+  }
+
+  .imoveis-page .lista-tabela thead {
+    display: none;
+  }
+
+  .imoveis-page .lista-tabela tr {
+    display: block;
+    background: #fff;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+    overflow: hidden;
+  }
+
+  /* label em cima, valor embaixo */
+  .imoveis-page .lista-tabela td {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+    gap: 6px;
+
+    padding: 10px 14px;
+    border-bottom: 1px solid #eee;
+
+    font-size: 1rem;
+    color: #1f2937;
+    font-weight: 500;
+  }
+
+
+  .imoveis-page .lista-tabela td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #0b4f94;
+    font-size: 1.05rem;
+  }
+
+  /* botões full width no mobile */
+  .imoveis-page .acoes-botoes {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .imoveis-page .acoes-botoes button,
+  .imoveis-page .btn-ver-imoveis,
+  .imoveis-page .btn-excluir,
+  .imoveis-page .btn-editar {
+    width: 100%;
+  }
+}
+
+
+ /* configs para desktop */
+@media (min-width: 769px) {
+
+  .imoveis-page .admin-header {
+    display: flex;
+    flex-direction: column;   /* 🔥 ISSO resolve tudo */
+    align-items: stretch;     /* ocupa largura total */
+    gap: 5px;
+    margin-bottom: 2px;
+  }
+
+  /* título central */
+  .imoveis-page .titulo-centralizado {
+    text-align: center;
+    width: 100%;
+  }
+
+  /* subtítulo maior e central */
+  .imoveis-page .subtitulo-pagina {
+    text-align: center;
+    font-size: 1.4rem;
+  }
+
+  /* botão à direita e mais abaixo */
+  .imoveis-page .admin-action-button {
+    align-self: flex-end;   /* joga pra direita */
+    margin-top: 2px;       /* desce um pouco */
+  }
+
+  /* linhas das colunas */
+  .imoveis-page .lista-tabela th {
+    border-right: 1px solid #384f7c;
+  }
+  .imoveis-page .lista-tabela td {
+    border-right: 1px solid #e5e7eb;
+  }
+
+  /* remove a última linha vertical (não deixa borda no final da tabela) */
+  .imoveis-page .lista-tabela th:last-child,
+  .imoveis-page .lista-tabela td:last-child {
+    border-right: none;
+  }
+  
+.imoveis-page .lista-tabela .acoes-botoes button {
+  margin: 0;
+  padding: 0 14px; /* padding horizontal */
+  height: 38px;    /* mantém a altura padrão */
+  min-width: 140px;
+}
+
+}

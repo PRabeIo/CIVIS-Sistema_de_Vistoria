@@ -1,0 +1,274 @@
+/* =========================================================
+   INICIAR VISTORIA (DADOS GERAIS) — PADRÃO CIVIS
+   escopo: .iniciar-vistoria-detalhes-page
+   ========================================================= */
+
+.iniciar-vistoria-detalhes-page {
+  background: #f8f9fa;
+  min-height: 100vh;
+  padding: 34px 20px 70px;
+  font-family: Roboto, system-ui, -apple-system, Segoe UI, Arial;
+}
+
+/* card central */
+.iniciar-vistoria-detalhes-page .iniciar-vistoria-card {
+  max-width: 720px;
+  margin: 30px auto 0;
+  background: #fff;
+  border-radius: 16px;
+  padding: 34px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* títulos */
+.iniciar-vistoria-detalhes-page h1 {
+  margin: 0 0 8px;
+  text-align: center;
+  color: #004080;
+  font-weight: 800;
+  font-size: 2rem;
+}
+
+.iniciar-vistoria-detalhes-page .subtitulo-bloco-numero {
+  margin: 0 0 18px;
+  text-align: center;
+  color: #004080;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.iniciar-vistoria-detalhes-page .description {
+  margin: 0 0 22px;
+  text-align: center;
+  color: #475569;
+  font-size: 1rem;
+}
+
+/* alerta */
+.iniciar-vistoria-detalhes-page .alerta-visualizacao {
+  margin: 0 0 18px;
+  color: #856404;
+  background: #fff3cd;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(133, 100, 4, 0.25);
+}
+
+/* form */
+.iniciar-vistoria-detalhes-page .iniciar-vistoria-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.iniciar-vistoria-detalhes-page .field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+
+.iniciar-vistoria-detalhes-page .label {
+  color: #64748b;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.iniciar-vistoria-detalhes-page input,
+.iniciar-vistoria-detalhes-page textarea {
+  width: 100%;
+  border: 1px solid #d7dde6;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 1rem;
+  outline: none;
+  background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.iniciar-vistoria-detalhes-page textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.iniciar-vistoria-detalhes-page .campo-imprevistos {
+  min-height: 80px;
+}
+
+.iniciar-vistoria-detalhes-page input:focus,
+.iniciar-vistoria-detalhes-page textarea:focus {
+  border-color: #0b4f94;
+  box-shadow: 0 0 0 4px rgba(11, 79, 148, 0.14);
+}
+
+.iniciar-vistoria-detalhes-page input::placeholder,
+.iniciar-vistoria-detalhes-page textarea::placeholder {
+  color: #94a3b8;
+  opacity: 1;
+}
+
+/* readonly */
+.iniciar-vistoria-detalhes-page input[readonly],
+.iniciar-vistoria-detalhes-page textarea[readonly] {
+  background: #f3f4f6;
+  color: #111827;
+  cursor: not-allowed;
+}
+
+/* status row */
+.iniciar-vistoria-detalhes-page .status-row {
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.iniciar-vistoria-detalhes-page .iniciar-vistoria-form .status-text {
+  grid-column: 1 / -1; /* ocupa a linha toda */
+  margin: 6px 0 4px;
+  font-size: 16px;
+  line-height: 1.3;
+  color: #475569;
+  font-weight: 500;
+}
+
+.iniciar-vistoria-detalhes-page .status-label {
+  color: #475569;
+  font-weight: 700;
+}
+
+.iniciar-vistoria-detalhes-page .status-value {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+/* ações */
+.iniciar-vistoria-detalhes-page .form-actions-extended {
+  display: flex;
+  justify-content: center; /* alinha à direita */
+  gap: 12px;
+  margin-top: 10px;
+  flex-wrap: nowrap;
+}
+
+.iniciar-vistoria-detalhes-page .action-button {
+  height: 48px;
+  min-width: 170px;
+  padding: 0 18px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+
+  font-size: 1rem;
+  font-weight: 800;
+
+  transition: transform 0.15s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.10);
+}
+
+.iniciar-vistoria-detalhes-page .action-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.14);
+}
+
+.iniciar-vistoria-detalhes-page .action-button:disabled {
+  background: #cbd5e1; 
+  cursor: not-allowed;
+  opacity: 0.8;
+  transform: none;
+  box-shadow: none;
+}
+
+/* cores CIVIS */
+.iniciar-vistoria-detalhes-page .save-button {
+  background: #135ea5;
+  color: #fff;
+}
+.iniciar-vistoria-detalhes-page .save-button:hover {
+  background: #004080;
+}
+
+.iniciar-vistoria-detalhes-page .report-button {
+  background: #016ee4;
+  color: #fff;
+  min-width: 200px;
+}
+.iniciar-vistoria-detalhes-page .report-button:hover {
+  background: #0056b3;
+}
+
+.iniciar-vistoria-detalhes-page .back-button {
+  background: #6c757d;
+  color: #fff;
+}
+.iniciar-vistoria-detalhes-page .back-button:hover {
+  background: #545b62;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+@media (max-width: 768px) {
+  .iniciar-vistoria-detalhes-page {
+    padding: 24px 16px 60px;
+  }
+
+  .iniciar-vistoria-detalhes-page .iniciar-vistoria-card {
+    padding: 22px;
+    margin-top: 20px;
+  }
+
+  .iniciar-vistoria-detalhes-page h1 {
+    font-size: 1.6rem;
+  }
+
+  .iniciar-vistoria-detalhes-page .subtitulo-bloco-numero {
+    font-size: 1.05rem;
+  }
+
+  .iniciar-vistoria-detalhes-page .iniciar-vistoria-form {
+    grid-template-columns: 1fr;
+  }
+
+
+  .iniciar-vistoria-detalhes-page .form-actions-extended {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+    /* ORDEM DE BOTÕES MOBILE */
+  .iniciar-vistoria-detalhes-page .save-button {
+    order: 1;
+  }
+
+  .iniciar-vistoria-detalhes-page .report-button {
+    order: 2;
+  }
+
+  .iniciar-vistoria-detalhes-page .back-button {
+    order: 3;
+  }
+
+  .iniciar-vistoria-detalhes-page .action-button {
+    width: 100%;
+    min-width: 0;
+  }
+
+    .iniciar-vistoria-detalhes-page .iniciar-vistoria-form .status-text {
+    grid-column: 1 / -1;
+    font-size: 15px;
+  }
+}
+

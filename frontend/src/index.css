@@ -1,0 +1,63 @@
+/* ===== Base global do app (seguro, sem brigar com páginas) ===== */
+
+:root {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Reset básico */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+
+  /* ✅ app normal (não centraliza tudo) */
+  display: block;
+
+  /* ✅ cor base neutra (suas páginas controlam o fundo) */
+  background: #ffffff;
+  color: #0f172a;
+}
+
+/* Links: deixa neutro e você estiliza por página quando quiser */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+
+/* ✅ MUITO IMPORTANTE:
+   NÃO estilize botão globalmente.
+   No máximo: herdar fonte + cursor */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Imagens responsivas por padrão */
+img {
+  max-width: 100%;
+  display: block;
+}

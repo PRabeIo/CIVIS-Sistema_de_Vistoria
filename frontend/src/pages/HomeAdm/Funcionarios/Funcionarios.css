@@ -1,0 +1,283 @@
+/* =========================================================
+   FUNCIONÁRIOS — PADRÃO CIVIS (ESCOPADO)
+   afeta somente .funcionarios-page
+   ========================================================= */
+
+.funcionarios-page .admin-page-container {
+  padding: 30px;
+  max-width: 1100px;
+  margin: 0 auto;
+  background-color: #f8f9fa;
+  min-height: calc(100vh - 70px);
+  font-family: Roboto, system-ui, -apple-system, Segoe UI, Arial;
+  color: #111827;
+}
+
+/* Header */
+.funcionarios-page .admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.funcionarios-page .titulo-centralizado {
+  margin: 0;
+  color: #004080;
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  margin-left: 33px;
+}
+
+/* Botão adicionar */
+.funcionarios-page .admin-action-button {
+  background-color: #135ea5;
+  color: #fff;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 800;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  white-space: nowrap;
+}
+
+.funcionarios-page .admin-action-button:hover {
+  background-color: #004080;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.16);
+}
+
+.funcionarios-page .admin-action-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.14);
+}
+
+.funcionarios-page .sem-registros {
+  margin-top: 18px;
+  color: #334155;
+  font-weight: 600;
+}
+
+/* Wrapper pra tabela ter scroll horizontal se precisar */
+.funcionarios-page .table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* =========================
+   DESKTOP TABLE
+   ========================= */
+.funcionarios-page .lista-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.10);
+  min-width: 780px; /* evita esmagar colunas */
+  table-layout: fixed;
+}
+
+.funcionarios-page .lista-tabela thead th {
+  background: #004080;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.01rem;
+  padding: 14px 16px;
+  text-align: center;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.funcionarios-page .lista-tabela tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  color: #111827;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.funcionarios-page .lista-tabela tbody tr:hover {
+  background: #f8fafc;
+}
+
+.funcionarios-page .lista-tabela tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* coluna ações */
+
+
+/* Botões ação */
+.funcionarios-page .lista-tabela .acoes-botoes .btn-editar,
+.funcionarios-page .lista-tabela .acoes-botoes .btn-excluir {
+  border: none;
+  border-radius: 10px;
+  padding: 7px 10px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  width: 150px; /* deixa consistente e alinhado com thumb */
+}
+
+.funcionarios-page .lista-tabela .acoes-botoes .btn-editar {
+  background: #1f5d99 ;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+.funcionarios-page .lista-tabela .acoes-botoes .btn-editar:hover {
+  background: #174a7c;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.16);
+}
+
+.funcionarios-page .lista-tabela .acoes-botoes .btn-excluir {
+  background: #c94a55; /* vermelho "soft" CIVIS */
+  color: #fff;
+}
+.funcionarios-page .lista-tabela .acoes-botoes .btn-excluir:hover {
+  background: #b94a52;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.16);
+}
+
+/* CPF */
+.funcionarios-page .lista-tabela th:nth-child(2),
+.funcionarios-page .lista-tabela td:nth-child(2) {
+  width: 140px;
+  white-space: nowrap;
+}
+
+/* Telefone */
+.funcionarios-page .lista-tabela th:nth-child(4),
+.funcionarios-page .lista-tabela td:nth-child(4) {
+  width: 150px;
+  white-space: nowrap;
+}
+
+/* =========================
+   MOBILE: tabela vira "cards"
+   ========================= */
+@media (max-width: 768px) {
+
+  .funcionarios-page .admin-page-container {
+    padding: 18px;
+  }
+
+  .funcionarios-page .titulo-centralizado {
+    font-size: 1.7rem;
+    margin-left: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  .funcionarios-page .admin-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .funcionarios-page .admin-action-button {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* ✅ Neutraliza propriedades do desktop que atrapalham no Safari */
+  .funcionarios-page .lista-tabela {
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
+
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: auto;
+  }
+
+  .funcionarios-page .lista-tabela thead {
+    display: none;
+  }
+
+  /* desmonta */
+  .funcionarios-page .lista-tabela,
+  .funcionarios-page .lista-tabela tbody,
+  .funcionarios-page .lista-tabela tr,
+  .funcionarios-page .lista-tabela td {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* ✅ RESET das larguras fixas do desktop (nth-child ganha na especificidade) */
+  .funcionarios-page .lista-tabela td:nth-child(2),
+  .funcionarios-page .lista-tabela td:nth-child(4) {
+    width: 100%;
+    white-space: normal; /* permite quebrar linha no mobile se precisar */
+  }
+
+  /* cada linha vira um card */
+  .funcionarios-page .lista-tabela tr {
+    background: #fff;
+    border-radius: 14px;
+    padding: 14px 14px 10px;
+    margin: 0 auto 12px;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.10);
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .funcionarios-page .lista-tabela td {
+    border: none;
+    padding: 10px 0;
+    text-align: center;
+  }
+
+  /* label do data-label */
+  .funcionarios-page .lista-tabela td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.99rem;
+    font-weight: 800;
+    color: #64748b;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+
+  /* não mostra label vazio do TD de ações (data-label="") */
+  .funcionarios-page .lista-tabela td.acoes-botoes::before {
+    content: "";
+    display: none;
+  }
+
+  /* ações: bloco centralizado e botões stretch */
+  .funcionarios-page .lista-tabela td.acoes-botoes {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+    max-width: 320px;
+    margin: 8px auto 0;
+    padding-top: 10px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .funcionarios-page .lista-tabela td.acoes-botoes .btn-editar,
+  .funcionarios-page .lista-tabela td.acoes-botoes .btn-excluir {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .funcionarios-page .mobile-hidden {
+    display: none;
+  }
+}

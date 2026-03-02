@@ -1,0 +1,176 @@
+/* =========================================================
+   AGENDAR VISTORIA (ESCOPADO) — PADRÃO CIVIS
+   Tudo aqui só afeta .agendar-vistoria-page
+   ========================================================= */
+
+.agendar-vistoria-page {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* Container padrão do conteúdo (igual outras páginas) */
+.agendar-vistoria-page .admin-page-container {
+  padding: 30px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Header / título */
+.agendar-vistoria-page .page-header {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+
+.agendar-vistoria-page .titulo-centralizado {
+  margin: 0;
+  color: #004080;
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+/* Card do formulário */
+.agendar-vistoria-page .form-card {
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto;
+
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 22px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.10);
+}
+
+/* Grupos */
+.agendar-vistoria-page .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.agendar-vistoria-page .form-group label {
+  font-weight: 700;
+  color: #0b4f94;
+  font-size: 1.1rem;
+}
+
+/* Inputs */
+.agendar-vistoria-page .form-group select,
+.agendar-vistoria-page .form-group input {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 11px 12px;
+  border-radius: 10px; /* ✅ padrão CIVIS (menos arredondado) */
+  border: 1px solid #d7dde6;
+  background: #ffffff;
+  color: #111827;
+  font-size: 1rem;
+
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.agendar-vistoria-page .form-group select:focus,
+.agendar-vistoria-page .form-group input:focus {
+  border-color: rgba(19, 94, 165, 0.70);
+  box-shadow: 0 0 0 4px rgba(11, 79, 148, 0.14);
+}
+
+/* =========================
+   AÇÕES (botões)
+   ========================= */
+.agendar-vistoria-page .form-actions {
+  margin-top: 18px;
+  display: flex;
+  gap: 12px;
+  justify-content: center; /* ✅ centraliza no desktop */
+  flex-wrap: wrap;
+}
+
+/* Botões base (padrão CIVIS) */
+.agendar-vistoria-page .btn-primary,
+.agendar-vistoria-page .btn-secundario {
+  border: none;
+  border-radius: 10px; /* ✅ padrão CIVIS */
+  padding: 10px 18px;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+
+  width: 200px; /* ✅ tamanho fixo no desktop */
+  height: 42px;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.agendar-vistoria-page .btn-primary:hover,
+.agendar-vistoria-page .btn-secundario:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.16);
+}
+
+/* Primário (Agendar) */
+.agendar-vistoria-page .btn-primary {
+  background-color: #135ea5;
+  color: #ffffff;
+}
+
+.agendar-vistoria-page .btn-primary:hover {
+  background-color: #004080;
+}
+
+/* Secundário (Cancelar) */
+.agendar-vistoria-page .btn-secundario {
+  background-color: #6c757d;
+  color: #ffffff;
+}
+
+.agendar-vistoria-page .btn-secundario:hover {
+  background-color: #5a6268;
+}
+
+/* Active */
+.agendar-vistoria-page .btn-primary:active,
+.agendar-vistoria-page .btn-secundario:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.14);
+}
+
+/* =========================
+   MOBILE (até 768px)
+   ========================= */
+@media (max-width: 768px) {
+  .agendar-vistoria-page .admin-page-container {
+    padding: 18px;
+  }
+
+  .agendar-vistoria-page .titulo-centralizado {
+    font-size: 1.9rem;
+  }
+
+  .agendar-vistoria-page .form-card {
+    padding: 18px;
+  }
+
+  /* botões empilhados e full width no mobile */
+  .agendar-vistoria-page .form-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .agendar-vistoria-page .btn-primary,
+  .agendar-vistoria-page .btn-secundario {
+    width: 100%;
+    min-width: 0;          /* ✅ remove o fixo do desktop */
+    max-width: 420px;      /* ✅ fica bonito, igual outras páginas */
+  }
+}

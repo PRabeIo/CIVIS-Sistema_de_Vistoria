@@ -1,0 +1,348 @@
+/* =========================================================
+   DETALHES VISTORIA — PADRÃO CIVIS
+   escopado: .vistoria-detalhes-page
+   ========================================================= */
+
+.vistoria-detalhes-page {
+  background: #f8f9fa;
+  min-height: 100vh;
+  padding: 40px 20px 80px;
+  font-family: Roboto, system-ui, -apple-system, Segoe UI, Arial;
+}
+
+/* container central */
+.vistoria-detalhes-page .vistoria-card {
+  max-width: 750px;
+  width: 100%;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 36px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* título */
+.vistoria-detalhes-page h1 {
+  margin: 0 0 20px;
+  font-size: 2.2rem;
+  color: #004080;
+  font-weight: 800;
+}
+
+/* imagem */
+.vistoria-detalhes-page .imagem-empreendimento {
+  width: 100%;
+  max-height: 340px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+
+/* relatório */
+.vistoria-detalhes-page .relatorio-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin: 10px 0 18px;
+}
+
+/* =========================================================
+   GRID INFOS (DESKTOP = 2 colunas)
+   ========================================================= */
+.vistoria-detalhes-page .vistoria-card .vistoria-form {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 32px;
+}
+
+/* linha info */
+.vistoria-detalhes-page .info-line {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 16px;
+}
+
+.vistoria-detalhes-page .label {
+  font-size: 18px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.vistoria-detalhes-page .value {
+  font-size: 16px;
+  color: #111827;
+  font-weight: 500;
+}
+
+/* status ocupa linha inteira */
+.vistoria-detalhes-page .info-line.status-line {
+  grid-column: 1 / -1;
+}
+
+/* badge status */
+/* =========================================================
+   STATUS BADGE — ESTILO SaaS PROFISSIONAL
+   ========================================================= */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 22px;      /* ↑ aumenta altura e largura */
+  border-radius: 10px;
+
+  font-size: 16px;         /* ↑ texto maior */
+  font-weight: 800;
+}
+
+/* status abaixo da imagem */
+.status-top {
+  margin: 10px 0 14px;
+  display: flex;
+  justify-content: center;
+}
+
+/* bolinha */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* ================= STATUS COLORS ================= */
+
+/* Agendada */
+.status--agendada {
+  background: #eef6ff;
+  color: #1d4ed8;
+  border-color: #c7ddff;
+}
+.status--agendada .status-dot {
+  background: #1d4ed8;
+}
+
+/* Reagendada */
+.status--reagendada {
+  background: #fff8e6;
+  color: #b45309;
+  border-color: #ffe3a3;
+}
+.status--reagendada .status-dot {
+  background: #f59e0b;
+}
+
+/* Em andamento */
+.status--andamento {
+  background: #e6f7ff;
+  color: #0369a1;
+  border-color: #bae6fd;
+}
+.status--andamento .status-dot {
+  background: #0284c7;
+}
+
+/* Aguardando validação */
+.status--aguardando-validacao {
+  background: #f3e8ff;
+  color: #6b21a8;
+  border-color: #e9d5ff;
+}
+.status--aguardando-validacao .status-dot {
+  background: #9333ea;
+}
+
+/* Validada */
+.status--validada {
+  background: #ecfdf5;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+.status--validada .status-dot {
+  background: #16a34a;
+}
+
+/* Rejeitada */
+.status--rejeitada {
+  background: #fef2f2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+.status--rejeitada .status-dot {
+  background: #dc2626;
+}
+
+/* Finalizada */
+.status--finalizada {
+  background: #f1f5f9;
+  color: #334155;
+  border-color: #e2e8f0;
+}
+.status--finalizada .status-dot {
+  background: #64748b;
+}
+
+
+/* =========================================================
+   BOTÕES — PADRÃO (SEM PILL)
+   ========================================================= */
+
+.vistoria-detalhes-page .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 10px;            /* ✅ mais quadrado */
+  padding: 12px 18px;
+
+  font-weight: 700;
+  font-size: 15px;
+
+  cursor: pointer;
+  transition: background 0.2s ease, opacity 0.2s ease, transform 0.05s ease;
+
+  text-decoration: none;
+  white-space: nowrap;
+
+  /* ✅ NÃO expande no desktop */
+  width: auto;
+  min-width: 180px;               /* deixa consistente sem virar “mini” */
+}
+
+.vistoria-detalhes-page a.btn {
+  text-decoration: none;
+}
+
+.vistoria-detalhes-page .btn:active {
+  transform: translateY(1px);
+}
+
+.vistoria-detalhes-page .btn:disabled,
+.vistoria-detalhes-page .btn.is-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Variantes */
+.vistoria-detalhes-page .btn--primary {
+  background: #135ea5;
+  color: #fff;
+}
+.vistoria-detalhes-page .btn--primary:hover {
+  background: #004080;
+}
+
+.vistoria-detalhes-page .btn--danger {
+  background: #dc3545;
+  color: #fff;
+}
+.vistoria-detalhes-page .btn--danger:hover {
+  background: #b73a44;
+}
+
+.vistoria-detalhes-page .btn--neutral {
+  background: #6c757d;
+  color: #fff;
+}
+.vistoria-detalhes-page .btn--neutral:hover {
+  background: #545b62;
+}
+
+/* ===== AÇÕES (Iniciar/Finalizar) ===== */
+.vistoria-detalhes-page .form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 14px;                 /* ✅ separação entre botões */
+  margin-top: 22px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ===== área do botão voltar ===== */
+.vistoria-detalhes-page .bottom-actions {
+  margin-top: 16px;          /* ✅ separação do “Voltar” */
+  display: flex;
+  justify-content: center;
+}
+
+/* =========================================================
+   MOBILE (1 coluna + botões full)
+   ========================================================= */
+@media (max-width: 768px) {
+
+  .vistoria-detalhes-page {
+    padding: 24px 14px 60px;
+  }
+
+  .vistoria-detalhes-page .vistoria-card {
+    max-width: 660px;
+    padding: 22px;
+    margin: 20px auto;
+  }
+
+  .vistoria-detalhes-page h1 {
+    font-size: 1.6rem;
+  }
+
+  .vistoria-detalhes-page .vistoria-card .vistoria-form {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .vistoria-detalhes-page .info-line.status-line {
+    grid-column: auto;
+  }
+
+  .vistoria-detalhes-page .form-actions {
+    grid-column: auto;
+    flex-direction: column;
+    gap: 12px;               /* ✅ separação no mobile */
+  }
+
+  .vistoria-detalhes-page .bottom-actions {
+    margin-top: 12px;        /* ✅ separação no mobile */
+  }
+
+  .vistoria-detalhes-page .btn {
+    width: 100%;             /* ✅ full no mobile */
+    min-width: 0;
+  }
+
+  .vistoria-detalhes-page .relatorio-actions .btn {
+    width: 100%;
+  }
+
+  .vistoria-detalhes-page .status-badge {
+    font-weight: 700;
+  }
+}
+
+@media (min-width: 769px) {
+  /* garante referência de posicionamento */
+  .vistoria-detalhes-page .vistoria-card {
+    position: relative;
+  }
+
+  /* deixa o status centralizado como sempre */
+  .vistoria-detalhes-page .status-top {
+    justify-content: center;
+  }
+
+  /* "puxa" o botão pra cima, pra ficar na faixa do status */
+  .vistoria-detalhes-page .relatorio-actions {
+    position: absolute;
+    left: 36px;          /* alinhado com padding do card */
+    top: 0;              /* vamos ajustar com translate */
+    transform: translateY(462px); 
+    /* ↑ ajuste fino: mude esse valor até ficar alinhado ao status */
+    margin: 0;
+  }
+
+  /* deixa o botão do relatório com tamanho consistente */
+  .vistoria-detalhes-page .relatorio-actions .btn {
+    min-width: 200px;
+  }
+}

@@ -1,0 +1,332 @@
+/* =========================================================
+   EMPREENDIMENTOS — PADRÃO CIVIS (ESCOPADO)
+   afeta somente .empreendimentos-page
+   Diferenças:
+   - imagem abaixo do nome (já no JSX)
+   - ações empilhadas no desktop
+   ========================================================= */
+
+.empreendimentos-page .admin-page-container {
+  padding: 30px;
+  max-width: 1100px;
+  margin: 0 auto;
+  background-color: #f8f9fa;
+  min-height: calc(100vh - 70px);
+  font-family: Roboto, system-ui, -apple-system, Segoe UI, Arial;
+  color: #111827;
+}
+
+/* Header */
+.empreendimentos-page .admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.empreendimentos-page .titulo-centralizado {
+  margin: 0;
+  color: #004080;
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  margin-left: 33px;
+}
+
+/* Botão adicionar */
+.empreendimentos-page .admin-action-button {
+  background-color: #135ea5;
+  color: #fff;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 800;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  white-space: nowrap;
+}
+
+.empreendimentos-page .admin-action-button:hover {
+  background-color: #004080;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.16);
+}
+
+.empreendimentos-page .admin-action-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.14);
+}
+
+.empreendimentos-page .sem-registros {
+  margin-top: 18px;
+  color: #334155;
+  font-weight: 600;
+}
+
+/* Wrapper pra tabela ter scroll horizontal se precisar */
+.empreendimentos-page .table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* =========================
+   DESKTOP TABLE
+   ========================= */
+.empreendimentos-page .lista-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.10);
+  min-width: 780px;
+}
+
+.empreendimentos-page .lista-tabela thead th {
+  background: #004080;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.01rem;
+  padding: 14px 16px;
+  text-align: center;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.empreendimentos-page .lista-tabela tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  color: #111827;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.empreendimentos-page .lista-tabela tbody tr:hover {
+  background: #f8fafc;
+}
+
+.empreendimentos-page .lista-tabela tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Desktop: endereço aparece */
+.empreendimentos-page .mobile-hidden {
+  display: table-cell;
+}
+
+/* =========================
+   NOME + IMAGEM (abaixo do nome)
+   ========================= */
+.empreendimentos-page .emp-nome-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.empreendimentos-page .emp-nome-text {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+/* Thumb com background-image */
+.empreendimentos-page .emp-thumb {
+  width: 170px;
+  height: 96px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* =========================
+   AÇÕES (DESKTOP empilhado)
+   ========================= */
+
+
+.empreendimentos-page .acoes-botoes {
+  display: flex;
+  flex-direction: column; /* ✅ empilhado no desktop */
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* base botão da tabela */
+.empreendimentos-page .lista-tabela .acoes-botoes .btn-ver-imoveis,
+.empreendimentos-page .lista-tabela .acoes-botoes .btn-excluir {
+  border: none;
+  border-radius: 10px;
+  padding: 7px 10px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  width: 150px; /* deixa consistente e alinhado com thumb */
+}
+
+/* Exibir imóveis (azul) */
+.empreendimentos-page .lista-tabela .acoes-botoes .btn-ver-imoveis {
+  background: #1f5d99;
+  color: #fff;
+}
+
+.empreendimentos-page .lista-tabela .acoes-botoes .btn-ver-imoveis:hover {
+  background: #174a7c;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.16);
+}
+
+/* Excluir (vermelho soft) */
+.empreendimentos-page .lista-tabela .acoes-botoes .btn-excluir {
+  background: #c94a55;
+  color: #fff;
+}
+
+.empreendimentos-page .lista-tabela .acoes-botoes .btn-excluir:hover {
+  background: #b94a52;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.16);
+}
+
+/* coluna Ações fixa */
+.empreendimentos-page .lista-tabela th:last-child,
+.empreendimentos-page .lista-tabela td:last-child {
+  width: 200px;
+}
+
+
+/* =========================
+   MOBILE: tabela vira "cards"
+   ========================= */
+@media (max-width: 768px) {
+  .empreendimentos-page .admin-page-container {
+    padding: 18px;
+  }
+
+  .empreendimentos-page .titulo-centralizado {
+    font-size: 1.7rem;
+    margin-left: 0;
+    text-align: center;
+    width: 100%;
+  }
+
+  .empreendimentos-page .admin-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .empreendimentos-page .admin-action-button {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* =========================
+     MOBILE: tabela vira cards
+     (ordem importa)
+     ========================= */
+
+  /* 1) "Desmonta" a tabela */
+  .empreendimentos-page .lista-tabela {
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+    border-collapse: separate; /* evita comportamento estranho no iOS */
+    border-spacing: 0;
+  }
+
+  .empreendimentos-page .lista-tabela thead {
+    display: none;
+  }
+
+  .empreendimentos-page .lista-tabela tbody,
+  .empreendimentos-page .lista-tabela tr,
+  .empreendimentos-page .lista-tabela td {
+    display: block;
+    width: 100%;
+  }
+
+  /* 2) Cada linha vira um card */
+  .empreendimentos-page .lista-tabela tr {
+    background: #fff;
+    border-radius: 14px;
+    padding: 1px 14px 10px;
+    margin-bottom: 12px;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.10);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .empreendimentos-page .lista-tabela tbody td {
+    padding: 10px 0;
+    text-align: center;
+  }
+
+  /* label */
+  .empreendimentos-page .lista-tabela td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.99rem;
+    font-weight: 800;
+    color: #64748b;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+
+  /* endereço some */
+  .empreendimentos-page .mobile-hidden {
+    display: none;
+  }
+
+  /* Nome + imagem */
+  .empreendimentos-page .emp-nome-wrapper {
+    align-items: center;
+    gap: 8px;
+  }
+
+  .empreendimentos-page .emp-thumb {
+    width: 100%;
+    max-width: 420px;
+    height: 170px;
+  }
+
+  /* =========================
+     AÇÕES: centralizado + botões stretch
+     sem depender de "Ações"
+     ========================= */
+
+  /* o último td do card é o de ações (mais robusto que data-label="Ações") */
+  .empreendimentos-page .lista-tabela tr td:last-child {
+    width: 100%;
+    text-align: center; /* centraliza o bloco de ações */
+  }
+
+  
+  .empreendimentos-page .lista-tabela tr td:last-child .acoes-botoes {
+    width: 100%;
+    max-width: 320px;   /* mantém seu layout atual */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch; /* botões esticam */
+  }
+
+  .empreendimentos-page .lista-tabela tr td:last-child .acoes-botoes .btn-ver-imoveis,
+  .empreendimentos-page .lista-tabela tr td:last-child .acoes-botoes .btn-excluir {
+    width: 100%;
+    display: block;
+  }
+}

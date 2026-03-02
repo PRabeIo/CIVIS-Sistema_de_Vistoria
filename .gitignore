@@ -1,5 +1,22 @@
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# =========================
 # Logs
-logs
+# =========================
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,20 +24,58 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-dist
-dist-ssr
+# =========================
+# Env (NUNCA subir)
+# =========================
+.env
+.env.*
+!example.env
+
+# =========================
+# Node / Package managers
+# =========================
+**/node_modules/
+**/.pnp/
+**/.pnp.js
+
+# =========================
+# Frontend (Vite/React)
+# =========================
+frontend/dist/
+frontend/dist-ssr/
+frontend/.vite/
+frontend/.vite-temp/
 *.local
 
+# =========================
+# Backend (builds/cache)
+# =========================
+backend/dist/
+backend/build/
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.env
-node_modules/
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# =========================
+# Uploads e relatórios (CIVIS)
+# =========================
+
+backend/uploads/*
+!backend/uploads/.gitkeep
+!backend/uploads/clientes/
+!backend/uploads/empreendimentos/
+!backend/uploads/funcionarios/
+
+backend/uploads/clientes/*
+!backend/uploads/clientes/.gitkeep
+
+backend/uploads/empreendimentos/*
+!backend/uploads/empreendimentos/.gitkeep
+
+backend/uploads/funcionarios/*
+!backend/uploads/funcionarios/.gitkeep
+
+backend/relatorios/*
+!backend/relatorios/.gitkeep
+
+# =========================
+# Coverage / tests
+# =========================
+coverage/
