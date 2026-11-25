@@ -4,6 +4,8 @@ Sistema web full-stack para gerenciamento completo de vistorias imobiliárias, c
 
 Desenvolvido com foco em organização, rastreabilidade e automação do processo de vistoria entre administradores, clientes e vistoriadores.
 
+> O projeto está em reformulação para virar produto. O andamento está em [Planning.md](Planning.md).
+
 ## Sumário
 
 - [Visão Geral](#visão-geral)
