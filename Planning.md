@@ -3,6 +3,8 @@
 > Objetivo: levar o CIVIS de projeto acadêmico/portfólio a um produto utilizável em produção — seguro, coerente no fluxo, consistente no design e operável (deploy, testes, monitoramento).
 >
 > Baseado na análise completa do código feita em 25/11/2026 (branch `main`, commit `7924985`).
+>
+> **Progresso:** Fase 0 concluída · T1 (setup TypeScript) · D1 (usuário único) · S6 · B1 · B2. Próximo: S1, S7, S9 e depois S5 (ordem da Fase 1). Detalhes no [checklist](#checklist-de-acompanhamento).
 
 ---
 
@@ -74,7 +76,9 @@ Regra: uma tarefa adiada só entra no MVP se outra sair, para o prazo não cresc
 ## Convenções
 
 - Cada tarefa tem **ID**, prioridade, arquivos afetados e **critério de aceite**.
-- Uma branch/PR por grupo de tarefas (ex.: `fix/seguranca-senha-hash`, `feat/maquina-estados`).
+- **Git:** trabalho direto na `main`, **um commit simples por grupo de tarefas** (ex.: `feat: sessão segura com cookies (S5)`). Sem branches remotas nem PRs por enquanto; o commit e o push são feitos pelo desenvolvedor.
+- **Sem atribuição de IA nos commits:** nenhuma linha `Co-Authored-By` ou "Generated with" (configurado em `attribution` no settings do Claude Code). Um commit assim já chegou à `main` uma vez e precisou de reescrita do histórico.
+- Antes de cada commit: `typecheck`, `lint`, `test` e `build` verdes nos dois projetos.
 - Nenhuma tarefa é dada como concluída sem teste automatizado cobrindo o comportamento (a partir da Fase 0).
 - **TypeScript (DEC-5):** a partir da Fase 1, todo arquivo novo ou reescrito em uma tarefa é `.ts`/`.tsx`. Arquivo só tocado de leve (1–2 linhas) pode continuar `.js` até a sua fase.
 - Padronizar respostas de erro da API: `{ "erro": { "codigo": "STRING", "mensagem": "texto" } }` (hoje mistura `erro` e `error`).
@@ -223,9 +227,9 @@ Regra: uma tarefa adiada só entra no MVP se outra sair, para o prazo não cresc
 
 | ID | Prio | Tarefa | Critério de aceite |
 |---|---|---|---|
-| O1 | P1 | **Migrations versionadas** (`node-pg-migrate` ou `dbmate`) substituindo o `script.sql` único; seeds de desenvolvimento (empreendimentos, clientes e vistorias fictícios) e seed do admin (S8). | `npm run db:migrate && npm run db:seed` cria ambiente do zero. |
-| O2 | P1 | **Docker Compose** para dev (Postgres + backend + frontend) e Dockerfile de produção do backend. | `docker compose up` sobe tudo. |
-| O3 | P1 | **CI (GitHub Actions)**: lint, testes backend com Postgres de serviço, testes frontend, `vite build` em Linux, `npm audit` (nível high). | PR só entra com pipeline verde. |
+| O1 | P1 | **Migrations versionadas**: *base feita na Fase 0 (F0.8)*, com runner próprio, `migrate`, `seed` e `db:reset`. Falta: seed de desenvolvimento mais rico (vários empreendimentos, clientes e vistorias em todos os status), seed/criação do primeiro admin em produção (S8) e um teste de que as migrations rodam do zero no CI. | `npm run db:reset` cria um ambiente completo do zero; o CI aplica as migrations num banco vazio. |
+| O2 | P1 | **Docker Compose**: *Postgres (`db`, `db-test`) feito na Fase 0 (F0.6)*. Falta: serviços de backend e frontend no compose e Dockerfile de produção do backend (`npm run build` + `node dist/server.js`). | `docker compose up` sobe tudo. |
+| O3 | P1 | **CI (GitHub Actions)**: lint, testes backend com Postgres de serviço, testes frontend, `vite build` em Linux, `npm audit` (nível high), rodando em todo push na `main`. | Pipeline verde em todo push; vermelho é corrigido antes de qualquer outra tarefa. |
 | O4 | P1 | **Cobertura mínima**: services de vistoria (máquina de estados), auth, permissões por papel (matriz papel × rota), relatório (IA mockada). | ≥ 70% em `services/` e `domain/`. |
 | O5 | P1 | **Logs estruturados** (`pino`) com id de requisição; nunca logar senha/token/CPF completo. **Healthcheck** `GET /health` (app + banco). | Logs em JSON em produção. |
 | O6 | P1 | **Deploy**: frontend (Vercel/Netlify), backend (Render/Railway/Fly), Postgres e Storage no Supabase; ambientes `staging` e `production` com variáveis separadas; HTTPS obrigatório. | URL de staging funcionando com dados de seed. |
@@ -252,7 +256,7 @@ Regra: uma tarefa adiada só entra no MVP se outra sair, para o prazo não cresc
 | T2 | P1 | **Tipos de domínio e contrato da API**: tipos de `Usuario`, `Papel`, `Vistoria`, `StatusVistoria`, `Imovel`, `Empreendimento`, payload do JWT (`req.usuario` tipado via `declare module 'express'`), formato de erro padrão. Avaliar pacote compartilhado `shared/` (schemas zod usados pelo back e pelo front). | Junto de D1 e S2 | Nenhum `any` explícito nos tipos de domínio; front e back usam os mesmos nomes de status. |
 | T3 | P1 | **Backend por camada**: `config` → `middlewares` → `services` → `controllers` → `routes` → `app`/`server` → `scripts`. Cada arquivo reescrito nas Fases 1–2 já sai em TS; os que sobrarem são convertidos ao fim da Fase 2. | Fases 1–2 | Nenhum `.js` em `backend/src/`; build gera `dist/` e `npm start` roda `node dist/server.js`. |
 | T4 | P1 | **Frontend por camada**: `config`, `services/api`, `AuthProvider` e hooks (U4) primeiro; componentes do design system (U1) e telas novas (U6–U10) já em `.tsx`. Props de componentes tipadas. | Fase 3 | Camada de dados e componentes base 100% TS. |
-| T5 | P1 | **CI**: `typecheck` entra no pipeline (O3) e bloqueia PR. | Fase 4 (com O3) | PR com erro de tipo não entra. |
+| T5 | P1 | **CI**: `typecheck` entra no pipeline (O3). | Fase 4 (com O3) | Push com erro de tipo deixa o pipeline vermelho. |
 | T6 | P2 | **Fim da migração**: converter as telas restantes, remover `allowJs`, ativar `noUncheckedIndexedAccess`, proibir `any` (`@typescript-eslint/no-explicit-any: error`). Testes também em `.ts`. | Pós-MVP | Zero `.js`/`.jsx` em `src/` e `tests/` (exceto configs). |
 
 ---
