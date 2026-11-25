@@ -22,8 +22,7 @@ async function cadastroPublico(req, res) {
 
     const status = err.statusCode || 500;
     return res.status(status).json({
-      error: status === 409 ? err.message : 'Erro ao cadastrar cliente.',
-      detalhes: err.message,
+      error: status < 500 ? err.message : 'Erro ao cadastrar cliente.',
     });
   }
 }
@@ -50,8 +49,7 @@ async function criar(req, res) {
 
     const status = err.statusCode || 500;
     return res.status(status).json({
-      error: status === 409 ? err.message : 'Erro ao cadastrar cliente.',
-      detalhes: err.message,
+      error: status < 500 ? err.message : 'Erro ao cadastrar cliente.',
     });
   }
 }
@@ -109,6 +107,9 @@ async function atualizar(req, res) {
 
     return res.status(200).json(clienteAtualizado);
   } catch (err) {
+    if (err.statusCode && err.statusCode < 500) {
+      return res.status(err.statusCode).json({ error: err.message });
+    }
     console.error('Erro ao atualizar cliente:', err);
     return res.status(500).json({ error: 'Erro ao atualizar cliente.', detalhes: err.message });
   }
@@ -166,6 +167,9 @@ async function atualizarComImagem(req, res) {
 
     return res.status(200).json(clienteAtualizado);
   } catch (err) {
+    if (err.statusCode && err.statusCode < 500) {
+      return res.status(err.statusCode).json({ error: err.message });
+    }
     console.error('Erro ao atualizar cliente com imagem:', err);
     return res.status(500).json({ error: 'Erro ao atualizar cliente.', detalhes: err.message });
   }
@@ -200,6 +204,9 @@ async function atualizarMe(req, res) {
 
     return res.status(200).json(atualizado);
   } catch (err) {
+    if (err.statusCode && err.statusCode < 500) {
+      return res.status(err.statusCode).json({ error: err.message });
+    }
     console.error('Erro ao atualizar meu perfil:', err);
     return res.status(500).json({ error: 'Erro ao atualizar perfil.' });
   }
@@ -248,7 +255,7 @@ async function atualizarMinhaSenha(req, res) {
     }
 
     if (atualizado?.erro === 'SENHA_FRACA') {
-      return res.status(400).json({ error: 'A nova senha deve ter pelo menos 6 caracteres.' });
+      return res.status(400).json({ error: 'A nova senha deve ter pelo menos 8 caracteres.' });
     }
 
     return res.status(200).json({ message: 'Senha alterada com sucesso.' });

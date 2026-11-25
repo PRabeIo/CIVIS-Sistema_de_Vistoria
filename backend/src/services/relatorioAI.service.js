@@ -1,6 +1,11 @@
 const { GoogleGenAI } = require("@google/genai");
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// Criado sob demanda: importar o módulo não exige GEMINI_API_KEY (testes, dev sem IA).
+let ai = null;
+function getAI() {
+  if (!ai) ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  return ai;
+}
 
 function montarPrompt(context) {
   return `
@@ -93,7 +98,9 @@ function extrairJsonSeguro(text) {
   // caminho feliz
   try {
     return JSON.parse(t);
-  } catch {}
+  } catch {
+    // não é JSON puro; tenta recortar abaixo
+  }
 
   // tenta recortar do primeiro "{" ao último "}"
   const start = t.indexOf("{");
@@ -108,7 +115,7 @@ function extrairJsonSeguro(text) {
 async function gerarRelatorioIA(context) {
   const model = "gemini-3-flash-preview";
 
-  const resp = await ai.models.generateContent({
+  const resp = await getAI().models.generateContent({
     model,
     contents: montarPrompt(context),
     generationConfig: {

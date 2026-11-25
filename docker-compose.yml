@@ -1,0 +1,38 @@
+# Postgres local para desenvolvimento (db) e testes automatizados (db-test).
+# Uso: docker compose up -d db db-test
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: civis
+      POSTGRES_PASSWORD: civis
+      POSTGRES_DB: civis
+    ports:
+      - "${CIVIS_DB_PORT:-55432}:5432"
+    volumes:
+      - civis-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U civis -d civis"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  db-test:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: civis
+      POSTGRES_PASSWORD: civis
+      POSTGRES_DB: civis_test
+    ports:
+      - "${CIVIS_DB_TEST_PORT:-55433}:5432"
+    # Dados em memória: cada "up" começa limpo e os testes rodam mais rápido.
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U civis -d civis_test"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  civis-db:

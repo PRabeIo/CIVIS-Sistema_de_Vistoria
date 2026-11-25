@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import "./CriarRelatorioPage.css";
 import { apiFetch, getToken } from "../../../services/api";
+import { API_BASE_URL } from "../../../config";
 
 const opcoesEstado = ["Péssimo", "Ruim", "Razoável", "Bom", "Excelente"];
 const comodos = ["quartos", "banheiros", "sala", "cozinha", "varanda"];
@@ -359,7 +360,7 @@ function CriarRelatorioPage() {
         });
       }
 
-      const response = await fetch("http://localhost:3001/api/relatorio/gerar", {
+      const response = await fetch(`${API_BASE_URL}/relatorio/gerar`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

@@ -9,7 +9,6 @@ router.get('/', vistoriadorController.listar);
 // GET: buscar por id
 router.get('/:id', vistoriadorController.buscarPorId);
 
-// DELETE: remove o cargo de vistoriador
-router.delete('/:id', vistoriadorController.deletar);
+// (D1) Para tirar alguém do papel de vistoriador, troque o cargo em PUT /funcionarios/:id.
 
 module.exports = router;

@@ -73,14 +73,6 @@ function ListagemImoveis({ onLogout }) {
     }
   };
 
-  const badgeClass = (status) => {
-    const s = String(status || "").toLowerCase();
-    if (s.includes("ativo") || s.includes("dispon")) return "badge badge-ok";
-    if (s.includes("vist") || s.includes("andamento")) return "badge badge-warn";
-    if (s.includes("inativ") || s.includes("bloq")) return "badge badge-bad";
-    return "badge";
-  };
-
   return (
     <div className="home-container imoveis-page">
       <Navbar onLogout={handleLogout} />

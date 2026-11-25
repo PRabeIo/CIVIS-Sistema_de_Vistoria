@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../../../services/api";
 import "../../styles/editarPerfil.css";
 import Navbar from "../../components/Navbar/Navbar"; // ajuste o caminho se necessário
+import { SERVER_URL } from "../../../config";
 
 /* ===== helpers (máscaras / normalização) ===== */
 const onlyDigits = (v = "") => String(v).replace(/\D/g, "");
@@ -135,7 +136,7 @@ function EditarPerfilVistoriador({ onLogout }) {
   const fotoAtualUrl = useMemo(() => {
     if (previewUrl) return previewUrl;
     if (perfil?.imagemdeperfil) {
-      return `http://localhost:3001/uploads/funcionarios/${perfil.imagemdeperfil}`;
+      return `${SERVER_URL}/uploads/funcionarios/${perfil.imagemdeperfil}`;
     }
     return "/imagens/default-profile.png";
   }, [perfil?.imagemdeperfil, previewUrl]);

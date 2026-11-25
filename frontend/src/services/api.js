@@ -1,5 +1,5 @@
 // src/services/api.js
-const API_BASE_URL = "http://localhost:3001/api";
+import { API_BASE_URL } from "../config";
 
 export function getToken() {
   return localStorage.getItem("token");
@@ -58,10 +58,24 @@ export async function apiFetch(path, options = {}) {
     data = await response.json();
   } catch (_) {}
 
+  // Sessão inválida/expirada (ex.: tokens emitidos antes da unificação de usuários):
+  // limpa a sessão e volta para o login. O tratamento completo (refresh, aviso) vem no U4.
+  if (response.status === 401 && baseHeaders.Authorization) {
+    encerrarSessao();
+  }
+
   if (!response.ok) {
     const msg = data?.erro || data?.error || "Erro na resposta do servidor.";
     throw new Error(msg);
   }
 
   return data;
+}
+
+export function encerrarSessao() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("usuario");
+  if (window.location.pathname !== "/login") {
+    window.location.assign("/login");
+  }
 }

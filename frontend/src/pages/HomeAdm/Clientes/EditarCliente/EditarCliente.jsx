@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../../Home.css';
 import '../Clientes.css';
+import { API_BASE_URL } from "../../../../config";
 
 function EditarCliente() {
   const { id } = useParams();
@@ -21,7 +22,7 @@ function EditarCliente() {
   useEffect(() => {
     async function fetchCliente() {
       try {
-        const response = await fetch(`http://localhost:3001/api/clientes/${id}`);
+        const response = await fetch(`${API_BASE_URL}/clientes/${id}`);
         if (!response.ok) throw new Error('Cliente não encontrado');
 
         const data = await response.json();
@@ -76,7 +77,7 @@ function EditarCliente() {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/api/clientes/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/clientes/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

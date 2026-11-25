@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../../../services/api";
 import "../../styles/perfil.css";
 import Navbar from "../../components/Navbar/Navbar"; 
+import { SERVER_URL } from "../../../config";
 
 /* ===== helpers (máscaras / normalização) ===== */
 const onlyDigits = (v = "") => String(v).replace(/\D/g, "");
@@ -76,7 +77,7 @@ function PerfilCliente({ onLogout }) {
 
   const fotoUrl =
     perfil?.imagemdeperfil
-      ? `http://localhost:3001/uploads/clientes/${perfil.imagemdeperfil}`
+      ? `${SERVER_URL}/uploads/clientes/${perfil.imagemdeperfil}`
       : "/imagens/default-profile.png";
 
   // ✅ valores formatados (máscara só no front)

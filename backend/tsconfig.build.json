@@ -1,0 +1,11 @@
+{
+  // Build de produção: compila src/ (.ts e .js) para dist/.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "rootDir": "src",
+    "outDir": "dist",
+    "sourceMap": true
+  },
+  "include": ["src"]
+}

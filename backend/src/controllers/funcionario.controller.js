@@ -37,67 +37,28 @@ async function criar(req, res) {
     console.error("Erro ao cadastrar funcionário:", err);
     const status = err.statusCode || 500;
     return res.status(status).json({
-      error: status === 409 ? err.message : "Erro ao cadastrar funcionário.",
-      detalhes: err.message,
+      error: status < 500 ? err.message : "Erro ao cadastrar funcionário.",
     });
   }
 }
 
-// ATUALIZAR POR ID (fluxo admin)
-async function atualizar(id, dados, imagemdeperfilFilenameOrNull = null) {
-  const idNum = Number(id);
-
-  // se vier upload e id inválido, remove upload novo
-  if (Number.isNaN(idNum)) {
-    if (imagemdeperfilFilenameOrNull) {
-      safeUnlink(path.join(FUNCIONARIO_UPLOAD_DIR, imagemdeperfilFilenameOrNull));
-    }
-    return null;
-  }
-
-  const caminhoNovo = imagemdeperfilFilenameOrNull
-    ? path.join(FUNCIONARIO_UPLOAD_DIR, imagemdeperfilFilenameOrNull)
-    : null;
-
+// ATUALIZAR POR ID (fluxo admin) — PUT /funcionarios/:id (multipart, campo opcional "imagemdeperfil")
+async function atualizar(req, res) {
   try {
-    const [existente] = await db`SELECT * FROM funcionario WHERE id = ${idNum}`;
-    if (!existente) {
-      // funcionário não existe -> remove upload novo
-      safeUnlink(caminhoNovo);
-      return null;
-    }
+    const funcionario = await funcionarioService.atualizar(
+      req.params.id,
+      req.body || {},
+      req.file ? req.file.filename : null,
+    );
+    if (!funcionario) return res.status(404).json({ error: "Funcionário não encontrado." });
 
-    const filenameAntigo = existente.imagemdeperfil ? String(existente.imagemdeperfil) : null;
-
-    const { cpf, email, nome, senha, telefone } = dados;
-    const senhaFinal = senha ? await bcrypt.hash(senha, SALT_ROUNDS) : existente.senha;
-
-    const imagemdeperfilFinal = imagemdeperfilFilenameOrNull ?? existente.imagemdeperfil;
-
-    // 1) atualiza banco primeiro
-    const [f] = await db`
-      UPDATE funcionario
-      SET
-        cpf = ${cpf ?? existente.cpf},
-        email = ${email ?? existente.email},
-        nome = ${nome ?? existente.nome},
-        senha = ${senhaFinal},
-        telefone = ${telefone ?? existente.telefone},
-        imagemdeperfil = ${imagemdeperfilFinal}
-      WHERE id = ${idNum}
-      RETURNING *
-    `;
-
-    // 2) remove antigo APÓS sucesso, somente se realmente trocou
-    if (imagemdeperfilFilenameOrNull && filenameAntigo && filenameAntigo !== imagemdeperfilFilenameOrNull) {
-      safeUnlink(path.join(FUNCIONARIO_UPLOAD_DIR, filenameAntigo));
-    }
-
-    return f;
+    return res.json(funcionario);
   } catch (err) {
-    // erro -> remove upload novo
-    safeUnlink(caminhoNovo);
-    throw err;
+    if (err.statusCode && err.statusCode < 500) {
+      return res.status(err.statusCode).json({ error: err.message });
+    }
+    console.error("Erro ao atualizar funcionário:", err);
+    return res.status(500).json({ error: "Erro ao atualizar funcionário." });
   }
 }
 
@@ -148,23 +109,6 @@ async function perfil(req, res) {
   }
 }
 
-async function atualizarCargo(req, res) {
-  const { id } = req.params;
-  const { cargo } = req.body;
-
-  if (!cargo) return res.status(400).json({ error: "cargo é obrigatório." });
-
-  try {
-    const result = await funcionarioService.atualizarCargo(id, cargo);
-    if (!result.ok) return res.status(result.status).json({ error: result.msg });
-
-    return res.json({ message: "Cargo atualizado com sucesso." });
-  } catch (err) {
-    console.error("Erro ao atualizar cargo:", err);
-    return res.status(500).json({ error: "Erro ao atualizar cargo." });
-  }
-}
-
 /* ======= NOVOS CONTROLLERS: /me ======= */
 
 async function me(req, res) {
@@ -197,6 +141,9 @@ async function atualizarMe(req, res) {
 
     return res.status(200).json(atualizado);
   } catch (err) {
+    if (err.statusCode && err.statusCode < 500) {
+      return res.status(err.statusCode).json({ error: err.message });
+    }
     console.error("Erro ao atualizar meu perfil (funcionário):", err);
     return res.status(500).json({ error: "Erro ao atualizar perfil." });
   }
@@ -243,7 +190,6 @@ module.exports = {
   deletar,
   buscarPorId,
   perfil,
-  atualizarCargo,
   me,
   atualizarMe,
   atualizarMeuAvatar,

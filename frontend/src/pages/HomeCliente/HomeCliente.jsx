@@ -3,12 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { apiFetch } from "../../services/api";
 import Navbar from "../components/Navbar/Navbar"; 
+import { SERVER_URL } from "../../config";
 
 function Home({ onLogout }) {
   const navigate = useNavigate();
 
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
-  const clienteId = usuario?.id;
 
   const [imoveis, setImoveis] = useState([]);
 
@@ -143,7 +142,7 @@ function Home({ onLogout }) {
                 <img
                   src={
                     img
-                      ? `http://localhost:3001/uploads/${img}`
+                      ? `${SERVER_URL}/uploads/${img}`
                       : "/imagens/vistoria.png"
                   }
                   alt={`Imagem do imóvel ${imovel.descricao || ""}`}

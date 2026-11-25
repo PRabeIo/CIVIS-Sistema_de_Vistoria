@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { apiFetch } from "../../../services/api";
 import "../../styles/vistoriaDetalhes.css";
+import { SERVER_URL } from "../../../config";
 
 function VistoriaDetalhes() {
   const { id } = useParams();
@@ -129,7 +130,7 @@ function VistoriaDetalhes() {
 
         {vistoriaDetalhes.anexos && (
           <img
-            src={`http://localhost:3001/uploads/${vistoriaDetalhes.anexos}`}
+            src={`${SERVER_URL}/uploads/${vistoriaDetalhes.anexos}`}
             alt="Imagem do Imóvel"
             className="imagem-empreendimento"
             onError={(e) => {

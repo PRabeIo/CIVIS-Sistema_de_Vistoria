@@ -1,0 +1,25 @@
+{
+  // Só checagem de tipos (o Vite compila). Migração incremental (DEC-5): .jsx/.js convivem
+  // com .ts/.tsx; só os arquivos TypeScript são checados.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "types": ["vite/client", "@testing-library/jest-dom/vitest"],
+
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "allowJs": true,
+    "checkJs": false,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "noEmit": true
+  },
+  "include": ["src", "vite.config.js"],
+  "exclude": ["src/_arquivadas"]
+}

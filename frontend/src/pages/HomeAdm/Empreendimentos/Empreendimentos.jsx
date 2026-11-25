@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./Empreendimentos.css";
 import { apiFetch } from "../../../services/api";
 import Navbar from "../../components/Navbar/Navbar"; // ajuste o caminho se necessário
+import { SERVER_URL } from "../../../config";
 
 function Empreendimentos({ onLogout }) {
   const navigate = useNavigate();
@@ -47,7 +48,7 @@ function Empreendimentos({ onLogout }) {
 
   // Helper pra evitar quebrar se mudar o nome do campo no backend
   const getImg = (emp) => emp?.anexos ?? emp?.imagemempreendimento ?? emp?.imagem ?? null;
-  const BASE_UPLOAD_URL = "http://localhost:3001/uploads";
+  const BASE_UPLOAD_URL = `${SERVER_URL}/uploads`;
 
   const buildImgUrl = (imgPath) => {
     if (!imgPath) return "/imagens/vistoria.png";
@@ -56,7 +57,7 @@ function Empreendimentos({ onLogout }) {
     if (String(imgPath).startsWith("http")) return imgPath;
 
     // se vier com "/uploads/..." normaliza
-    if (String(imgPath).startsWith("/uploads/")) return `http://localhost:3001${imgPath}`;
+    if (String(imgPath).startsWith("/uploads/")) return `${SERVER_URL}${imgPath}`;
 
     // se vier com subpasta tipo "empreendimentos/arquivo.png" ou só "arquivo.png"
     const clean = String(imgPath).replace(/^\/+/, "");

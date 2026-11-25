@@ -9,7 +9,7 @@ import ContatosIcon from '/assets/imagenstelainicial/5.png';
 function Inicial() {
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false); 
-  
+ 
 
     useEffect(() => {
         document.body.classList.add("inicial-body");

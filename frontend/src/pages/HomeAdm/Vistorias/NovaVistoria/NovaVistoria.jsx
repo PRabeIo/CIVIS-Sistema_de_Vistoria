@@ -1,6 +1,7 @@
   import React, { useState, useEffect } from 'react';
   import { useNavigate } from 'react-router-dom';
   import '../../Home.css';
+import { API_BASE_URL } from "../../../../config";
 
   function NovaVistoria() {
     const navigate = useNavigate();
@@ -22,9 +23,9 @@
       const fetchData = async () => {
         try {
           const [empRes, cliRes, vistRes] = await Promise.all([
-            fetch('http://localhost:3001/api/empreendimentos'),
-            fetch('http://localhost:3001/api/clientes'),
-            fetch('http://localhost:3001/api/vistoriadores'),
+            fetch(`${API_BASE_URL}/empreendimentos`),
+            fetch(`${API_BASE_URL}/clientes`),
+            fetch(`${API_BASE_URL}/vistoriadores`),
           ]);
 
           setEmpreendimentos(await empRes.json());
@@ -44,7 +45,7 @@
       setFormData({ ...formData, idimovel: '' });
 
       try {
-        const res = await fetch(`http://localhost:3001/api/imoveis?empreendimentoid=${id}`);
+        const res = await fetch(`${API_BASE_URL}/imoveis?empreendimentoid=${id}`);
         setImoveis(await res.json());
       } catch (err) {
         console.error('Erro ao carregar imóveis:', err);
@@ -68,7 +69,7 @@
       };
 
       try {
-        const res = await fetch('http://localhost:3001/api/vistorias', {
+        const res = await fetch(`${API_BASE_URL}/vistorias`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),

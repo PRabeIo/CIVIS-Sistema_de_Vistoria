@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../../Home.css';
+import { API_BASE_URL } from "../../../../config";
 
 function VistoriaDetalhes() {
   const { id } = useParams(); // ID da vistoria vindo da URL
@@ -10,7 +11,7 @@ function VistoriaDetalhes() {
   useEffect(() => {
     const fetchVistoria = async () => {
       try {
-        const res = await fetch(`http://localhost:3001/api/vistorias/${id}`);
+        const res = await fetch(`${API_BASE_URL}/vistorias/${id}`);
         if (!res.ok) {
           throw new Error('Vistoria não encontrada');
         }

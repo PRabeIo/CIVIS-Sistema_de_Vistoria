@@ -10,7 +10,6 @@ export const NAV_BY_TIPO = {
 
   vistoriador: [
     { label: "Home", to: "/home" },
-    { label: "Histórico de Vistorias", to: "/vistoriador/historico" },
     { label: "Perfil", to: "/vistoriador/perfil" },
   ],
 

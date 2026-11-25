@@ -112,7 +112,7 @@ CLIENTE
 
 ---
 
-## Status da vistoria (ENUM banco)
+## Status da vistoria (coluna `status`, VARCHAR + CHECK)
 
 - **Aguardando Agendamento da Vistoria**: aguardando agendamento do cliente
 - **Vistoria Agendada** : vistoria marcada pelo cliente.
@@ -216,7 +216,7 @@ CIVIS/
  │   └── public/
  │
  ├── diagramas/
- └── script.sql
+ └── docker-compose.yml
 ```  
 
 ---
@@ -226,17 +226,30 @@ CIVIS/
 PostgreSQL (Supabase)
 
 Tabelas principais:
-- funcionario
-- administrador
-- vistoriador
-- cliente
+- usuario: identidade única de todos (e-mail único, senha, papel `admin` | `vistoriador` | `cliente`, ativo)
+- cliente: perfil 1:1 do usuário cliente (`idcliente` = `usuario.id`)
+- funcionario: perfil 1:1 de admin e vistoriador (`id` = `usuario.id`)
 - empreendimento
 - imovel
 - vistoria
 - relatoriotecnico
 
-Para criar o banco:
-abrir Supabase → SQL Editor → executar script.sql
+O schema é criado **só por migrations** (`backend/migrations/*.sql`), aplicadas em ordem pelo
+`backend/scripts/migrate.js`, que registra cada uma em `schema_migrations`.
+
+```bash
+docker compose up -d db          # Postgres local na porta 55432
+cd backend
+npm run migrate                  # aplica as migrations pendentes
+npm run seed                     # dados de teste (admin, vistoriador, cliente…)
+npm run db:reset                 # recria o schema do zero + seed (só dev)
+```
+
+Usuários do seed: `admin@civis.test`, `vistoriador@civis.test` e `cliente@civis.test`. A senha é
+`SEED_PASSWORD` ou o padrão definido em `backend/scripts/seed.js`.
+
+Para usar o Supabase, aponte `DATABASE_URL` para o projeto, defina `DATABASE_SSL=require` e rode
+`npm run migrate`.
 
 ---
 
@@ -267,13 +280,22 @@ Renomeie o arquivo `backend/example.env` para `backend/.env`, ele deve ter a seg
 
 ```env
 PORT=3001
-DATABASE_URL=postgresql://USER:SENHA@HOST:5432/postgres
+DATABASE_URL=postgres://civis:civis@127.0.0.1:55432/civis
+DATABASE_SSL=disable            # "require" para Supabase
 SUPABASE_URL=https://seu-projeto.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=sua_service_role_key
 JWT_SECRET=sua_chave_jwt
 JWT_EXPIRES_IN=7d
 BCRYPT_SALT_ROUNDS=10
 GEMINI_API_KEY=SUA_CHAVE_AQUI
+# SEED_PASSWORD=                # senha dos usuários do seed
+```
+
+No frontend, copie `frontend/.env.example` para `frontend/.env.local`:
+
+```env
+VITE_SERVER_URL=http://localhost:3001   # origem do backend (arquivos em /uploads)
+VITE_API_URL=http://localhost:3001/api  # opcional; padrão: ${VITE_SERVER_URL}/api
 ```
 ### Onde obter o DATABASE_URL
 
@@ -335,17 +357,24 @@ git clone LINK_DO_REPOSITORIO
 cd CIVIS
 ``` 
 
-2. Backend
+2. Banco de dados (Docker)
+```bash
+docker compose up -d db
+```
+
+3. Backend
 ```bash
 cd backend
 npm install
+cp example.env .env
+npm run db:reset
 npm run dev
 ``` 
 
 Backend disponível em:
 `http://localhost:3001`
 
-3. Frontend
+4. Frontend
 ```bash  
 cd frontend
 npm install
@@ -354,6 +383,25 @@ npm run dev
 
 Frontend disponível em:
 `http://localhost:5173`
+
+### Testes e lint
+
+```bash
+docker compose up -d db-test     # banco de teste (porta 55433, em memória)
+cd backend && npm test && npm run lint && npm run typecheck
+cd frontend && npm test && npm run lint && npm run typecheck
+```
+
+### TypeScript
+
+O projeto está migrando para TypeScript de forma incremental: `.js` e `.ts` convivem, e só os arquivos
+TypeScript são checados (`npm run typecheck`). Arquivos novos ou reescritos devem ser `.ts`/`.tsx`.
+
+No backend, `npm run dev` usa `tsx watch`; para produção, `npm run build` gera `dist/` e
+`npm start` roda `node dist/server.js`.
+
+O `npm test` do backend recria o schema do banco de teste a partir das migrations e aplica o seed
+antes da suíte.
 
 ---
 

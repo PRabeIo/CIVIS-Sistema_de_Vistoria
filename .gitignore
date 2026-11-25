@@ -30,6 +30,7 @@ lerna-debug.log*
 .env
 .env.*
 !example.env
+!.env.example
 
 # =========================
 # Node / Package managers

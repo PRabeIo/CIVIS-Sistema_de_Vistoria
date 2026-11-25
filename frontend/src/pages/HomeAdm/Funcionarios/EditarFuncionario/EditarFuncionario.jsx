@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import '../../Home.css';
 import '../Funcionarios.css';
+import { API_BASE_URL } from "../../../../config";
 
 function EditarFuncionario() {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ function EditarFuncionario() {
   useEffect(() => {
     async function fetchFuncionario() {
       try {
-        const response = await fetch(`http://localhost:3001/api/funcionarios/${id}`);
+        const response = await fetch(`${API_BASE_URL}/funcionarios/${id}`);
         const data = await response.json();
         setFormData({
           nome: data.nome || '',
@@ -71,7 +72,7 @@ function EditarFuncionario() {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/api/funcionarios/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/funcionarios/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

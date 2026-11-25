@@ -1,12 +1,7 @@
--- ============================================================
--- CIVIS - (Supabase/Postgres)
--- - Novo banco do zero
--- ============================================================
+-- 0001_baseline: schema atual do CIVIS, recriado do zero (DEC-4: só dados de teste).
+-- Única diferença em relação ao antigo script.sql: o status da vistoria deixa de ser
+-- ENUM e passa a ser VARCHAR + CHECK, para facilitar as mudanças da Fase 2.
 
--- (Opcional) Garantir schema public
--- CREATE SCHEMA IF NOT EXISTS public;
-
--- (Opcional) Email sem diferenciar maiúsculo/minúsculo (recomendado)
 CREATE EXTENSION IF NOT EXISTS citext;
 
 -- =========================
@@ -94,25 +89,6 @@ CREATE TABLE IF NOT EXISTS public.imovel (
 );
 
 -- =========================
--- 7) ENUM de status (profissional)
--- =========================
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'status_vistoria') THEN
-    CREATE TYPE public.status_vistoria AS ENUM (
-      'Aguardando Agendamento da Vistoria',
-      'Vistoria Agendada',
-      'Em Andamento',
-      'Aguardando Validação',
-      'Vistoria Reagendada',
-      'Vistoria Finalizada',
-      'Vistoria Validada',
-      'Vistoria Rejeitada'
-    );
-  END IF;
-END$$;
-
--- =========================
 -- 8) VISTORIA
 -- - idvistoriador pode ser NULL no início
 -- - status com default
@@ -128,7 +104,17 @@ CREATE TABLE IF NOT EXISTS public.vistoria (
   datahorainicio TIMESTAMPTZ,
   datahorafim TIMESTAMPTZ,
 
-  status public.status_vistoria NOT NULL DEFAULT 'Aguardando Agendamento da Vistoria',
+  status VARCHAR(40) NOT NULL DEFAULT 'Aguardando Agendamento da Vistoria'
+    CONSTRAINT vistoria_status_chk CHECK (status IN (
+      'Aguardando Agendamento da Vistoria',
+      'Vistoria Agendada',
+      'Em Andamento',
+      'Aguardando Validação',
+      'Vistoria Reagendada',
+      'Vistoria Finalizada',
+      'Vistoria Validada',
+      'Vistoria Rejeitada'
+    )),
 
   condicoesclimaticas VARCHAR(100),
   imprevistos TEXT,

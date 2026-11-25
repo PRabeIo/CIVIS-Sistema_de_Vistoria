@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { apiFetch } from "../../services/api";
 import "./HomeVistoriador.css";
 import Navbar from "../components/Navbar/Navbar"; // ajuste o caminho se necessário
+import { SERVER_URL } from "../../config";
 
 function HomeVistoriador({ onLogout }) {
   const navigate = useNavigate();
@@ -176,7 +177,7 @@ function HomeVistoriador({ onLogout }) {
             return (
               <div key={v.idvistoria} className="survey-card">
                 <img
-                  src={img ? `http://localhost:3001/uploads/${img}` : "/imagens/vistoria.png"}
+                  src={img ? `${SERVER_URL}/uploads/${img}` : "/imagens/vistoria.png"}
                   alt={`Imagem do empreendimento ${v.nomeempreendimento || ""}`}
                   className="survey-image"
                 />

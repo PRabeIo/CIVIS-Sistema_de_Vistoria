@@ -18,7 +18,6 @@ import CadastrarFuncionario from "./pages/HomeAdm/Funcionarios/CadastroFuncionar
 import EditarFuncionario from "./pages/HomeAdm/Funcionarios/EditarFuncionario/EditarFuncionario";
 import Empreendimentos from "./pages/HomeAdm/Empreendimentos/Empreendimentos";
 import CadastrarEmpreendimento from "./pages/HomeAdm/Empreendimentos/CadastroEmpreendimento/CadastrarEmpreendimento";
-import EditarEmpreendimento from "./pages/HomeAdm/Empreendimentos/EditarEmpreendimento (OFF)/EditarEmpreendimento";
 import Imoveis from "./pages/HomeAdm/Imoveis/Imoveis";
 import CadastrarImovel from "./pages/HomeAdm/Imoveis/CadastrarImovel/CadastrarImovel";
 import EditarImovel from "./pages/HomeAdm/Imoveis/EditarImovel/EditarImovel";
@@ -31,38 +30,24 @@ import PerfilAdministrador from "./pages/HomeAdm/Perfil/PerfilAdministrador";
 import EditarPerfilAdministrador from "./pages/HomeAdm/Perfil/EditarPerfilAdministrador";
 
 // Páginas do cliente
-import MeusImoveis from "./pages/HomeCliente/MeuImovel(OFF)/MeuImovel ";
-import ImovelDetalhado from "./pages/HomeCliente/ImovelDetalhado(OFF)/ImovelDetalhado";
-import MinhasVistorias from "./pages/HomeCliente/MinhasVistorias (OFF)/MinhasVistorias";
 import AgendarVistoria from "./pages/HomeCliente/AgendarVistoria/AgendarVistoria";
 import ValidarVistoria from "./pages/HomeCliente/ValidarVistoria/ValidarVistoria";
 import SolicitarNovaVistoria from "./pages/HomeCliente/SolicitarNovaVistoria/SolicitarNovaVistoria";
-import PerfilCliente from './pages/HomeCliente//Perfil/PerfilCliente';
+import PerfilCliente from "./pages/HomeCliente/Perfil/PerfilCliente";
 import EditarPerfilCliente from "./pages/HomeCliente/Perfil/EditarPerfilCliente";
 import VistoriaDetalhes from "./pages/HomeCliente/VistoriaDetalhes/VistoriaDetalhes";
 
 // Páginas do vistoriador
 import VistoriaDataEntryPage from "./pages/HomeVistoriador/VistoriaData/VistoriaDataEntryPage";
-import ReagendarVistoriaPage from "./pages/HomeVistoriador/ReagendarVistoria(OFF)/ReagendarVistoriaPage";
 import CriarRelatorioPage from "./pages/HomeVistoriador/CriarRelatorio/CriarRelatorioPage";
-import HistoricoVistoriasPage from "./pages/HomeVistoriador/HistoricoVistorias(OFF)/HistoricoVistoriasPage";
 import PerfilVistoriador from "./pages/HomeVistoriador/Perfil/PerfilVistoriador";
 import EditarPerfilVistoriador from "./pages/HomeVistoriador/Perfil/EditarPerfilVistoriador";
 import IniciarVistoriaDetalhesPage from "./pages/HomeVistoriador/IniciarVistoria/IniciarVistoriaDetalhesPage";
 
-const NotificarClientePage = () => (
-  <div>
-    <h1>Página de Notificação de Clientes</h1>
-    <p>Envie mensagens ou alertas para clientes.</p>
-  </div>
-);
-
-// ... no topo, imports iguais
-
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userType, setUserType] = useState(null);
-  const [userId, setUserId] = useState(null);
+  const [, setUserId] = useState(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
@@ -147,7 +132,6 @@ function App() {
                 <Route path="/editar-funcionario/:id" element={<EditarFuncionario />} />
                 <Route path="/empreendimentos" element={<Empreendimentos />} />
                 <Route path="/cadastrar-empreendimento" element={<CadastrarEmpreendimento />} />
-                <Route path="/editar-empreendimento/:id" element={<EditarEmpreendimento />} />
                 <Route path="/clientes" element={<Clientes />} />
                 <Route path="/cadastrar-cliente" element={<CadastrarCliente />} />
                 <Route path="/editar-cliente/:id" element={<EditarCliente />} />
@@ -165,9 +149,6 @@ function App() {
             {/* Cliente */}
             {userType === "cliente" && (
               <>
-                <Route path="/meus-imoveis" element={<MeusImoveis />} />
-                <Route path="/imovel-detalhado/:id" element={<ImovelDetalhado />} />
-                <Route path="/minhas-vistorias" element={<MinhasVistorias />} />
                 <Route path="/agendar-vistoria" element={<AgendarVistoria />} />
                 <Route path="/validar-vistoria" element={<ValidarVistoria />} />
                 <Route path="/cliente/vistoria/:id" element={<VistoriaDetalhes />} />
@@ -183,11 +164,8 @@ function App() {
                 <Route path="/vistoriador/vistoria/:id" element={<VistoriaDataEntryPage />} />
                 <Route path="/vistoriador/iniciar-vistoria-detalhes/:id" element={<IniciarVistoriaDetalhesPage />} />
                 <Route path="/vistoriador/criar-relatorio/:id" element={<CriarRelatorioPage />} />
-                <Route path="/vistoriador/notificar-cliente" element={<NotificarClientePage />} />
-                <Route path="/vistoriador/reagendar-vistoria/:id" element={<ReagendarVistoriaPage />} />
                 <Route path="/vistoriador/perfil" element={<PerfilVistoriador />} />
                 <Route path="/vistoriador/editar-perfil" element={<EditarPerfilVistoriador />} />
-                <Route path="/vistoriador/historico" element={<HistoricoVistoriasPage />} />
               </>
             )}
 

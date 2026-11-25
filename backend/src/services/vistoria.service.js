@@ -60,15 +60,15 @@ async function buscarPorIdComAcesso(idvistoria, usuario) {
   if (!vistoria) return null;
 
   // Admin vê tudo
-  if (usuario?.cargo === "Administrador") return vistoria;
+  if (usuario?.papel === "admin") return vistoria;
 
   // Cliente só vê as dele
-  if (usuario?.tipo === "cliente") {
+  if (usuario?.papel === "cliente") {
     return Number(vistoria.idcliente) === Number(usuario.sub) ? vistoria : null;
   }
 
   // Vistoriador
-  if (usuario?.cargo === "Vistoriador") {
+  if (usuario?.papel === "vistoriador") {
     // se já for dele
     if (Number(vistoria.idvistoriador) === Number(usuario.sub)) return vistoria;
 
@@ -205,7 +205,7 @@ async function agendar(idvistoria, idcliente, { dataagendada, horaagendada }) {
         status = 'Vistoria Agendada'
     WHERE idvistoria = ${id}
       AND idcliente = ${idc}
-      AND status = ANY(${statusPermitidos}::public.status_vistoria[])
+      AND status = ANY(${statusPermitidos}::text[])
     RETURNING *
   `;
 

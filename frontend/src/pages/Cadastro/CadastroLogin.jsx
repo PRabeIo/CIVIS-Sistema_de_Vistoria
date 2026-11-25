@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../Login/Login.css";
+import { API_BASE_URL } from "../../config";
 
 function CadastroLogin() {
   const navigate = useNavigate();
@@ -161,7 +162,7 @@ function CadastroLogin() {
     if (erroNome || erroCpf || erroEmail || erroSenha) return;
 
     try {
-      const response = await fetch("http://localhost:3001/api/clientes/cadastro", {
+      const response = await fetch(`${API_BASE_URL}/clientes/cadastro`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

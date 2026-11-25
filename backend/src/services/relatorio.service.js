@@ -2,7 +2,6 @@ const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
 const db = require("../config/db");
-const fetch = require("node-fetch");
 
 const { gerarRelatorioIA } = require("./relatorioAI.service");
 
@@ -333,7 +332,9 @@ async function gerar({ idVistoria, comodos, arquivos, idVistoriadorToken }) {
       try {
         doc.image(img.buffer, { fit: [450, 300], align: "center" });
         doc.moveDown();
-      } catch {}
+      } catch {
+        // imagem inválida/corrompida: ignora e segue com as demais
+      }
     }
   }
 

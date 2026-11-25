@@ -11,7 +11,6 @@ router.use('/auth', require('./auth.routes'));
 router.use('/funcionarios', auth, require('./funcionario.routes'));
 
 // ADMIN
-router.use('/administradores', auth, apenasAdmin, require('./administrador.routes'));
 router.use('/empreendimentos', auth, apenasAdmin, require('./empreendimento.routes'));
 router.use('/vistoriadores', auth, apenasAdmin, require('./vistoriador.routes'));
 

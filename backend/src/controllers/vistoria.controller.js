@@ -203,42 +203,6 @@ async function finalizar(req, res) {
   }
 }
 
-/**
- * LEGADO (mantido)
- */
-async function pendentesAgendamentoCliente(req, res) {
-  try {
-    const idcliente = req.usuario.sub;
-    const vistorias = await vistoriaService.pendentesAgendamentoCliente(idcliente);
-    return res.status(200).json(vistorias);
-  } catch (err) {
-    console.error('Erro ao buscar vistorias pendentes:', err);
-    return res.status(err.statusCode || 500).json({ error: err.message || 'Erro ao buscar vistorias pendentes.' });
-  }
-}
-
-async function pendentesValidacaoCliente(req, res) {
-  try {
-    const idcliente = req.usuario.sub;
-    const vistorias = await vistoriaService.pendentesValidacaoCliente(idcliente);
-    return res.status(200).json(vistorias);
-  } catch (err) {
-    console.error('Erro ao buscar vistorias pendentes de validação:', err);
-    return res.status(err.statusCode || 500).json({ error: err.message || 'Erro ao buscar vistorias pendentes.' });
-  }
-}
-
-async function aguardandoValidacaoCliente(req, res) {
-  try {
-    const idcliente = req.usuario.sub;
-    const vistorias = await vistoriaService.aguardandoValidacaoCliente(idcliente);
-    return res.status(200).json(vistorias);
-  } catch (err) {
-    console.error('Erro ao buscar vistorias aguardando validação:', err);
-    return res.status(err.statusCode || 500).json({ error: err.message || 'Erro ao buscar vistorias aguardando validação' });
-  }
-}
-
 async function atualizar(req, res) {
   try {
     const ok = await vistoriaService.atualizar(req.params.idvistoria, req.body);
@@ -296,11 +260,6 @@ module.exports = {
   minhasVistoriador,
   iniciar,
   finalizar,
-
-  // legado
-  pendentesAgendamentoCliente,
-  pendentesValidacaoCliente,
-  aguardandoValidacaoCliente,
 
   // admin
   atualizar,
