@@ -3,8 +3,6 @@ const router = express.Router();
 
 const vistoriaController = require('../controllers/vistoria.controller');
 const { apenasAdmin, apenasVistoriador, apenasCliente } = require('../middlewares/role.middleware');
-const auth = require('../middlewares/auth.middleware'); 
-const { onlyNumericId } = require('../middlewares/numeric.middleware');
 
 /**
  * CLIENTE
@@ -37,7 +35,9 @@ router.delete('/:idvistoria', apenasAdmin, vistoriaController.deletar);
 /**
  * POR ID 
  */
-router.get("/:idvistoria", auth, onlyNumericId, vistoriaController.buscarPorId);
+// S2: relatório privado (cliente dono, vistoriador da vistoria ou admin)
+router.get('/:idvistoria/relatorio', vistoriaController.relatorio);
+router.get('/:idvistoria', vistoriaController.buscarPorId);
 
 
 

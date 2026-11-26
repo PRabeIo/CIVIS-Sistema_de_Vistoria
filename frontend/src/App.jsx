@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./pages/styles/navbar.css";
 
 // Página inicial e login
@@ -22,7 +22,6 @@ import Imoveis from "./pages/HomeAdm/Imoveis/Imoveis";
 import CadastrarImovel from "./pages/HomeAdm/Imoveis/CadastrarImovel/CadastrarImovel";
 import EditarImovel from "./pages/HomeAdm/Imoveis/EditarImovel/EditarImovel";
 import VistoriasAgendadas from "./pages/HomeAdm/Vistorias/VistoriaAgendadas/VistoriasAgendadas";
-import NovaVistoria from "./pages/HomeAdm/Vistorias/NovaVistoria/NovaVistoria";
 import Clientes from "./pages/HomeAdm/Clientes/Clientes";
 import CadastrarCliente from "./pages/HomeAdm/Clientes/CadastrarCliente/CadastrarCliente";
 import EditarCliente from "./pages/HomeAdm/Clientes/EditarCliente/EditarCliente";
@@ -43,34 +42,32 @@ import CriarRelatorioPage from "./pages/HomeVistoriador/CriarRelatorio/CriarRela
 import PerfilVistoriador from "./pages/HomeVistoriador/Perfil/PerfilVistoriador";
 import EditarPerfilVistoriador from "./pages/HomeVistoriador/Perfil/EditarPerfilVistoriador";
 import IniciarVistoriaDetalhesPage from "./pages/HomeVistoriador/IniciarVistoria/IniciarVistoriaDetalhesPage";
+import { logoutNoServidor } from "./services/api";
+import { ROTAS } from "./rotas";
+
+/** Usuário salvo no login (só dados públicos; a sessão em si está no cookie httpOnly). */
+function lerUsuarioSalvo() {
+  const stored = localStorage.getItem("usuario");
+  if (!stored) return null;
+  try {
+    const u = JSON.parse(stored);
+    // ✅ suporta novo padrão (tipo) e legado (type)
+    const tipo = u?.tipo ?? u?.type ?? null;
+    return tipo ? { tipo, id: u.id ?? null } : null;
+  } catch (e) {
+    console.error("Erro ao parsear dados do usuário no localStorage", e);
+    localStorage.removeItem("usuario");
+    return null;
+  }
+}
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userType, setUserType] = useState(null);
-  const [, setUserId] = useState(null);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("usuario");
-    if (storedUser) {
-      try {
-        const userData = JSON.parse(storedUser);
-        setIsAuthenticated(true);
-
-        // ✅ suporta novo padrão (tipo) e legado (type)
-        const tipo = userData.tipo ?? userData.type ?? null;
-        setUserType(tipo);
-
-        setUserId(userData.id ?? null);
-      } catch (e) {
-        console.error("Erro ao parsear dados do usuário no localStorage", e);
-        localStorage.removeItem("usuario");
-        localStorage.removeItem("token");
-        setIsAuthenticated(false);
-        setUserType(null);
-        setUserId(null);
-      }
-    }
-  }, []);
+  // Lido já na inicialização: se fosse num useEffect, a 1ª renderização (deslogada) redirecionaria
+  // para /login ao recarregar qualquer página protegida.
+  const [usuarioInicial] = useState(lerUsuarioSalvo);
+  const [isAuthenticated, setIsAuthenticated] = useState(Boolean(usuarioInicial));
+  const [userType, setUserType] = useState(usuarioInicial?.tipo ?? null);
+  const [, setUserId] = useState(usuarioInicial?.id ?? null);
 
   // ✅ padroniza para "tipo"
   const login = (tipo, id) => {
@@ -95,22 +92,22 @@ function App() {
     setUserType(null);
     setUserId(null);
     localStorage.removeItem("usuario");
-    localStorage.removeItem("token");
+    logoutNoServidor();
   };
 
   return (
     <BrowserRouter>
       <Routes>
         {/* Página Inicial */}
-        <Route path="/" element={<Inicial />} />
-        <Route path="/login" element={<Login onLogin={login} />} />
-        <Route path="/cadastro-login" element={<CadastroLogin />} />
+        <Route path={ROTAS.inicial} element={<Inicial />} />
+        <Route path={ROTAS.login} element={<Login onLogin={login} />} />
+        <Route path={ROTAS.cadastro} element={<CadastroLogin />} />
 
         {/* Rotas protegidas */}
         {isAuthenticated ? (
           <>
             <Route
-              path="/home"
+              path={ROTAS.home}
               element={
                 userType === "admin" ? (
                   <HomeAdm onLogout={logout} />
@@ -127,52 +124,51 @@ function App() {
             {/* Admin */}
             {userType === "admin" && (
               <>
-                <Route path="/funcionarios" element={<Funcionarios />} />
-                <Route path="/cadastrar-funcionario" element={<CadastrarFuncionario />} />
-                <Route path="/editar-funcionario/:id" element={<EditarFuncionario />} />
-                <Route path="/empreendimentos" element={<Empreendimentos />} />
-                <Route path="/cadastrar-empreendimento" element={<CadastrarEmpreendimento />} />
-                <Route path="/clientes" element={<Clientes />} />
-                <Route path="/cadastrar-cliente" element={<CadastrarCliente />} />
-                <Route path="/editar-cliente/:id" element={<EditarCliente />} />
-                <Route path="/imoveis" element={<Imoveis />} />
-                <Route path="/cadastrar-imovel" element={<CadastrarImovel />} />
-                <Route path="/editar-imovel/:id" element={<EditarImovel />} />
-                <Route path="/vistorias-agendadas" element={<VistoriasAgendadas />} />
-                <Route path="/nova-vistoria" element={<NovaVistoria />} />
-                <Route path="/vistoria-detalhes/:id" element={<VistoriaDetalhes />} />
-                <Route path="/admin/perfil" element={<PerfilAdministrador />} />
-                <Route path="/admin/editar-perfil" element={<EditarPerfilAdministrador />} />
+                <Route path={ROTAS.admin.funcionarios} element={<Funcionarios />} />
+                <Route path={ROTAS.admin.cadastrarFuncionario} element={<CadastrarFuncionario />} />
+                <Route path={ROTAS.admin.editarFuncionario()} element={<EditarFuncionario />} />
+                <Route path={ROTAS.admin.empreendimentos} element={<Empreendimentos />} />
+                <Route path={ROTAS.admin.cadastrarEmpreendimento} element={<CadastrarEmpreendimento />} />
+                <Route path={ROTAS.admin.clientes} element={<Clientes />} />
+                <Route path={ROTAS.admin.cadastrarCliente} element={<CadastrarCliente />} />
+                <Route path={ROTAS.admin.editarCliente()} element={<EditarCliente />} />
+                <Route path={ROTAS.admin.imoveis} element={<Imoveis />} />
+                <Route path={ROTAS.admin.cadastrarImovel} element={<CadastrarImovel />} />
+                <Route path={ROTAS.admin.editarImovel()} element={<EditarImovel />} />
+                <Route path={ROTAS.admin.vistorias} element={<VistoriasAgendadas />} />
+                <Route path={ROTAS.admin.vistoriaDetalhes()} element={<VistoriaDetalhes />} />
+                <Route path={ROTAS.admin.perfil} element={<PerfilAdministrador />} />
+                <Route path={ROTAS.admin.editarPerfil} element={<EditarPerfilAdministrador />} />
               </>
             )}
 
             {/* Cliente */}
             {userType === "cliente" && (
               <>
-                <Route path="/agendar-vistoria" element={<AgendarVistoria />} />
-                <Route path="/validar-vistoria" element={<ValidarVistoria />} />
-                <Route path="/cliente/vistoria/:id" element={<VistoriaDetalhes />} />
-                <Route path="/reagendar-vistoria" element={<SolicitarNovaVistoria />} />
-                <Route path="/perfil-cliente" element={<PerfilCliente />} />
-                <Route path="/editar-perfil-cliente" element={<EditarPerfilCliente />} />
+                <Route path={ROTAS.cliente.agendarVistoria} element={<AgendarVistoria />} />
+                <Route path={ROTAS.cliente.validarVistoria} element={<ValidarVistoria />} />
+                <Route path={ROTAS.cliente.vistoria()} element={<VistoriaDetalhes />} />
+                <Route path={ROTAS.cliente.reagendarVistoria} element={<SolicitarNovaVistoria />} />
+                <Route path={ROTAS.cliente.perfil} element={<PerfilCliente />} />
+                <Route path={ROTAS.cliente.editarPerfil} element={<EditarPerfilCliente />} />
               </>
             )}
 
             {/* Vistoriador */}
             {userType === "vistoriador" && (
               <>
-                <Route path="/vistoriador/vistoria/:id" element={<VistoriaDataEntryPage />} />
-                <Route path="/vistoriador/iniciar-vistoria-detalhes/:id" element={<IniciarVistoriaDetalhesPage />} />
-                <Route path="/vistoriador/criar-relatorio/:id" element={<CriarRelatorioPage />} />
-                <Route path="/vistoriador/perfil" element={<PerfilVistoriador />} />
-                <Route path="/vistoriador/editar-perfil" element={<EditarPerfilVistoriador />} />
+                <Route path={ROTAS.vistoriador.vistoria()} element={<VistoriaDataEntryPage />} />
+                <Route path={ROTAS.vistoriador.iniciarVistoria()} element={<IniciarVistoriaDetalhesPage />} />
+                <Route path={ROTAS.vistoriador.criarRelatorio()} element={<CriarRelatorioPage />} />
+                <Route path={ROTAS.vistoriador.perfil} element={<PerfilVistoriador />} />
+                <Route path={ROTAS.vistoriador.editarPerfil} element={<EditarPerfilVistoriador />} />
               </>
             )}
 
-            <Route path="*" element={<Navigate to="/home" />} />
+            <Route path="*" element={<Navigate to={ROTAS.home} />} />
           </>
         ) : (
-          <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="*" element={<Navigate to={ROTAS.login} />} />
         )}
       </Routes>
     </BrowserRouter>

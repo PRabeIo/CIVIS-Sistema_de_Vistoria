@@ -18,6 +18,12 @@ async function criarTransporter() {
   console.log("Ethereal pronto para envio de e-mails.");
 }
 
+// B13: se o provedor não subiu, o envio falha com mensagem clara (a API continua no ar).
+function transporterPronto() {
+  if (!transporter) throw new Error("Serviço de e-mail indisponível.");
+  return transporter;
+}
+
 // Envia o relatório técnico com anexo
 async function enviarEmailRelatorio(destino, nomeArquivo, caminhoDoArquivo) {
   const mailOptions = {
@@ -34,7 +40,7 @@ async function enviarEmailRelatorio(destino, nomeArquivo, caminhoDoArquivo) {
   };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
+    const info = await transporterPronto().sendMail(mailOptions);
     console.log("Ver email em:", nodemailer.getTestMessageUrl(info));
   } catch (error) {
     console.error("Erro ao enviar e-mail de relatório:", error);
@@ -81,7 +87,7 @@ Sistema CIVIS`;
   };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
+    const info = await transporterPronto().sendMail(mailOptions);
     console.log("Ver email em:", nodemailer.getTestMessageUrl(info));
   } catch (error) {
     console.error("Erro ao enviar e-mail de agendamento:", error);
@@ -109,7 +115,7 @@ Sistema CIVIS`;
   };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
+    const info = await transporterPronto().sendMail(mailOptions);
     console.log("Ver email em:", nodemailer.getTestMessageUrl(info));
   } catch (error) {
     console.error("Erro ao enviar e-mail de solicitação de vistoria:", error);

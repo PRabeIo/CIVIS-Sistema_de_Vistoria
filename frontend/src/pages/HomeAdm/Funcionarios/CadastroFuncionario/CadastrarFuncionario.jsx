@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiFetch } from "../../../../services/api";
+import { apiFetch, logoutNoServidor } from "../../../../services/api";
 import "../../../styles/cadastro.css";
 import Navbar from "../../../components/Navbar/Navbar"; // ajuste o caminho se necessário
 
@@ -9,7 +9,7 @@ function CadastrarFuncionario({ onLogout }) {
 
   const handleLogout = () => {
     if (onLogout) return onLogout();
-    localStorage.removeItem("token");
+    logoutNoServidor();
     localStorage.removeItem("usuario");
     navigate("/login");
   };

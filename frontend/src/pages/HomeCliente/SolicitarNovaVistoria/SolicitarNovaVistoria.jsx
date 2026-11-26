@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiFetch } from "../../../services/api"; // ajuste o caminho se necessário
+import { apiFetch, logoutNoServidor } from "../../../services/api"; // ajuste o caminho se necessário
 import "./SolicitarNovaVistoria.css";
+import Navbar from "../../components/Navbar/Navbar";
 
 function SolicitarNovaVistoria() {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ function SolicitarNovaVistoria() {
 
         if (String(err.message).toLowerCase().includes("token")) {
           alert("Sessão expirada. Faça login novamente.");
-          localStorage.removeItem("token");
+          logoutNoServidor();
           localStorage.removeItem("usuario");
           navigate("/login");
           return;
@@ -54,7 +55,7 @@ function SolicitarNovaVistoria() {
       });
 
       alert("Sua solicitação de reagendamento foi enviada com sucesso!");
-      navigate("/home-cliente");
+      navigate("/home");
     } catch (err) {
       alert(err.message || "Erro ao reagendar vistoria.");
     }
@@ -62,31 +63,12 @@ function SolicitarNovaVistoria() {
 
   return (
     <div className="home-container">
-      <header className="navbar">
-        <div className="logo">CIVIS</div>
-        <nav className="nav-links">
-          <a href="#" onClick={() => navigate("/home-cliente")}>Home</a>
-          <a href="#" onClick={() => navigate("/agendar-vistoria")}>Agendar Vistoria</a>
-          <a href="#" onClick={() => navigate("/minhas-vistorias")}>Minhas Vistorias</a>
-          <a href="#" onClick={() => navigate("/meus-imoveis")}>Meus Imóveis</a>
-        </nav>
-
-        <button
-          className="logout-button"
-          onClick={() => {
-            localStorage.removeItem("token");
-            localStorage.removeItem("usuario");
-            navigate("/login");
-          }}
-        >
-          Sair
-        </button>
-      </header>
+      <Navbar />
 
       <main className="main-content" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
         <button
           className="back-arrow"
-          onClick={() => navigate("/home-cliente")}
+          onClick={() => navigate("/home")}
           style={{ marginBottom: "20px", marginLeft: "20px", alignSelf: "flex-start" }}
         >
           &#8592; Voltar

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Clientes.css";
-import { apiFetch } from "../../../services/api";
+import { apiFetch, logoutNoServidor } from "../../../services/api";
 import Navbar from "../../components/Navbar/Navbar"; 
 
 function Clientes({ onLogout }) {
@@ -11,7 +11,7 @@ function Clientes({ onLogout }) {
 
   const handleLogout = () => {
     if (onLogout) return onLogout();
-    localStorage.removeItem("token");
+    logoutNoServidor();
     localStorage.removeItem("usuario");
     navigate("/login");
   };
@@ -80,7 +80,7 @@ function Clientes({ onLogout }) {
         body: JSON.stringify({ confirmacao: "SIM" }),
       });
 
-      setClientes((prev) => prev.filter((c) => c.id !== id));
+      setClientes((prev) => prev.filter((c) => c.idcliente !== id));
       alert(`Cliente ${nome} excluído(a) com sucesso!`);
     } catch (err) {
       console.error("Erro ao excluir cliente:", err);
@@ -123,7 +123,7 @@ function Clientes({ onLogout }) {
 
               <tbody>
                 {clientes.map((cli) => (
-                  <tr key={cli.id}>
+                  <tr key={cli.idcliente}>
                     <td data-label="Nome">{cli.nome}</td>
                     <td data-label="CPF">{formatarCPF(cli.cpf)}</td>
                     <td className="mobile-hidden" data-label="Email">
@@ -134,14 +134,14 @@ function Clientes({ onLogout }) {
                     <td className="acoes-botoes" data-label="">
                       <button
                         className="btn-editar"
-                        onClick={() => navigate(`/editar-cliente/${cli.id}`)}
+                        onClick={() => navigate(`/editar-cliente/${cli.idcliente}`)}
                       >
                         Editar
                       </button>
 
                       <button
                         className="btn-excluir"
-                        onClick={() => handleExcluir(cli.id, cli.nome)}
+                        onClick={() => handleExcluir(cli.idcliente, cli.nome)}
                       >
                         Excluir
                       </button>

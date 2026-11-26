@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiFetch } from "../../../services/api";
+import { apiFetch, logoutNoServidor } from "../../../services/api";
 import "../../styles/perfil.css";
 import Navbar from "../../components/Navbar/Navbar"; 
 import { SERVER_URL } from "../../../config";
@@ -45,7 +45,7 @@ function PerfilVistoriador({ onLogout }) {
 
   const handleLogout = () => {
     if (onLogout) return onLogout();
-    localStorage.removeItem("token");
+    logoutNoServidor();
     localStorage.removeItem("usuario");
     navigate("/login");
   };

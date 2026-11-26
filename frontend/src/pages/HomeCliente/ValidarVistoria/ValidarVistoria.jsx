@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiFetch } from "../../../services/api";
+import { apiFetch, logoutNoServidor, urlDaApi } from "../../../services/api";
 import Navbar from "../../components/Navbar/Navbar"; 
 import "./ValidarVistoria.css";
 
@@ -12,7 +12,7 @@ function ValidarVistoria() {
   const [pendentes, setPendentes] = useState([]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    logoutNoServidor();
     localStorage.removeItem("usuario");
     navigate("/login");
   };
@@ -65,7 +65,7 @@ function ValidarVistoria() {
         method: "PUT",
       });
       alert("Vistoria validada com sucesso!");
-      navigate("/home-cliente");
+      navigate("/home");
     } catch (err) {
       alert(err.message || "Erro ao validar vistoria.");
     }
@@ -81,7 +81,7 @@ function ValidarVistoria() {
         method: "PUT",
       });
       alert("Vistoria rejeitada com sucesso!");
-      navigate("/home-cliente");
+      navigate("/home");
     } catch (err) {
       alert(err.message || "Erro ao rejeitar vistoria.");
     }
@@ -123,7 +123,7 @@ function ValidarVistoria() {
           {relatorioUrl ? (
             <div className="pdf-row">
               <a
-                href={relatorioUrl}
+                href={urlDaApi(relatorioUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`btn btn-pdf ${!podeAcao ? "is-disabled" : ""}`}
@@ -154,7 +154,7 @@ function ValidarVistoria() {
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={() => navigate("/home-cliente")}
+              onClick={() => navigate("/home")}
             >
               Voltar
             </button>

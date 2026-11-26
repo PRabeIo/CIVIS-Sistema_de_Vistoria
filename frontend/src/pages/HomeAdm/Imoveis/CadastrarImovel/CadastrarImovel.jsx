@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./CadastrarImovel.css";
-import { apiFetch } from "../../../../services/api"; // ajuste o caminho se necessário
+import { apiFetch, logoutNoServidor } from "../../../../services/api"; // ajuste o caminho se necessário
 import Navbar from "../../../components/Navbar/Navbar"; // ajuste o caminho se necessário
 
 function CadastrarImovel({ onLogout }) {
@@ -19,7 +19,7 @@ function CadastrarImovel({ onLogout }) {
 
   const handleLogout = () => {
     if (onLogout) return onLogout();
-    localStorage.removeItem("token");
+    logoutNoServidor();
     localStorage.removeItem("usuario");
     navigate("/login");
   };

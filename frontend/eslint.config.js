@@ -34,6 +34,11 @@ export default tseslint.config(
     }
   },
   {
+    // scripts de linha de comando (rodam no Node, não no navegador)
+    files: ["scripts/**/*.mjs"],
+    languageOptions: { globals: globals.node }
+  },
+  {
     files: ["**/*.{ts,tsx}"],
     extends: [tseslint.configs.recommended],
     languageOptions: { globals: globals.browser },

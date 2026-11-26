@@ -73,8 +73,8 @@ backend/uploads/empreendimentos/*
 backend/uploads/funcionarios/*
 !backend/uploads/funcionarios/.gitkeep
 
-backend/relatorios/*
-!backend/relatorios/.gitkeep
+# Storage privado local (S2): relatórios em dev/teste. Nunca versionar.
+backend/storage/
 
 # =========================
 # Coverage / tests

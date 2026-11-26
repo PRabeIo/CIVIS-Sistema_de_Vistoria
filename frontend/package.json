@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/checar-imports.mjs && vite build",
+    "check:imports": "node scripts/checar-imports.mjs",
     "preview": "vite preview",
     "lint": "eslint .",
     "test": "vitest run",

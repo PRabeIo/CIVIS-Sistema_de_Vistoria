@@ -20,4 +20,8 @@ router.get('/cliente/:idcliente/disponiveis',apenasAdmin, imovelController.lista
 router.get('/me', apenasCliente, imovelController.listarMeusImoveis);  // GET - Imóveis do Cliente
 router.get('/me/:idimovel', apenasCliente, imovelController.buscarMeuImovelPorId);  // GET - Imóvel X do Cliente
 
+// ADMIN (por id: fica por último para não capturar /me, /todos, /orfaos)
+router.get('/:idimovel', apenasAdmin, imovelController.buscarPorId);
+router.delete('/:idimovel', apenasAdmin, imovelController.deletar); // B6
+
 module.exports = router;

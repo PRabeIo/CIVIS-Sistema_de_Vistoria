@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { estadosECidades } from "../../../../utils/estadosECidades";
 import "./CadastrarEmpreendimento.css";
-import { apiFetch } from "../../../../services/api";
+import { apiFetch, logoutNoServidor, IMAGENS_ACEITAS } from "../../../../services/api";
 import Navbar from "../../../components/Navbar/Navbar"; // ajuste o caminho se necessário
 
 function CadastrarEmpreendimento({ onLogout }) {
@@ -10,7 +10,7 @@ function CadastrarEmpreendimento({ onLogout }) {
 
   const handleLogout = () => {
     if (onLogout) return onLogout();
-    localStorage.removeItem("token");
+    logoutNoServidor();
     localStorage.removeItem("usuario");
     navigate("/login");
   };
@@ -124,7 +124,7 @@ function CadastrarEmpreendimento({ onLogout }) {
                 type="file"
                 id="anexos"
                 name="anexos"
-                accept="image/*"
+                accept={IMAGENS_ACEITAS}
                 onChange={handleChange}
               />
             </div>

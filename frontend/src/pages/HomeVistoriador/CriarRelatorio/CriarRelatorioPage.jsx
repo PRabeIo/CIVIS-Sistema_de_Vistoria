@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import "./CriarRelatorioPage.css";
-import { apiFetch, getToken } from "../../../services/api";
-import { API_BASE_URL } from "../../../config";
+import { apiFetch, IMAGENS_PDF } from "../../../services/api";
 
 const opcoesEstado = ["Péssimo", "Ruim", "Razoável", "Bom", "Excelente"];
 const comodos = ["quartos", "banheiros", "sala", "cozinha", "varanda"];
@@ -335,13 +334,6 @@ function CriarRelatorioPage() {
     setMensagem("Gerando relatório com IA... isso pode levar alguns segundos.");
 
     try {
-      const token = getToken();
-      if (!token) {
-        setMensagem("Sessão expirada. Faça login novamente.");
-        navigate("/login");
-        return;
-      }
-
       const formData = new FormData();
       formData.append("idVistoria", form.idVistoria);
 
@@ -360,17 +352,8 @@ function CriarRelatorioPage() {
         });
       }
 
-      const response = await fetch(`${API_BASE_URL}/relatorio/gerar`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data?.erro || data?.error || "Erro ao gerar relatório.");
-      }
+      // apiFetch não define Content-Type para FormData (o navegador põe o boundary)
+      const data = await apiFetch("/relatorio/gerar", { method: "POST", body: formData });
 
       if (data.arquivo) {
         // ✅ ao gerar com sucesso, limpa draft local
@@ -453,7 +436,7 @@ function CriarRelatorioPage() {
               <input
                 type="file"
                 multiple
-                accept="image/*,video/*,audio/*"
+                accept={IMAGENS_PDF}
                 onChange={(e) => handleAnexosChange(comodo, e)}
               />
 

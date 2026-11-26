@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import "./Login.css";
-import { API_BASE_URL } from "../../config";
+import { apiFetch } from "../../services/api";
 
 function Login({ onLogin }) {
   const navigate = useNavigate();
@@ -14,27 +14,16 @@ function Login({ onLogin }) {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, senha }),
-      });
+      // apiFetch: cookies de sessão (S5) e erro padronizado; 401 no login não tenta renovar
+      const data = await apiFetch("/auth/login", { method: "POST", body: JSON.stringify({ email, senha }) });
 
-      const data = await response.json();
-
-      if (!response.ok) throw new Error(data.erro || data.error || "Erro desconhecido.");
-
-      // aceita formato antigo e novo
-      const tipo = data.tipo ?? data.usuario?.tipo;
-      const id   = data.id   ?? data.usuario?.id;
-      const token = data.token;
-      const cargo = data.usuario?.cargo ?? null;
+      const tipo = data?.usuario?.tipo;
+      const id = data?.usuario?.id;
+      const cargo = data?.usuario?.cargo ?? null;
 
       if (!tipo || !id) throw new Error("Resposta de login inválida (tipo/id ausente).");
-      if (!token) throw new Error("Resposta de login inválida (token ausente).");
 
-      // salva token e usuário
-      localStorage.setItem("token", token);
+      // a sessão fica em cookie httpOnly; aqui só os dados públicos do usuário
       localStorage.setItem("usuario", JSON.stringify({ tipo, id, cargo }));
 
       onLogin(tipo, id);

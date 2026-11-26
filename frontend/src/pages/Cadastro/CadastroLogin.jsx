@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../Login/Login.css";
-import { API_BASE_URL } from "../../config";
+import { apiFetch } from "../../services/api";
 
 function CadastroLogin() {
   const navigate = useNavigate();
@@ -162,9 +162,8 @@ function CadastroLogin() {
     if (erroNome || erroCpf || erroEmail || erroSenha) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/clientes/cadastro`, {
+      await apiFetch("/clientes/cadastro", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           nome: formData.nome.trim(),
           cpf: somenteDigitos(formData.cpf),
@@ -174,21 +173,10 @@ function CadastroLogin() {
         }),
       });
 
-      if (!response.ok) {
-        let msg = "Erro ao cadastrar.";
-        try {
-          const data = await response.json();
-          msg = data?.error || data?.message || msg;
-        } catch {}
-        alert(msg);
-        return;
-      }
-
       alert("Cadastro realizado com sucesso! Agora você pode fazer login.");
       navigate("/login");
     } catch (error) {
-      console.error("Erro ao cadastrar:", error);
-      alert("Erro ao cadastrar. Tente novamente mais tarde.");
+      alert(error.message || "Erro ao cadastrar. Tente novamente mais tarde.");
     }
   };
 

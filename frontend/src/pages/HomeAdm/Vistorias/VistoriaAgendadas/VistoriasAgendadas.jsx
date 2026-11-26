@@ -1,101 +1,95 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import '../../Home.css';
-import { API_BASE_URL } from "../../../../config";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "../../Clientes/Clientes.css"; // mesmo layout de tabela das outras listagens do admin
+import Navbar from "../../../components/Navbar/Navbar";
+import { apiFetch } from "../../../../services/api";
 
-function VistoriaDetalhes() {
-  const { id } = useParams(); // ID da vistoria vindo da URL
+// B7: antes lia um ":id" de uma rota sem parâmetro e sempre falhava.
+// Agora é a listagem de vistorias do admin (GET /vistorias), com filtro por status.
+// A listagem completa com busca e paginação fica para a Fase 3 (U6).
+
+const formatarData = (v) =>
+  v ? new Date(v).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }) : "-";
+
+function unidade(v) {
+  return [v.descricao, v.bloco && `Bloco ${v.bloco}`, v.numero && `nº ${v.numero}`].filter(Boolean).join(" · ") || "-";
+}
+
+function VistoriasAgendadas() {
   const navigate = useNavigate();
-  const [vistoria, setVistoria] = useState(null);
+  const [vistorias, setVistorias] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState("");
 
   useEffect(() => {
-    const fetchVistoria = async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/vistorias/${id}`);
-        if (!res.ok) {
-          throw new Error('Vistoria não encontrada');
-        }
+    apiFetch("/vistorias")
+      .then((data) => setVistorias(Array.isArray(data) ? data : []))
+      .catch((err) => alert(err.message || "Não foi possível carregar as vistorias."))
+      .finally(() => setLoading(false));
+  }, []);
 
-        const data = await res.json();
-
-        const sanitizedData = {
-          idVistoria: data.idvistoria ?? 'N/A',
-          idCliente: data.idcliente ?? 'N/A',
-          idImovel: data.idimovel ?? 'N/A',
-          idRelatorio: data.idrelatorio ?? 'N/A',
-          idVistoriador: data.idvistoriador ?? 'N/A',
-          dataInicio: data.datainicio ?? 'N/A',
-          dataFim: data.datafim ?? 'N/A',
-          status: data.status ?? 'Vistoria Criada',      // Status do imóvel
-          observacoes: data.observacoes ?? 'N/A',        // Observação do imóvel
-        };
-
-        setVistoria(sanitizedData);
-      } catch (error) {
-        console.error('Erro ao buscar vistoria:', error);
-        alert('Vistoria não encontrada!');
-        navigate('/vistorias-agendadas');
-      }
-    };
-
-    fetchVistoria();
-  }, [id, navigate]);
-
-  if (!vistoria) {
-    return (
-      <div className="home-container">
-        <header className="navbar">
-          <div className="logo">CIVIS (Admin)</div>
-          <nav className="nav-links">
-            <a href="#" onClick={() => navigate("/home")}>Home</a>
-            <a href="#" onClick={() => navigate("/vistorias-agendadas")}>Vistorias Agendadas</a>
-          </nav>
-          <button className="logout-button" onClick={() => navigate("/login")}>Sair</button>
-        </header>
-        <main className="admin-page-container" style={{ textAlign: 'center', marginTop: '50px' }}>
-          <h2>Carregando detalhes da vistoria...</h2>
-        </main>
-      </div>
-    );
-  }
+  const statusDisponiveis = useMemo(() => [...new Set(vistorias.map((v) => v.status))].sort(), [vistorias]);
+  const filtradas = status ? vistorias.filter((v) => v.status === status) : vistorias;
 
   return (
-    <div className="home-container">
-      <header className="navbar">
-        <div className="logo">CIVIS (Admin)</div>
-        <nav className="nav-links">
-          <a href="#" onClick={() => navigate("/home")}>Home</a>
-          <a href="#" onClick={() => navigate("/vistorias-agendadas")}>Vistorias Agendadas</a>
-        </nav>
-        <button className="logout-button" onClick={() => navigate("/login")}>Sair</button>
-      </header>
+    <div className="home-container clientes-page">
+      <Navbar />
 
       <main className="admin-page-container">
-        <button className="back-arrow" onClick={() => navigate('/vistorias-agendadas')} style={{ marginBottom: '20px' }}>
-          &#8592; Voltar para Vistorias Agendadas
-        </button>
-        <h1 style={{ marginBottom: '30px', color: '#004080' }}>Detalhes da Vistoria: {vistoria.idVistoria}</h1>
-
-        <div className="form-container" style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'left' }}>
-          <div className="form-group"><label><strong>ID da Vistoria:</strong></label><p>{vistoria.idVistoria}</p></div>
-          <div className="form-group"><label><strong>ID do Cliente:</strong></label><p>{vistoria.idCliente}</p></div>
-          <div className="form-group"><label><strong>ID do Imóvel:</strong></label><p>{vistoria.idImovel}</p></div>
-          <div className="form-group"><label><strong>ID do Vistoriador:</strong></label><p>{vistoria.idVistoriador}</p></div>
-          <div className="form-group"><label><strong>Data de Início:</strong></label><p>{vistoria.dataInicio}</p></div>
-          <div className="form-group"><label><strong>Data de Fim:</strong></label><p>{vistoria.dataFim}</p></div>
-          <div className="form-group"><label><strong>Status:</strong></label><p>{vistoria.status}</p></div>
-          <div className="form-group"><label><strong>ID do Relatório:</strong></label><p>{vistoria.idRelatorio}</p></div>
-          <div className="form-group"><label><strong>Observações (Agendamento):</strong></label><p>{vistoria.observacoes}</p></div>
-
-          <div className="form-actions" style={{ justifyContent: 'flex-start' }}>
-            <button type="button" className="btn-editar" onClick={() => navigate(`/vistoriador/vistoria/${id}`)}>
-              ✏️ Iniciar/Editar Vistoria (Vistoriador)
-            </button>
-          </div>
+        <div className="admin-header">
+          <h1 className="titulo-centralizado">Vistorias</h1>
+          <select value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Filtrar por status">
+            <option value="">Todos os status</option>
+            {statusDisponiveis.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
         </div>
+
+        {loading ? (
+          <p>Carregando vistorias...</p>
+        ) : filtradas.length === 0 ? (
+          <p className="sem-registros">Nenhuma vistoria encontrada.</p>
+        ) : (
+          <div className="table-responsive">
+            <table className="lista-tabela">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Imóvel</th>
+                  <th>Status</th>
+                  <th>Agendada para</th>
+                  <th>Vistoriador</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtradas.map((v) => (
+                  <tr key={v.idvistoria}>
+                    <td data-label="Cliente">{v.nomecliente || "-"}</td>
+                    <td data-label="Imóvel">
+                      {unidade(v)}
+                      {v.nomeempreendimento ? <small style={{ display: "block" }}>{v.nomeempreendimento}</small> : null}
+                    </td>
+                    <td data-label="Status">{v.status}</td>
+                    <td data-label="Agendada para">{formatarData(v.dataagendada)}</td>
+                    <td data-label="Vistoriador">{v.nomevistoriador || "-"}</td>
+                    <td className="acoes-botoes" data-label="">
+                      <button className="btn-editar" onClick={() => navigate(`/vistoria-detalhes/${v.idvistoria}`)}>
+                        Detalhes
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </main>
     </div>
   );
 }
 
-export default VistoriaDetalhes;
+export default VistoriasAgendadas;

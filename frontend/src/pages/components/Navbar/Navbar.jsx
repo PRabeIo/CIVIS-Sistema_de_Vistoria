@@ -2,6 +2,7 @@
 import React, { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { NAV_BY_TIPO } from "../../../utils/navConfig";
+import { logoutNoServidor } from "../../../services/api";
 
 function getStoredUser() {
   try {
@@ -34,7 +35,7 @@ export default function Navbar({ onLogout, tipo: tipoProp, userId: userIdProp })
 
   const doLogout = () => {
     if (onLogout) return onLogout();
-    localStorage.removeItem("token");
+    logoutNoServidor();
     localStorage.removeItem("usuario");
     navigate("/login");
   };

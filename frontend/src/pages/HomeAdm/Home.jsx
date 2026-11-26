@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import "./home.css";
-import Navbar from "../components/Navbar/Navbar"; // ✅ ajuste o caminho se necessário
+import Navbar from "../components/Navbar/Navbar";
 
 function HomeAdm({ onLogout }) {
   const navigate = useNavigate();
@@ -30,14 +30,9 @@ function HomeAdm({ onLogout }) {
         <h2>Gerenciamento Rápido</h2>
 
         <div className="atalhos-cards">
-          <div className="card" onClick={() => navigate("/nova-vistoria")}>
-            <img src="/assets/nova.png" alt="Nova Vistoria" />
-            <h3>Nova Vistoria</h3>
-          </div>
-
           <div className="card" onClick={() => navigate("/vistorias-agendadas")}>
-            <img src="/assets/agendada.png" alt="Agendadas" />
-            <h3>Vistorias Agendadas</h3>
+            <img src="/assets/agendada.png" alt="Vistorias" />
+            <h3>Vistorias</h3>
           </div>
 
           <div className="card" onClick={() => navigate("/clientes")}>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiFetch } from "../../../services/api";
+import { apiFetch, logoutNoServidor } from "../../../services/api";
 import "./AgendarVistoria.css";
 import Navbar from "../../components/Navbar/Navbar"; 
 
@@ -13,7 +13,7 @@ function AgendarVistoria() {
   const [imoveisDisponiveis, setImoveisDisponiveis] = useState([]);
 
   const doLogout = () => {
-    localStorage.removeItem("token");
+    logoutNoServidor();
     localStorage.removeItem("usuario");
     navigate("/login");
   };
@@ -89,7 +89,7 @@ function AgendarVistoria() {
       });
 
       alert("Vistoria agendada com sucesso!");
-      navigate("/home-cliente");
+      navigate("/home");
     } catch (err) {
       alert(err.message || "Erro ao agendar vistoria.");
     }
@@ -165,7 +165,7 @@ function AgendarVistoria() {
             <button
               type="button"
               className="btn-secundario"
-              onClick={() => navigate("/home-cliente")}
+              onClick={() => navigate("/home")}
             >
               Cancelar
             </button>

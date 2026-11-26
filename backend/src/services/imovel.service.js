@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { AppError } = require('../domain/erros');
 
 function badRequest(msg) {
   const err = new Error(msg);
@@ -208,7 +209,7 @@ async function listarMeusImoveis(idcliente) {
       v.dataagendada,
       v.datahorainicio,
       v.datahorafim,
-      v.relatorio_url
+      CASE WHEN v.relatorio_arquivo IS NOT NULL THEN '/vistorias/' || v.idvistoria || '/relatorio' END AS relatorio_url
     FROM imovel i
     LEFT JOIN empreendimento e ON e.idempreendimento = i.idempreendimento
     LEFT JOIN LATERAL (
@@ -247,7 +248,7 @@ async function buscarMeuImovelPorId(idcliente, idimovel) {
       v.dataagendada,
       v.datahorainicio,
       v.datahorafim,
-      v.relatorio_url,
+      CASE WHEN v.relatorio_arquivo IS NOT NULL THEN '/vistorias/' || v.idvistoria || '/relatorio' END AS relatorio_url,
       v.idvistoriador
     FROM imovel i
     LEFT JOIN empreendimento e ON e.idempreendimento = i.idempreendimento
@@ -266,7 +267,52 @@ async function buscarMeuImovelPorId(idcliente, idimovel) {
   return row;
 }
 
+/** Admin: um imóvel com o nome do empreendimento e do cliente. */
+async function buscarPorId(idimovel) {
+  const [row] = await db`
+    SELECT i.*, e.nome AS nomeempreendimento, c.nome AS nomecliente
+    FROM imovel i
+    LEFT JOIN empreendimento e ON e.idempreendimento = i.idempreendimento
+    LEFT JOIN cliente c ON c.idcliente = i.idcliente
+    WHERE i.idimovel = ${idimovel}
+  `;
+  return row;
+}
+
+// Status em que a vistoria ainda não começou: o imóvel pode sair junto com elas.
+const STATUS_SEM_HISTORICO = ['Aguardando Agendamento da Vistoria', 'Vistoria Agendada', 'Vistoria Reagendada'];
+
+/**
+ * B6: exclui o imóvel (e as vistorias que ainda não começaram).
+ * Bloqueia (409) se houver vistoria em andamento ou já realizada, para não apagar relatórios.
+ * Exclusão lógica (soft delete) fica para a Fase 2.
+ */
+async function deletarImovel(idimovel) {
+  return db.begin(async (tx) => {
+    const [imovel] = await tx`SELECT idimovel FROM imovel WHERE idimovel = ${idimovel} FOR UPDATE`;
+    if (!imovel) return false;
+
+    const [bloqueio] = await tx`
+      SELECT count(*)::int AS n FROM vistoria
+      WHERE idimovel = ${idimovel}
+        AND (status <> ALL(${STATUS_SEM_HISTORICO}) OR relatorio_arquivo IS NOT NULL)
+    `;
+    if (bloqueio.n > 0) {
+      throw new AppError(
+        409,
+        'IMOVEL_COM_HISTORICO',
+        'Este imóvel tem vistoria em andamento ou já realizada e não pode ser excluído.',
+      );
+    }
+
+    await tx`DELETE FROM imovel WHERE idimovel = ${idimovel}`; // vistorias pendentes saem em cascata
+    return true;
+  });
+}
+
 module.exports = {
+  buscarPorId,
+  deletarImovel,
   criarImovelComVistoria,
   listarPorEmpreendimento,
   listarOrfaosSemVistoria,

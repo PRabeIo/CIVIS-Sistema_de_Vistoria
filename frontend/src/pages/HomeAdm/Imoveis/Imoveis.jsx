@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Imoveis.css";
-import { apiFetch } from "../../../services/api";  
+import { apiFetch, logoutNoServidor } from "../../../services/api";  
 import Navbar from "../../components/Navbar/Navbar"; 
 
 function ListagemImoveis({ onLogout }) {
@@ -16,7 +16,7 @@ function ListagemImoveis({ onLogout }) {
 
   const handleLogout = () => {
     if (onLogout) return onLogout();
-    localStorage.removeItem("token");
+    logoutNoServidor();
     localStorage.removeItem("usuario");
     navigate("/login");
   };

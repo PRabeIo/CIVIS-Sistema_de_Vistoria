@@ -1,7 +1,7 @@
 // src/pages/HomeVistoriador/VistoriaData/VistoriaDataEntryPage.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { apiFetch } from "../../../services/api";
+import { apiFetch, logoutNoServidor, urlDaApi } from "../../../services/api";
 import "../../styles/vistoriaDetalhes.css";
 import { SERVER_URL } from "../../../config";
 
@@ -31,7 +31,7 @@ function VistoriaDataEntryPage() {
 
         if (String(err.message).toLowerCase().includes("token")) {
           alert("Sessão expirada. Faça login novamente.");
-          localStorage.removeItem("token");
+          logoutNoServidor();
           localStorage.removeItem("usuario");
           navigate("/login");
           return;
@@ -101,7 +101,7 @@ function VistoriaDataEntryPage() {
 
       if (String(err.message).toLowerCase().includes("token")) {
         alert("Sessão expirada. Faça login novamente.");
-        localStorage.removeItem("token");
+        logoutNoServidor();
         localStorage.removeItem("usuario");
         navigate("/login");
         return;
@@ -210,7 +210,7 @@ function VistoriaDataEntryPage() {
         {relatorioUrl && (
           <div className="relatorio-actions">
             <a
-              href={relatorioUrl}
+              href={urlDaApi(relatorioUrl)}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn--primary"

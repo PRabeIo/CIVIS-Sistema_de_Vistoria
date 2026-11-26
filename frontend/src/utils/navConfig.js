@@ -1,22 +1,24 @@
+import { ROTAS } from "../rotas";
 
 export const NAV_BY_TIPO = {
   admin: [
-    { label: "Home", to: "/home" },
-    { label: "Empreendimentos", to: "/empreendimentos" },
-    { label: "Funcionários", to: "/funcionarios" },
-    { label: "Clientes", to: "/clientes" },
-    { label: "Perfil", to: "/admin/perfil" },
+    { label: "Home", to: ROTAS.home },
+    { label: "Vistorias", to: ROTAS.admin.vistorias },
+    { label: "Empreendimentos", to: ROTAS.admin.empreendimentos },
+    { label: "Funcionários", to: ROTAS.admin.funcionarios },
+    { label: "Clientes", to: ROTAS.admin.clientes },
+    { label: "Perfil", to: ROTAS.admin.perfil },
   ],
 
   vistoriador: [
-    { label: "Home", to: "/home" },
-    { label: "Perfil", to: "/vistoriador/perfil" },
+    { label: "Home", to: ROTAS.home },
+    { label: "Perfil", to: ROTAS.vistoriador.perfil },
   ],
 
   cliente: [
-    { label: "Home", to: "/home" },
-    { label: "Agendar Vistoria", to: "/agendar-vistoria" },
-    { label: "Validar Vistoria", to: "/validar-vistoria" },
-    { label: "Perfil", to: "/perfil-cliente" },
+    { label: "Home", to: ROTAS.home },
+    { label: "Agendar Vistoria", to: ROTAS.cliente.agendarVistoria },
+    { label: "Validar Vistoria", to: ROTAS.cliente.validarVistoria },
+    { label: "Perfil", to: ROTAS.cliente.perfil },
   ],
 };

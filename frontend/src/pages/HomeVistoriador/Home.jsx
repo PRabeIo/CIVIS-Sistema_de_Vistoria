@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
-import { apiFetch } from "../../services/api";
+import { apiFetch, logoutNoServidor } from "../../services/api";
 import "./HomeVistoriador.css";
 import Navbar from "../components/Navbar/Navbar"; // ajuste o caminho se necessário
 import { SERVER_URL } from "../../config";
@@ -112,7 +112,7 @@ function HomeVistoriador({ onLogout }) {
 
   const handleLogout = () => {
     if (onLogout) return onLogout();
-    localStorage.removeItem("token");
+    logoutNoServidor();
     localStorage.removeItem("usuario");
     navigate("/login");
   };

@@ -2,7 +2,7 @@
 import path from 'path';
 import db from '../config/db';
 import { emTransacao } from '../config/transacao';
-import { ErroHttp } from '../domain/erros';
+import { AppError } from '../domain/erros';
 import { safeUnlink } from '../utils/file.util';
 import * as usuarioService from './usuario.service';
 
@@ -54,7 +54,7 @@ export async function criarCliente(dados: {
   senha: string;
   telefone?: string | null;
 }): Promise<Cliente> {
-  if (await usuarioService.emailEmUso(dados.email)) throw new ErroHttp(409, 'Email já cadastrado.');
+  if (await usuarioService.emailEmUso(dados.email)) throw new AppError(409, 'EMAIL_EM_USO', 'Email já cadastrado.');
 
   const id = await emTransacao(async (tx) => {
     const idUsuario = await usuarioService.criar(tx, {
@@ -118,7 +118,7 @@ async function atualizarDados(id: number, dados: DadosCliente, imagem?: string |
 
 export async function atualizarCliente(id: unknown, dados: DadosCliente): Promise<Cliente | undefined> {
   const n = idValido(id);
-  return n ? atualizarDados(n, { ...dados, senha: null }) : undefined;
+  return n ? atualizarDados(n, dados) : undefined; // senha vazia/ausente fica como está
 }
 
 /** Troca a imagem com segurança: remove o arquivo novo se falhar e o antigo só após sucesso. */
@@ -169,23 +169,14 @@ export async function atualizarMeuAvatar(idcliente: unknown, filenameNovo: strin
   return trocarImagem(idValido(idcliente), filenameNovo, (n) => atualizarDados(n, {}, filenameNovo));
 }
 
-export type ResultadoSenha =
-  | { ok: true; erro?: undefined }
-  | { ok?: undefined; erro: 'CLIENTE_NAO_ENCONTRADO' | 'SENHA_ATUAL_INCORRETA' | 'SENHA_FRACA' };
-
-export async function atualizarMinhaSenha(
+/** Troca de senha pelo próprio cliente (exige a senha atual). */
+export async function trocarMinhaSenha(
   idcliente: unknown,
   senhaAtual: string,
   senhaNova: string,
-): Promise<ResultadoSenha> {
+  manterSid?: string,
+): Promise<void> {
   const n = idValido(idcliente);
-  if (!n || !(await buscar(n))) return { erro: 'CLIENTE_NAO_ENCONTRADO' };
-  if (!senhaNova || String(senhaNova).length < usuarioService.SENHA_MIN) return { erro: 'SENHA_FRACA' };
-  try {
-    await usuarioService.trocarSenha(n, senhaAtual, senhaNova);
-    return { ok: true };
-  } catch (err) {
-    if (err instanceof ErroHttp && err.statusCode === 400) return { erro: 'SENHA_ATUAL_INCORRETA' };
-    throw err;
-  }
+  if (!n || !(await buscar(n))) throw new AppError(404, 'NAO_ENCONTRADO', 'Cliente não encontrado.');
+  await usuarioService.trocarSenha(n, senhaAtual, senhaNova, manterSid);
 }

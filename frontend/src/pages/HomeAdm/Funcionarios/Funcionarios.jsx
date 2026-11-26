@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Funcionarios.css";
-import { apiFetch } from "../../../services/api";
+import { apiFetch, logoutNoServidor } from "../../../services/api";
 import Navbar from "../../components/Navbar/Navbar"; // ajuste o caminho se necessário
 
 function Funcionarios({ onLogout }) {
@@ -11,7 +11,7 @@ function Funcionarios({ onLogout }) {
 
   const handleLogout = () => {
     if (onLogout) return onLogout();
-    localStorage.removeItem("token");
+    logoutNoServidor();
     localStorage.removeItem("usuario");
     navigate("/login");
   };

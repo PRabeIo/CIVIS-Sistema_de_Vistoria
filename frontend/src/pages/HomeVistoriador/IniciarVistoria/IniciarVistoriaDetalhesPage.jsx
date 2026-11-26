@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { apiFetch } from "../../../services/api";
+import { apiFetch, logoutNoServidor } from "../../../services/api";
 import "./IniciarVistoriaDetalhesPage.css";
+import Navbar from "../../components/Navbar/Navbar";
 
 const LS_KEY_PREFIX = "civis:vistoria-dados:";
 
@@ -12,8 +13,6 @@ function IniciarVistoriaDetalhesPage() {
   const [vistoria, setVistoria] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [menuOpen, setMenuOpen] = useState(false);
-
   const [form, setForm] = useState({
     condicoesClimaticas: "",
     imprevistos: "",
@@ -21,12 +20,6 @@ function IniciarVistoriaDetalhesPage() {
   });
 
   const lsKey = useMemo(() => `${LS_KEY_PREFIX}${id}`, [id]);
-
-  const doLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("usuario");
-    navigate("/login");
-  };
 
   useEffect(() => {
     // carrega rascunho salvo (se houver)
@@ -53,7 +46,7 @@ function IniciarVistoriaDetalhesPage() {
 
         if (String(err.message).toLowerCase().includes("token")) {
           alert("Sessão expirada. Faça login novamente.");
-          localStorage.removeItem("token");
+          logoutNoServidor();
           localStorage.removeItem("usuario");
           navigate("/login");
           return;
@@ -97,24 +90,7 @@ function IniciarVistoriaDetalhesPage() {
 
 return (
   <div className="home-container iniciar-vistoria-detalhes-page">
-    {/* NAVBAR (mantém como está) */}
-    <header className="navbar">
-      <div className="logo">CIVIS</div>
-
-      <nav className={`nav-links ${menuOpen ? "open" : ""}`}>
-        <a href="#" onClick={(e) => { e.preventDefault(); navigate("/home"); }}>Home</a>
-        <a href="#" onClick={(e) => { e.preventDefault(); navigate("/vistorias-agendadas"); }}>Vistorias Agendadas</a>
-        <a href="#" onClick={(e) => { e.preventDefault(); navigate("/minhas-vistorias"); }}>Minhas Vistorias</a>
-
-        <button className="logout-button mobile-logout" onClick={doLogout}>Sair</button>
-      </nav>
-
-      <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
-        ☰
-      </button>
-
-      <button className="logout-button desktop-logout" onClick={doLogout}>Sair</button>
-    </header>
+    <Navbar />
 
     {/* CONTEÚDO */}
     <div className="iniciar-vistoria-card">

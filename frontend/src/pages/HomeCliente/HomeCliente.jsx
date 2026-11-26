@@ -1,7 +1,7 @@
 import "./HomeCliente.css";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { apiFetch } from "../../services/api";
+import { apiFetch, logoutNoServidor } from "../../services/api";
 import Navbar from "../components/Navbar/Navbar"; 
 import { SERVER_URL } from "../../config";
 
@@ -13,7 +13,7 @@ function Home({ onLogout }) {
 
   const handleLogout = () => {
     if (onLogout) return onLogout();
-    localStorage.removeItem("token");
+    logoutNoServidor();
     localStorage.removeItem("usuario");
     navigate("/login");
   };

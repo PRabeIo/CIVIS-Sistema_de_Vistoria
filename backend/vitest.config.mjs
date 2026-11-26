@@ -13,8 +13,13 @@ export default defineConfig({
       NODE_ENV: 'test',
       DATABASE_URL: TEST_DATABASE_URL,
       DATABASE_SSL: 'disable',
-      JWT_SECRET: 'segredo-apenas-para-testes',
+      JWT_SECRET: 'segredo-apenas-para-testes-com-32-caracteres',
       BCRYPT_SALT_ROUNDS: '4',
+      // Os testes criam muitos cadastros; o limite de cadastro tem teste próprio.
+      RATE_LIMIT_CADASTRO_MAX: '1000',
+      // Nunca chamar a IA real nos testes: sem chave, o relatório usa o texto de fallback.
+      GEMINI_API_KEY: '',
+      STORAGE_DRIVER: 'local',
     },
     // Os testes compartilham um único banco: rodar arquivos em série evita interferência.
     fileParallelism: false,

@@ -1,12 +1,12 @@
 const fs = require("fs");
 const path = require("path");
+const { randomUUID } = require("crypto");
 const PDFDocument = require("pdfkit");
 const db = require("../config/db");
+const storage = require("./storage.service");
+const { AppError } = require("../domain/erros");
 
 const { gerarRelatorioIA } = require("./relatorioAI.service");
-
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 const CAMPOS = [
   { key: "Estrutura", label: "Estrutura" },
@@ -194,6 +194,8 @@ async function gerar({ idVistoria, comodos, arquivos, idVistoriadorToken }) {
     SELECT
       v.status,
       v.idvistoriador,
+      v.datahorainicio,
+      f.assinatura,
       e.cep,
       e.nome AS nomeempreendimento,
       i.bloco,
@@ -212,7 +214,8 @@ async function gerar({ idVistoria, comodos, arquivos, idVistoriadorToken }) {
   if (!detalhes) throw { statusCode: 404, message: "Vistoria não encontrada ou sem permissão." };
   if (detalhes.status !== "Em Andamento") throw { statusCode: 400, message: `Status atual: ${detalhes.status}` };
 
-  const data = new Date();
+  // B12: a data do relatório é a do início da vistoria (não a da geração do PDF).
+  const data = detalhes.datahorainicio ? new Date(detalhes.datahorainicio) : new Date();
   const dataVistoria = data.toLocaleDateString("pt-BR");
   const horaVistoria = data.toLocaleTimeString("pt-BR");
 
@@ -281,20 +284,16 @@ async function gerar({ idVistoria, comodos, arquivos, idVistoriadorToken }) {
     console.error("[IA] Falha ao gerar relatório via Gemini. Usando fallback:", e?.message || e);
   }
 
-  /* --------- Criar PDF --------- */
-  const nomeArquivo = `relatorio_${Date.now()}.pdf`;
-
-  const pastaRelatorios = path.join(__dirname, "..", "..", "relatorios");
-  const caminho = path.join(pastaRelatorios, nomeArquivo);
-
-  const assinaturaPath = path.join(__dirname, "..", "assets", "assinatura.png");
+  /* --------- Criar PDF (S2: só em memória, nunca em pasta pública) --------- */
   const fundoPath = path.join(__dirname, "..", "assets", "vistoria.png");
 
-  if (!fs.existsSync(pastaRelatorios)) fs.mkdirSync(pastaRelatorios, { recursive: true });
-
   const doc = new PDFDocument();
-  const stream = fs.createWriteStream(caminho);
-  doc.pipe(stream);
+  const partes = [];
+  doc.on("data", (parte) => partes.push(parte));
+  const pdfPronto = new Promise((resolve, reject) => {
+    doc.on("end", () => resolve(Buffer.concat(partes)));
+    doc.on("error", reject);
+  });
 
   const desenharFundo = () => {
     if (fs.existsSync(fundoPath)) {
@@ -339,49 +338,51 @@ async function gerar({ idVistoria, comodos, arquivos, idVistoriadorToken }) {
   }
 
   doc.addPage();
-  if (fs.existsSync(assinaturaPath)) doc.image(assinaturaPath, { width: 120 });
+  // B12: assinatura opcional do vistoriador (cadastrada no perfil); sem ela, só o nome.
+  if (detalhes.assinatura) {
+    try {
+      doc.image(detalhes.assinatura, { width: 120 });
+    } catch {
+      // imagem inválida: segue só com o nome
+    }
+  }
   doc.text(detalhes.nomevistoriador);
   doc.text("Responsável Técnico");
 
   doc.end();
+  const pdf = await pdfPronto;
 
-  /* --------- Upload Supabase --------- */
-  return new Promise((resolve, reject) => {
-    stream.on("finish", async () => {
-      try {
-        const pdfBuffer = fs.readFileSync(caminho);
-        const filePath = `relatorios/${nomeArquivo}`;
+  /* --------- Storage privado (S2): chave com UUID, nada adivinhável --------- */
+  const chave = `relatorios/vistoria-${idVistoriaNum}/${randomUUID()}.pdf`;
+  try {
+    await storage.salvar(chave, pdf, "application/pdf");
+  } catch (err) {
+    // B11: storage fora do ar → 502 e a vistoria continua "Em Andamento" (o vistoriador pode tentar de novo).
+    console.error(`[relatorio] falha ao salvar o PDF da vistoria ${idVistoriaNum}:`, err);
+    throw new AppError(502, "STORAGE_INDISPONIVEL", "Não foi possível salvar o relatório agora. Tente novamente em instantes.");
+  }
 
-        await fetch(`${SUPABASE_URL}/storage/v1/object/${filePath}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/pdf",
-            Authorization: `Bearer ${SUPABASE_KEY}`,
-          },
-          body: pdfBuffer,
-        });
+  const atualizadas = await db`
+    UPDATE vistoria
+    SET relatorio_arquivo = ${chave},
+        status = 'Aguardando Validação'
+    WHERE idvistoria = ${idVistoriaNum}
+      AND idvistoriador = ${idVistoriadorToken}
+      AND status = 'Em Andamento'
+    RETURNING idvistoria
+  `;
+  if (atualizadas.length === 0) {
+    throw { statusCode: 409, message: "A vistoria mudou de status enquanto o relatório era gerado." };
+  }
 
-        const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${filePath}`;
-
-        await db`
-          UPDATE vistoria
-          SET relatorio_url = ${publicUrl},
-              status = 'Aguardando Validação'
-          WHERE idvistoria = ${idVistoriaNum}
-            AND idvistoriador = ${idVistoriadorToken}
-        `;
-
-        resolve({
-          mensagem: "Relatório gerado com sucesso",
-          arquivo: nomeArquivo,
-          url: publicUrl,
-          gerado_por_ia: Boolean(relatorioIA),
-        });
-      } catch (err) {
-        reject(err);
-      }
-    });
-  });
+  return {
+    mensagem: "Relatório gerado com sucesso",
+    arquivo: `relatorio-vistoria-${idVistoriaNum}.pdf`,
+    // caminho na API (exige sessão e permissão): GET /api/vistorias/:id/relatorio
+    url: `/vistorias/${idVistoriaNum}/relatorio`,
+    gerado_por_ia: Boolean(relatorioIA),
+  };
 }
 
-module.exports = { gerar };
+module.exports = {
+  COMODOS: Object.keys(COMODO_LABEL), gerar };

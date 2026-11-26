@@ -3,7 +3,7 @@
 import path from 'path';
 import db from '../config/db';
 import { emTransacao } from '../config/transacao';
-import { ErroHttp } from '../domain/erros';
+import { AppError } from '../domain/erros';
 import { papelDoCargo, type Cargo, type PapelFuncionario } from '../domain/papel';
 import { safeUnlink } from '../utils/file.util';
 import * as usuarioService from './usuario.service';
@@ -21,6 +21,8 @@ export interface Funcionario {
   papel: PapelFuncionario;
   cargo: Exclude<Cargo, 'Cliente'>;
   ativo: boolean;
+  /** B12: há assinatura cadastrada (a imagem em si só sai por GET /funcionarios/me/assinatura). */
+  tem_assinatura: boolean;
 }
 
 interface DadosFuncionario {
@@ -35,6 +37,7 @@ interface DadosFuncionario {
 // Nunca seleciona senha_hash.
 const SELECT_FUNCIONARIO = db`
   SELECT f.id, f.nome, f.cpf, u.email, f.telefone, f.imagemdeperfil, u.papel, u.ativo,
+         (f.assinatura IS NOT NULL) AS tem_assinatura,
          CASE u.papel WHEN 'admin' THEN 'Administrador' ELSE 'Vistoriador' END AS cargo
   FROM funcionario f
   JOIN usuario u ON u.id = f.id
@@ -76,8 +79,8 @@ export async function criar(dados: {
   imagemdeperfil?: string | null;
 }): Promise<Funcionario> {
   const papel = papelDoCargo(dados.cargo);
-  if (!papel) throw new ErroHttp(400, 'Cargo inválido.');
-  if (await usuarioService.emailEmUso(dados.email)) throw new ErroHttp(409, 'Email já cadastrado.');
+  if (!papel) throw new AppError(400, 'VALIDACAO', 'Cargo inválido.');
+  if (await usuarioService.emailEmUso(dados.email)) throw new AppError(409, 'EMAIL_EM_USO', 'Email já cadastrado.');
 
   const id = await emTransacao(async (tx) => {
     const idUsuario = await usuarioService.criar(tx, { email: dados.email, senha: dados.senha, papel });
@@ -99,13 +102,20 @@ async function atualizarDados(
   id: number,
   dados: DadosFuncionario,
   imagem?: string | null,
+  atorId?: number,
 ): Promise<Funcionario | undefined> {
-  if (!(await buscar(id))) return undefined;
+  const antes = await buscar(id);
+  if (!antes) return undefined;
 
   const papel = dados.cargo ? papelDoCargo(dados.cargo) : null;
-  if (dados.cargo && !papel) throw new ErroHttp(400, 'Cargo inválido.');
+  if (dados.cargo && !papel) throw new AppError(400, 'VALIDACAO', 'Cargo inválido.');
+  const rebaixaAdmin = antes.papel === 'admin' && papel !== null && papel !== 'admin';
+  if (rebaixaAdmin && id === atorId) {
+    throw new AppError(409, 'ACAO_SOBRE_SI_MESMO', 'Você não pode remover o seu próprio acesso de administrador.');
+  }
 
   await emTransacao(async (tx) => {
+    if (rebaixaAdmin) await usuarioService.exigirOutroAdmin(tx, id);
     await usuarioService.atualizar(tx, id, {
       email: vazioParaNull(dados.email),
       senha: vazioParaNull(dados.senha),
@@ -156,18 +166,28 @@ async function comImagem(
   }
 }
 
-/** Admin edita funcionário (inclui troca de cargo e, opcionalmente, foto e senha). */
+/**
+ * Admin edita funcionário (inclui troca de cargo e, opcionalmente, foto e senha).
+ * S8: `atorId` é o admin logado; ele não pode rebaixar a si mesmo, e o último admin não pode ser rebaixado.
+ */
 export async function atualizar(
   id: unknown,
   dados: DadosFuncionario,
   imagemdeperfil: string | null = null,
+  atorId?: number,
 ): Promise<Funcionario | undefined> {
-  return comImagem(idValido(id), imagemdeperfil, (n) => atualizarDados(n, dados, imagemdeperfil));
+  return comImagem(idValido(id), imagemdeperfil, (n) => atualizarDados(n, dados, imagemdeperfil, atorId));
 }
 
-export async function deletar(id: unknown): Promise<boolean> {
+/** S8: o admin não exclui a própria conta, e o último admin ativo não pode ser excluído. */
+export async function deletar(id: unknown, atorId?: number): Promise<boolean> {
   const n = idValido(id);
-  return n ? usuarioService.deletar(n, PAPEIS_FUNCIONARIO) : false;
+  if (!n) return false;
+  if (n === atorId) throw new AppError(409, 'ACAO_SOBRE_SI_MESMO', 'Você não pode excluir a sua própria conta.');
+  return emTransacao(async (tx) => {
+    await usuarioService.exigirOutroAdmin(tx, n);
+    return usuarioService.deletar(n, PAPEIS_FUNCIONARIO, tx);
+  });
 }
 
 /** O próprio funcionário edita seus dados (sem senha, sem cargo, sem imagem). */
@@ -181,19 +201,30 @@ export async function atualizarMeuAvatar(id: unknown, filenameNovo: string | nul
   return comImagem(idValido(id), filenameNovo, (n) => atualizarDados(n, {}, filenameNovo));
 }
 
-export async function alterarMinhaSenha(
+/** B12: assinatura do próprio funcionário (imagem JPEG/PNG já conferida pelo upload). */
+export async function salvarMinhaAssinatura(id: number, imagem: Buffer, tipo: string): Promise<void> {
+  await db`UPDATE funcionario SET assinatura = ${imagem}, assinatura_tipo = ${tipo} WHERE id = ${id}`;
+}
+
+export async function removerMinhaAssinatura(id: number): Promise<void> {
+  await db`UPDATE funcionario SET assinatura = NULL, assinatura_tipo = NULL WHERE id = ${id}`;
+}
+
+export async function buscarMinhaAssinatura(id: number): Promise<{ imagem: Buffer; tipo: string } | undefined> {
+  const [r] = await db<{ assinatura: Buffer | null; assinatura_tipo: string | null }[]>`
+    SELECT assinatura, assinatura_tipo FROM funcionario WHERE id = ${id}
+  `;
+  return r?.assinatura && r.assinatura_tipo ? { imagem: r.assinatura, tipo: r.assinatura_tipo } : undefined;
+}
+
+/** Troca de senha pelo próprio funcionário (exige a senha atual). */
+export async function trocarMinhaSenha(
   id: unknown,
   senhaAtual: string,
   senhaNova: string,
-): Promise<{ ok: true } | { ok: false; status: number; msg: string }> {
+  manterSid?: string,
+): Promise<void> {
   const n = idValido(id);
-  if (!n) return { ok: false, status: 400, msg: 'ID inválido.' };
-  if (!(await buscar(n))) return { ok: false, status: 404, msg: 'Funcionário não encontrado.' };
-  try {
-    await usuarioService.trocarSenha(n, senhaAtual, senhaNova);
-    return { ok: true };
-  } catch (err) {
-    if (err instanceof ErroHttp) return { ok: false, status: err.statusCode, msg: err.message };
-    throw err;
-  }
+  if (!n || !(await buscar(n))) throw new AppError(404, 'NAO_ENCONTRADO', 'Funcionário não encontrado.');
+  await usuarioService.trocarSenha(n, senhaAtual, senhaNova, manterSid);
 }

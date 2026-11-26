@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { apiFetch } from "../../../services/api";
+import { apiFetch, logoutNoServidor, urlDaApi } from "../../../services/api";
 import "../../styles/vistoriaDetalhes.css";
 import { SERVER_URL } from "../../../config";
 
@@ -65,14 +65,14 @@ function VistoriaDetalhes() {
 
         if (String(err.message).toLowerCase().includes("token")) {
           alert("Sessão expirada. Faça login novamente.");
-          localStorage.removeItem("token");
+          logoutNoServidor();
           localStorage.removeItem("usuario");
           navigate("/login");
           return;
         }
 
         alert(err.message || "Erro ao carregar detalhes da vistoria.");
-        navigate("/home-cliente");
+        navigate("/home");
       } finally {
         setLoading(false);
       }
@@ -150,7 +150,7 @@ function VistoriaDetalhes() {
         {relatorioUrl && (
           <div className="relatorio-actions">
             <a
-              href={relatorioUrl}
+              href={urlDaApi(relatorioUrl)}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn--primary"
@@ -217,7 +217,7 @@ function VistoriaDetalhes() {
 
         {}
         <div className="bottom-actions">
-          <button onClick={() => navigate("/home-cliente")} className="btn btn--neutral">
+          <button onClick={() => navigate("/home")} className="btn btn--neutral">
             Voltar
           </button>
         </div>

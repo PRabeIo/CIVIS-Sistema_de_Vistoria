@@ -3,6 +3,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 import app from '../src/app.js';
 import sql from '../src/config/db.js';
 import { SENHA_PADRAO, USUARIOS_SEED } from '../scripts/seed';
+import { cookieDe } from './helpers/auth';
 
 afterAll(() => sql.end());
 
@@ -11,10 +12,11 @@ async function login(email, senha = SENHA_PADRAO) {
 }
 
 describe('POST /api/auth/login', () => {
-  it('autentica o admin do seed e devolve token', async () => {
+  it('autentica o admin do seed e grava o cookie de sessão (sem token no corpo)', async () => {
     const res = await login(USUARIOS_SEED.admin.email);
     expect(res.status).toBe(200);
-    expect(res.body.token).toEqual(expect.any(String));
+    expect(res.body.token).toBeUndefined();
+    expect(cookieDe(res, 'civis_at')).toEqual(expect.any(String));
     expect(res.body.usuario).toMatchObject({ tipo: 'admin', email: USUARIOS_SEED.admin.email });
   });
 
@@ -42,8 +44,8 @@ describe('rotas protegidas', () => {
   });
 
   it('permite admin e bloqueia cliente em rota de admin', async () => {
-    const admin = (await login(USUARIOS_SEED.admin.email)).body.token;
-    const cliente = (await login(USUARIOS_SEED.cliente.email)).body.token;
+    const admin = cookieDe(await login(USUARIOS_SEED.admin.email), 'civis_at');
+    const cliente = cookieDe(await login(USUARIOS_SEED.cliente.email), 'civis_at');
 
     const ok = await request(app).get('/api/empreendimentos').set('Authorization', `Bearer ${admin}`);
     expect(ok.status).toBe(200);

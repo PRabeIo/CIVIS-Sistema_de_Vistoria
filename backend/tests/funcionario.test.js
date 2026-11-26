@@ -22,7 +22,7 @@ describe('PUT /api/funcionarios/:id', () => {
       .send({ telefone: '(11) 99999-0000' });
 
     expect(res.status).toBe(200);
-    expect(res.body.telefone).toBe('(11) 99999-0000');
+    expect(res.body.telefone).toBe('11999990000'); // S9: normalizado para dígitos
     expect(res.body).not.toHaveProperty('senha');
   });
 
@@ -30,7 +30,7 @@ describe('PUT /api/funcionarios/:id', () => {
     const res = await request(app)
       .put('/api/funcionarios/999999')
       .set('Authorization', `Bearer ${admin}`)
-      .send({ telefone: '1' });
+      .send({ telefone: '(11) 98888-7777' });
     expect(res.status).toBe(404);
   });
 });

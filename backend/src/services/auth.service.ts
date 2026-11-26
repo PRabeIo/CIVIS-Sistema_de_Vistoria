@@ -1,7 +1,7 @@
-import jwt, { type SignOptions } from 'jsonwebtoken';
 import db from '../config/db';
+import { AppError } from '../domain/erros';
 import { CARGO_POR_PAPEL, type Cargo, type Papel } from '../domain/papel';
-import type { UsuarioToken } from '../types/express';
+import * as sessaoService from './sessao.service';
 import * as usuarioService from './usuario.service';
 
 export interface UsuarioLogado {
@@ -13,48 +13,46 @@ export interface UsuarioLogado {
   email: string;
 }
 
-export type ResultadoLogin =
-  | { token: string; usuario: UsuarioLogado; erro?: undefined }
-  | { erro: string; status: number };
+const CREDENCIAIS_INVALIDAS = () => new AppError(401, 'NAO_AUTENTICADO', 'Email ou senha inválidos.');
 
-const CREDENCIAIS_INVALIDAS = { erro: 'Email ou senha inválidos.', status: 401 } as const;
-
-export function assinarToken(id: number, papel: Papel): string {
-  const secret = process.env.JWT_SECRET;
-  if (!secret) throw new Error('JWT_SECRET não configurado.');
-  const payload: Pick<UsuarioToken, 'sub' | 'papel'> = { sub: id, papel };
-  const expiresIn = (process.env.JWT_EXPIRES_IN || '7d') as SignOptions['expiresIn'];
-  return jwt.sign(payload, secret, { expiresIn });
+/** Dados públicos do usuário (o que o frontend guarda para saber quem está logado). */
+export async function usuarioLogado(id: number): Promise<UsuarioLogado | null> {
+  const [u] = await db<{ id: number; email: string; papel: Papel; nome: string | null }[]>`
+    SELECT u.id, u.email, u.papel, COALESCE(c.nome, f.nome) AS nome
+    FROM usuario u
+    LEFT JOIN cliente c ON c.idcliente = u.id
+    LEFT JOIN funcionario f ON f.id = u.id
+    WHERE u.id = ${id} AND u.ativo
+  `;
+  if (!u) return null;
+  return { id: u.id, tipo: u.papel, cargo: CARGO_POR_PAPEL[u.papel], nome: u.nome, email: u.email };
 }
 
-async function buscarNome(id: number, papel: Papel): Promise<string | null> {
-  const [p] =
-    papel === 'cliente'
-      ? await db<{ nome: string }[]>`SELECT nome FROM cliente WHERE idcliente = ${id}`
-      : await db<{ nome: string }[]>`SELECT nome FROM funcionario WHERE id = ${id}`;
-  return p?.nome ?? null;
+/**
+ * Login em uma única tabela (D1) que abre uma sessão revogável (S5).
+ * Mesma resposta para e-mail inexistente e senha errada.
+ */
+export async function autenticar(
+  email: string,
+  senha: string,
+  meta: sessaoService.MetaSessao = {},
+): Promise<{ usuario: UsuarioLogado; tokens: sessaoService.TokensSessao }> {
+  const u = await usuarioService.buscarPorEmail(String(email).trim());
+  if (!u) throw CREDENCIAIS_INVALIDAS();
+
+  if (!(await usuarioService.conferirSenha(String(senha), u.senha_hash))) throw CREDENCIAIS_INVALIDAS();
+  if (!u.ativo) throw new AppError(403, 'USUARIO_INATIVO', 'Usuário desativado. Procure o administrador.');
+
+  await usuarioService.registrarLogin(u.id);
+  const tokens = await sessaoService.criar(u.id, meta);
+  const usuario = (await usuarioLogado(u.id)) as UsuarioLogado;
+  return { usuario, tokens };
 }
 
-/** Login em uma única tabela (D1). Mesma resposta para e-mail inexistente e senha errada. */
-export async function autenticar(email: string, senha: string): Promise<ResultadoLogin> {
-  const usuario = await usuarioService.buscarPorEmail(String(email).trim());
-  if (!usuario) return CREDENCIAIS_INVALIDAS;
-
-  const senhaOk = await usuarioService.conferirSenha(String(senha), usuario.senha_hash);
-  if (!senhaOk) return CREDENCIAIS_INVALIDAS;
-
-  if (!usuario.ativo) return { erro: 'Usuário desativado. Procure o administrador.', status: 403 };
-
-  await usuarioService.registrarLogin(usuario.id);
-
-  return {
-    token: assinarToken(usuario.id, usuario.papel),
-    usuario: {
-      id: usuario.id,
-      tipo: usuario.papel,
-      cargo: CARGO_POR_PAPEL[usuario.papel],
-      nome: await buscarNome(usuario.id, usuario.papel),
-      email: usuario.email,
-    },
-  };
+/** Renova a sessão a partir do refresh token (rotação). */
+export async function renovar(refresh: string): Promise<{ usuario: UsuarioLogado; tokens: sessaoService.TokensSessao }> {
+  const r = await sessaoService.renovar(refresh);
+  const usuario = r && (await usuarioLogado(r.usuarioId));
+  if (!r || !usuario) throw new AppError(401, 'NAO_AUTENTICADO', 'Sessão expirada. Faça login novamente.');
+  return { usuario, tokens: r };
 }

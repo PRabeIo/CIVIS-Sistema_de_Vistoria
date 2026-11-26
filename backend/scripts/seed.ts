@@ -13,14 +13,14 @@ import type { Papel } from '../src/domain/papel';
 export const SENHA_PADRAO = 'Civis@teste123';
 
 export const USUARIOS_SEED = {
-  admin: { nome: 'Admin Teste', email: 'admin@civis.test', cpf: '000.000.000-01', papel: 'admin' },
+  admin: { nome: 'Admin Teste', email: 'admin@civis.test', cpf: '12345678909', papel: 'admin' },
   vistoriador: {
     nome: 'Vistoriador Teste',
     email: 'vistoriador@civis.test',
-    cpf: '000.000.000-02',
+    cpf: '98765432100',
     papel: 'vistoriador',
   },
-  cliente: { nome: 'Cliente Teste', email: 'cliente@civis.test', cpf: '000.000.000-03', papel: 'cliente' },
+  cliente: { nome: 'Cliente Teste', email: 'cliente@civis.test', cpf: '11144477735', papel: 'cliente' },
 } as const satisfies Record<string, { nome: string; email: string; cpf: string; papel: Papel }>;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

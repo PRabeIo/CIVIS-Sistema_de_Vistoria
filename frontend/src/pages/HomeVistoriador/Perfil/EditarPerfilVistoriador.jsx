@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiFetch } from "../../../services/api";
+import { apiFetch, logoutNoServidor, IMAGENS_ACEITAS } from "../../../services/api";
+import AssinaturaCard from "./AssinaturaCard";
 import "../../styles/editarPerfil.css";
 import Navbar from "../../components/Navbar/Navbar"; // ajuste o caminho se necessário
 import { SERVER_URL } from "../../../config";
@@ -71,7 +72,7 @@ function EditarPerfilVistoriador({ onLogout }) {
 
   const handleLogout = () => {
     if (onLogout) return onLogout();
-    localStorage.removeItem("token");
+    logoutNoServidor();
     localStorage.removeItem("usuario");
     navigate("/login");
   };
@@ -319,7 +320,7 @@ function EditarPerfilVistoriador({ onLogout }) {
                 <input
                   className="editar-file"
                   type="file"
-                  accept="image/*"
+                  accept={IMAGENS_ACEITAS}
                   onChange={(e) => setImagemFile(e.target.files?.[0] ?? null)}
                 />
                 <small className="editar-hint">
@@ -458,6 +459,9 @@ function EditarPerfilVistoriador({ onLogout }) {
                 </button>
               </div>
             </form>
+
+            {/* CARD 3 — ASSINATURA (B12) */}
+            <AssinaturaCard temAssinatura={perfil.tem_assinatura} />
           </div>
         )}
       </main>

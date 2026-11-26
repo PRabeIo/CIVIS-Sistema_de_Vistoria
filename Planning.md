@@ -4,7 +4,7 @@
 >
 > Baseado na análise completa do código feita em 25/11/2026 (branch `main`, commit `7924985`).
 >
-> **Progresso:** Fase 0 concluída · T1 (setup TypeScript) · D1 (usuário único) · S6 · B1 · B2. Próximo: S1, S7, S9 e depois S5 (ordem da Fase 1). Detalhes no [checklist](#checklist-de-acompanhamento).
+> **Progresso:** Fase 0 concluída · T1 (setup TypeScript) · D1 (usuário único) · S1–S10 · B1–B14. Próximo: S11 e S12 (LGPD e sanitização do texto enviado à IA), que fecham a Fase 1. Detalhes no [checklist](#checklist-de-acompanhamento).
 
 ---
 
@@ -81,7 +81,8 @@ Regra: uma tarefa adiada só entra no MVP se outra sair, para o prazo não cresc
 - Antes de cada commit: `typecheck`, `lint`, `test` e `build` verdes nos dois projetos.
 - Nenhuma tarefa é dada como concluída sem teste automatizado cobrindo o comportamento (a partir da Fase 0).
 - **TypeScript (DEC-5):** a partir da Fase 1, todo arquivo novo ou reescrito em uma tarefa é `.ts`/`.tsx`. Arquivo só tocado de leve (1–2 linhas) pode continuar `.js` até a sua fase.
-- Padronizar respostas de erro da API: `{ "erro": { "codigo": "STRING", "mensagem": "texto" } }` (hoje mistura `erro` e `error`).
+- **Erros da API** (S7): `{ "erro": { "codigo": "STRING", "mensagem": "texto", "campos"?: {...} }, "error": "texto" }`. O campo `error` (texto) é legado e sai quando todas as telas usarem o `apiFetch` (B3). No frontend, ler sempre com `mensagemDeErro(data)`. No backend, lançar `AppError(status, codigo, mensagem)`; os controllers não têm `try/catch` (o Express 5 encaminha o erro para o handler central).
+- **Entrada** (S9): todo controller valida `body`/`params`/`query` com os schemas de `backend/src/validacao/`. CPF, telefone e CEP são salvos só com dígitos; e-mail em minúsculas.
 
 ---
 
@@ -227,7 +228,7 @@ Regra: uma tarefa adiada só entra no MVP se outra sair, para o prazo não cresc
 
 | ID | Prio | Tarefa | Critério de aceite |
 |---|---|---|---|
-| O1 | P1 | **Migrations versionadas**: *base feita na Fase 0 (F0.8)*, com runner próprio, `migrate`, `seed` e `db:reset`. Falta: seed de desenvolvimento mais rico (vários empreendimentos, clientes e vistorias em todos os status), seed/criação do primeiro admin em produção (S8) e um teste de que as migrations rodam do zero no CI. | `npm run db:reset` cria um ambiente completo do zero; o CI aplica as migrations num banco vazio. |
+| O1 | P1 | **Migrations versionadas**: *base feita na Fase 0 (F0.8)*, com runner próprio, `migrate`, `seed` e `db:reset`. Falta: seed de desenvolvimento mais rico (vários empreendimentos, clientes e vistorias em todos os status), um teste de que as migrations rodam do zero no CI. | `npm run db:reset` cria um ambiente completo do zero; o CI aplica as migrations num banco vazio. |
 | O2 | P1 | **Docker Compose**: *Postgres (`db`, `db-test`) feito na Fase 0 (F0.6)*. Falta: serviços de backend e frontend no compose e Dockerfile de produção do backend (`npm run build` + `node dist/server.js`). | `docker compose up` sobe tudo. |
 | O3 | P1 | **CI (GitHub Actions)**: lint, testes backend com Postgres de serviço, testes frontend, `vite build` em Linux, `npm audit` (nível high), rodando em todo push na `main`. | Pipeline verde em todo push; vermelho é corrigido antes de qualquer outra tarefa. |
 | O4 | P1 | **Cobertura mínima**: services de vistoria (máquina de estados), auth, permissões por papel (matriz papel × rota), relatório (IA mockada). | ≥ 70% em `services/` e `domain/`. |
@@ -360,8 +361,8 @@ stateDiagram-v2
 
 ### Fase 1
 - [x] D1
-- [ ] S1 · [ ] S2 · [ ] S3 · [ ] S4 · [ ] S5 · [x] S6 · [ ] S7 · [ ] S8 · [ ] S9 · [ ] S10 · [ ] S11 · [ ] S12
-- [x] B1 · [x] B2 · [ ] B3 · [ ] B4 · [ ] B5 · [ ] B6 · [ ] B7 · [ ] B8 · [ ] B9 · [ ] B10 · [ ] B11 · [ ] B12 · [ ] B13 · [ ] B14
+- [x] S1 · [x] S2 · [x] S3 · [x] S4 · [x] S5 · [x] S6 · [x] S7 · [x] S8 · [x] S9 · [x] S10 · [ ] S11 · [ ] S12
+- [x] B1 · [x] B2 · [x] B3 · [x] B4 · [x] B5 · [x] B6 · [x] B7 · [x] B8 · [x] B9 · [x] B10 · [x] B11 · [x] B12 · [x] B13 · [x] B14
 
 - Notas do D1:
   - Migration `0002_usuario_unificado.sql`: tabela `usuario`; `cliente.idcliente` e `funcionario.id` passam a ser o `usuario.id` (FK 1:1, `ON DELETE CASCADE`); `administrador` e `vistoriador` removidas; `vistoria.idvistoriador` referencia `funcionario`. Os nomes de coluna dos perfis foram mantidos para não quebrar os JOINs; padronizar fica para a Fase 2.
@@ -372,6 +373,47 @@ stateDiagram-v2
   - Em TypeScript (DEC-5): `domain/papel`, `domain/erros`, `config/transacao`, os services `usuario`, `auth`, `cliente`, `funcionario` e `vistoriador`, `auth.controller`, os middlewares `auth` e `role`, o seed e os testes novos. Os controllers de cliente e funcionário seguem em JS até o S1/S2.
   - Testes: `tests/setup.ts` registra o hook CJS do `tsx` para os `require()` dos `.js` acharem os `.ts` (sai no fim do T3).
   - S6 (e-mail único) foi resolvido junto, pela constraint e pela tradução do erro para 409.
+- Notas de S1, S7 e S9:
+  - **S1:** o hash já não saía depois do D1 (a senha mora em `usuario` e os perfis usam listas explícitas de colunas). Os `SELECT *` que sobraram são de empreendimento, imóvel e vistoria, sem dados sensíveis. Há teste garantindo que nenhuma listagem contém `senha`.
+  - **S7:** `AppError` + handler central (`middlewares/erro.middleware.ts`) com `X-Request-Id`. Erros de Postgres (único, FK, formato), JSON malformado e multer viram 4xx; o resto vira 500 genérico com o `requestId` (o detalhe só vai para o log). O campo `detalhes` foi removido de todas as respostas.
+  - **S9:** zod 4. A política de senha (mín. 8, letra + número) vale para cadastro, troca de senha e funcionários. Exclusões exigem `confirmacao: "SIM"` validado. O `numeric.middleware` saiu: ids inválidos agora dão 400.
+  - **Todos os controllers em TypeScript** (T3 avançou): `auth`, `cliente`, `funcionario`, `vistoriador`, `vistoria`, `imovel`, `empreendimento` e `relatorio`. Os services de vistoria, imóvel, empreendimento e relatório seguem em JS até a Fase 2.
+  - Efeito visível no frontend: CPF e telefone aparecem sem máscara nas telas que não formatam a exibição (a lista de clientes já formata), até o U5.
+- Notas do S5:
+  - Migration `0003_sessao.sql`. Access token JWT `{ sub, sid }` de 15 min no cookie `civis_at` (path `/api`); refresh opaco de 7 dias no cookie `civis_rt` (path `/api/auth`), guardado como SHA-256 e **rotacionado** a cada `/auth/refresh`. Os dois cookies são `httpOnly` e `SameSite=Strict` (`Secure` em produção).
+  - O `auth.middleware` consulta a sessão e o papel no banco a cada requisição, então a revogação é **imediata** (melhor que os 15 min do critério). Revogam sessões: logout; troca de senha (mantém a sessão atual); senha redefinida pelo admin; mudança de papel; exclusão (cascade); `ativo = false`.
+  - CORS restrito a `CORS_ORIGIN` com credenciais (adianta parte do S4). Variáveis novas no `example.env`; `JWT_EXPIRES_IN` deixou de existir.
+  - Frontend: `apiFetch` envia os cookies e, em 401, renova uma vez e repete (renovações simultâneas são compartilhadas). Os botões "Sair" chamam `POST /auth/logout`. As 13 chamadas `fetch` diretas ganharam `credentials: "include"` (convertê-las para `apiFetch` continua no B3).
+  - Corrigido junto: recarregar uma página protegida mandava para o login (o `App.jsx` lia o usuário num `useEffect`, depois do primeiro redirecionamento).
+  - Verificado no navegador (front em :5173, API em :3001): login pela tela, recarregar `/clientes`, tela com `fetch` direto, refresh e "Sair".
+  - Ainda não há detecção de reuso de refresh roubado (o antigo só deixa de valer); fica para o backlog de segurança.
+- Notas de S2, S3 e S4:
+  - **S2:** migration `0004_relatorio_privado.sql` renomeia `relatorio_url` → `relatorio_arquivo` (chave no storage). PDF gerado só em memória, chave `relatorios/vistoria-<id>/<uuid>.pdf`, upload com checagem da resposta. `services/storage.service.ts` com driver `local` (dev/teste, `backend/storage/`) e `supabase` (bucket privado + URL assinada de 10 min). `GET /vistorias/:id/relatorio` confere o acesso (mesma regra do detalhe da vistoria) e envia o PDF ou redireciona. A API devolve `relatorio_url` como caminho protegido (`/vistorias/:id/relatorio`); o frontend monta o endereço com `urlDaApi()`. `express.static('/relatorios')` e a pasta saíram. O admin não define mais `relatorio_url` à mão.
+  - **S3:** `utils/upload.ts` único: só JPEG/PNG/WebP, checagem de *magic bytes* própria (sem `file-type`, que é só ESM), nome UUID com extensão pelo tipo, limites (avatar 5 MB, empreendimento 10 MB, fotos da vistoria 10 MB cada, até 10 por cômodo e 30 no total). O relatório usa `upload.fields()` com os cômodos conhecidos. Arquivo recusado é apagado. Os `<input type="file">` aceitam só esses formatos.
+  - **S4:** `helmet` (CSP `default-src 'none'`, CORP `same-site` para o front exibir `/uploads`), sem `X-Powered-By`, rate limit no login (5 falhas/15 min por IP+e-mail), no cadastro público (10/h por IP) e no refresh. Limites ajustáveis por env. O CORS restrito já tinha entrado no S5.
+  - Rotas de cliente, funcionário, empreendimento e relatório passaram para TS.
+  - Verificado no navegador: link "Visualizar Relatório" aponta para a API, o PDF chega com sessão (200, `%PDF`), sem sessão dá 401, `/relatorios/*` dá 404 e as imagens de `/uploads` continuam carregando no front.
+  - Pendente para produção: criar o bucket privado no Supabase e definir `STORAGE_DRIVER=supabase`. O driver Supabase não tem teste automatizado (depende do serviço externo).
+- Notas de S8 e S10:
+  - **S8:** o admin não exclui nem rebaixa a própria conta (409 `ACAO_SOBRE_SI_MESMO`), e o último admin ativo não pode ser excluído nem rebaixado (409 `ULTIMO_ADMIN`). A checagem trava as linhas dos admins na transação (`SELECT ... FOR UPDATE`), então duas remoções simultâneas não deixam o sistema sem admin. A rota duplicada `DELETE /administradores/:id` já não existia desde o D1 (há teste garantindo 404). `npm run seed:admin` (`src/cli/seed-admin.ts`, também em `dist/` para produção via `seed:admin:prod`) cria o primeiro admin a partir de `ADMIN_NOME/EMAIL/CPF/SENHA`, com a mesma validação do cadastro, e não faz nada se já existe admin.
+  - **S10:** `config/env.ts` valida o env com zod antes de carregar o app (`server.js`): `DATABASE_URL` postgres, `JWT_SECRET` ≥ 32, números e opções válidos, `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` obrigatórios com `STORAGE_DRIVER=supabase`, `CORS_ORIGIN` obrigatório e `COOKIE_SECURE` ≠ false em produção. Variável vazia conta como ausente. Sem `GEMINI_API_KEY` só avisa (fallback sem IA). Lista todas as variáveis com problema e encerra com código 1. Os módulos continuam lendo `process.env`.
+  - Verificado rodando `node dist/server.js`: sem env lista `DATABASE_URL` e `JWT_SECRET`; com env válido sobe normalmente.
+  - Atenção: um `.env` com `JWT_SECRET` curto (como o antigo `sua_chave_jwt`) agora impede o servidor de subir; gere uma chave nova.
+- Notas de B3–B14:
+  - **B3:** nenhuma tela usa mais `fetch` direto (login, cadastro, editar cliente/funcionário, relatório e as telas removidas/reescritas). O campo legado `error` saiu das respostas e do `mensagemDeErro`; o 401/403 do `role.middleware` também passou para o formato `{ erro: { codigo, mensagem } }`.
+  - **B4:** `NovaVistoria` removida (rota, card da Home e links). Criar vistoria para imóvel existente fica no F4.
+  - **B5:** lista de clientes usa `idcliente` (editar e excluir).
+  - **B6:** `GET` e `DELETE /imoveis/:id` (admin). A exclusão apaga junto as vistorias que ainda não começaram e responde 409 `IMOVEL_COM_HISTORICO` se houver vistoria em andamento, realizada ou com relatório. Soft delete continua na Fase 2. A tela `EditarImovel`, que só mexia num mock do `localStorage`, agora usa a API (editar e excluir).
+  - **B7:** `VistoriasAgendadas` virou a listagem de vistorias do admin (`GET /vistorias` agora traz cliente, imóvel, empreendimento e vistoriador, sem a chave do storage) com filtro por status e link para os detalhes. Item "Vistorias" no menu do admin. Painel completo com KPIs, busca e paginação continua no U6.
+  - **B8:** `EditarCliente`, `EditarFuncionario`, `EditarImovel`, `VistoriasAgendadas`, `SolicitarNovaVistoria` e `IniciarVistoriaDetalhesPage` usam a `Navbar` (o "Sair" encerra a sessão no servidor).
+  - **B9:** imports `Home.css` corrigidos. `npm run check:imports` (`frontend/scripts/checar-imports.mjs`) confere a caixa de todo import relativo e roda antes do `vite build`, então o build quebra no Windows também, como quebraria no Linux.
+  - **B10:** `src/rotas.js` centraliza os endereços (App.jsx e menus usam as constantes). O teste `src/rotas.test.js` lê todo `navigate(...)`/`to=` do código e falha se algum apontar para rota inexistente ou de outro papel; ele achou 18 links quebrados (`/home-cliente`, `/minhas-vistorias`, `/meus-imoveis`, `/nova-vistoria`...). Os demais links continuam como texto, protegidos pelo teste.
+  - **B11:** a checagem do upload já tinha entrado no S2; agora, se o storage falhar, a API responde 502 `STORAGE_INDISPONIVEL` e a vistoria continua "Em Andamento".
+  - **B12:** a data do relatório é o `datahorainicio` da vistoria. Assinatura opcional do vistoriador: migration `0005_assinatura_vistoriador.sql` (imagem no banco, não em `/uploads`, que é público), `GET/PUT/DELETE /funcionarios/me/assinatura` (só vistoriador, PNG/JPEG até 1 MB) e card "Assinatura" no perfil do vistoriador. Fotos do relatório passaram a aceitar só JPEG/PNG (o PDFKit não desenha WebP e as fotos sumiam do PDF sem aviso).
+  - **B13:** o servidor sobe antes do e-mail; se o Ethereal falhar, só o envio fica indisponível (erro claro em vez de travar).
+  - **B14:** coberto pelo S9 + `COALESCE`; testes garantem que editar só o nome não apaga telefone e que campo vazio não altera. O `PUT /clientes/:id` do admin passou a aceitar redefinir a senha (o formulário pedia e o backend ignorava).
+  - Testes: `backend/tests/bugs.test.ts` (17 novos, 111 no total) e `frontend/src/rotas.test.js` (16 no total).
+  - Verificado no navegador: lista de vistorias e detalhes como admin, editar cliente (id certo, telefone salvo), admin tentando se rebaixar (mensagem do S8), editar imóvel (salva e a exclusão é bloqueada com vistoria em andamento), assinatura enviada e exibida no perfil do vistoriador, navbar padrão nas telas do vistoriador e do cliente.
 
 ### Fase 2
 - [ ] D2 · [ ] D3 · [ ] D4 · [ ] D5 · [ ] D6

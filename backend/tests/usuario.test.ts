@@ -5,7 +5,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import app from '../src/app.js';
 import sql from '../src/config/db.js';
 import { SENHA_PADRAO, USUARIOS_SEED } from '../scripts/seed';
-import { tokenDe } from './helpers/auth';
+import { cookieDe, tokenDe } from './helpers/auth';
+import { comMascara, gerarCpf } from './helpers/dados';
 
 let admin: string;
 
@@ -24,14 +25,15 @@ function semSegredos(obj: Record<string, unknown>) {
 }
 
 describe('login unificado', () => {
-  it.each(['admin', 'vistoriador', 'cliente'] as const)('autentica %s e coloca o papel no token', async (papel) => {
+  it.each(['admin', 'vistoriador', 'cliente'] as const)('autentica %s e abre uma sessão', async (papel) => {
     const res = await login(USUARIOS_SEED[papel].email, SENHA_PADRAO);
     expect(res.status).toBe(200);
     expect(res.body.usuario).toMatchObject({ tipo: papel, nome: USUARIOS_SEED[papel].nome });
 
-    const payload = jwt.decode(res.body.token) as unknown as { sub: number; papel: string };
-    expect(payload.papel).toBe(papel);
+    const payload = jwt.decode(cookieDe(res, 'civis_at') as string) as unknown as { sub: number; sid: string };
     expect(payload.sub).toBe(res.body.usuario.id);
+    const [s] = await sql`SELECT usuario_id, revogada_em FROM sessao WHERE id = ${payload.sid}`;
+    expect(s).toMatchObject({ usuario_id: res.body.usuario.id, revogada_em: null });
   });
 
   it('e-mail não diferencia maiúsculas', async () => {
@@ -51,13 +53,13 @@ describe('login unificado', () => {
     try {
       const res = await login(USUARIOS_SEED.vistoriador.email, SENHA_PADRAO);
       expect(res.status).toBe(403);
-      expect(res.body.token).toBeUndefined();
+      expect(cookieDe(res, 'civis_at')).toBeNull();
     } finally {
       await sql`UPDATE usuario SET ativo = TRUE WHERE email = ${USUARIOS_SEED.vistoriador.email}`;
     }
   });
 
-  it('recusa token antigo (sem papel) com 401', async () => {
+  it('recusa token antigo (sem sessão) com 401', async () => {
     const antigo = jwt.sign({ sub: 1, tipo: 'admin', cargo: 'Administrador' }, process.env.JWT_SECRET as string);
     const res = await request(app).get('/api/clientes').set('Authorization', `Bearer ${antigo}`);
     expect(res.status).toBe(401);
@@ -65,7 +67,7 @@ describe('login unificado', () => {
 });
 
 describe('cadastro de cliente', () => {
-  const novo = { nome: 'Novo Cliente', cpf: '111.111.111-11', email: 'novo.cliente@civis.test', senha: 'senhaForte1' };
+  const novo = { nome: 'Novo Cliente', cpf: comMascara(gerarCpf()), email: 'novo.cliente@civis.test', senha: 'senhaForte1' };
 
   it('cadastro público cria usuário + perfil e permite login', async () => {
     const res = await request(app).post('/api/clientes/cadastro').send(novo);
@@ -84,9 +86,9 @@ describe('cadastro de cliente', () => {
   it('e-mail é único entre todos os papéis (cliente com e-mail de funcionário → 409)', async () => {
     const res = await request(app)
       .post('/api/clientes/cadastro')
-      .send({ ...novo, cpf: '222.222.222-22', email: USUARIOS_SEED.admin.email });
+      .send({ ...novo, cpf: gerarCpf(), email: USUARIOS_SEED.admin.email });
     expect(res.status).toBe(409);
-    expect(res.body.error).toMatch(/email/i);
+    expect(res.body.erro.mensagem).toMatch(/email/i);
   });
 
   it('CPF duplicado → 409 e não deixa usuário órfão', async () => {
@@ -100,7 +102,7 @@ describe('cadastro de cliente', () => {
   it('senha curta → 400', async () => {
     const res = await request(app)
       .post('/api/clientes/cadastro')
-      .send({ ...novo, cpf: '333.333.333-33', email: 'curta@civis.test', senha: '123' });
+      .send({ ...novo, cpf: gerarCpf(), email: 'curta@civis.test', senha: '123' });
     expect(res.status).toBe(400);
   });
 
@@ -114,7 +116,7 @@ describe('cadastro de cliente', () => {
   it('excluir cliente remove também o usuário', async () => {
     const criado = await request(app)
       .post('/api/clientes/cadastro')
-      .send({ ...novo, cpf: '444.444.444-44', email: 'excluir@civis.test' });
+      .send({ ...novo, cpf: gerarCpf(), email: 'excluir@civis.test' });
     const id = criado.body.idcliente;
 
     const res = await request(app)
@@ -130,7 +132,7 @@ describe('funcionários e papel', () => {
   it('admin cria vistoriador, troca o cargo para Administrador e o papel muda', async () => {
     const dados = {
       nome: 'Vist Novo',
-      cpf: '555.555.555-55',
+      cpf: gerarCpf(),
       email: 'vist.novo@civis.test',
       senha: 'senhaForte1',
       cargo: 'Vistoriador',
@@ -158,7 +160,7 @@ describe('funcionários e papel', () => {
     const res = await request(app)
       .post('/api/funcionarios')
       .set('Authorization', `Bearer ${admin}`)
-      .send({ nome: 'X', cpf: '666.666.666-66', email: 'x@civis.test', senha: 'senhaForte1', cargo: 'Cliente' });
+      .send({ nome: 'X', cpf: gerarCpf(), email: 'x@civis.test', senha: 'senhaForte1', cargo: 'Cliente' });
     expect(res.status).toBe(400);
   });
 

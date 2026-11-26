@@ -1,7 +1,23 @@
 const db = require('../config/db');
 
+/** Admin: todas as vistorias com cliente, imóvel, empreendimento e vistoriador (B7). */
 async function listarTodas() {
-  return db`SELECT * FROM vistoria`;
+  return db`
+    SELECT
+      v.idvistoria, v.idcliente, v.idimovel, v.idvistoriador, v.status,
+      v.dataagendada, v.datahorainicio, v.datahorafim,
+      CASE WHEN v.relatorio_arquivo IS NOT NULL THEN '/vistorias/' || v.idvistoria || '/relatorio' END AS relatorio_url,
+      c.nome AS nomecliente,
+      i.descricao, i.bloco, i.numero,
+      e.nome AS nomeempreendimento,
+      f.nome AS nomevistoriador
+    FROM vistoria v
+    LEFT JOIN cliente c ON c.idcliente = v.idcliente
+    LEFT JOIN imovel i ON i.idimovel = v.idimovel
+    LEFT JOIN empreendimento e ON e.idempreendimento = i.idempreendimento
+    LEFT JOIN funcionario f ON f.id = v.idvistoriador
+    ORDER BY COALESCE(v.dataagendada, v.datahorainicio) DESC NULLS LAST, v.idvistoria DESC
+  `;
 }
 
 async function buscarPorId(idvistoria) {
@@ -15,6 +31,7 @@ async function buscarPorId(idvistoria) {
   const [vistoria] = await db`
     SELECT 
       v.*,
+      CASE WHEN v.relatorio_arquivo IS NOT NULL THEN '/vistorias/' || v.idvistoria || '/relatorio' END AS relatorio_url,
 
       -- dados do imóvel
       i.observacoes,
@@ -98,6 +115,7 @@ async function listarMinhas(idcliente) {
   return db`
     SELECT
       v.*,
+      CASE WHEN v.relatorio_arquivo IS NOT NULL THEN '/vistorias/' || v.idvistoria || '/relatorio' END AS relatorio_url,
       i.descricao, i.bloco, i.numero,
       e.nome AS nomeempreendimento
     FROM vistoria v
@@ -233,7 +251,6 @@ async function atualizar(idvistoria, payload) {
     observacoes,
     observacoesgerais,
     status,
-    relatorio_url,
   } = payload;
 
   const [vistoriaExistente] = await db`
@@ -253,8 +270,7 @@ async function atualizar(idvistoria, payload) {
       condicoesclimaticas = ${condicoesclimaticas ?? vistoriaExistente.condicoesclimaticas},
       imprevistos = ${imprevistos ?? vistoriaExistente.imprevistos},
       observacoes = ${observacoesFinal},
-      status = ${status ?? vistoriaExistente.status},
-      relatorio_url = ${relatorio_url ?? vistoriaExistente.relatorio_url}
+      status = ${status ?? vistoriaExistente.status}
     WHERE idvistoria = ${id}
   `;
 
@@ -327,7 +343,7 @@ async function pendentesAgendamentoCliente(idcliente) {
   }
 
   return db`
-    SELECT v.*, i.descricao, e.nome AS nomeempreendimento
+    SELECT v.*, CASE WHEN v.relatorio_arquivo IS NOT NULL THEN '/vistorias/' || v.idvistoria || '/relatorio' END AS relatorio_url, i.descricao, e.nome AS nomeempreendimento
     FROM vistoria v
     JOIN imovel i ON v.idimovel = i.idimovel
     JOIN empreendimento e ON i.idempreendimento = e.idempreendimento
@@ -345,7 +361,7 @@ async function pendentesValidacaoCliente(idcliente) {
   }
 
   return db`
-    SELECT v.idvistoria, v.relatorio_url, v.status,
+    SELECT v.idvistoria, CASE WHEN v.relatorio_arquivo IS NOT NULL THEN '/vistorias/' || v.idvistoria || '/relatorio' END AS relatorio_url, v.status,
       i.idimovel, i.descricao, i.bloco, i.numero,
       e.nome AS nomeempreendimento, e.anexos AS imagemempreendimento
     FROM vistoria v

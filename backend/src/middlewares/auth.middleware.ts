@@ -1,29 +1,20 @@
+// S5: autentica pelo cookie de sessão (ou Bearer) e confere no banco se a sessão segue ativa.
+// O papel vem do banco, não do token: rebaixar/desativar/excluir vale na próxima requisição.
 import type { NextFunction, Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import { isPapel } from '../domain/papel';
+import { accessDaRequisicao } from '../controllers/_cookies';
+import { AppError } from '../domain/erros';
+import { lerAccess, papelDaSessaoAtiva } from '../services/sessao.service';
 
-function auth(req: Request, res: Response, next: NextFunction) {
-  const header = req.headers.authorization;
-  if (!header) {
-    return res.status(401).json({ erro: 'Token não enviado.' });
-  }
+async function auth(req: Request, _res: Response, next: NextFunction) {
+  const token = accessDaRequisicao(req);
+  if (!token) throw new AppError(401, 'NAO_AUTENTICADO', 'Sessão não encontrada. Faça login.');
 
-  const [type, token] = header.split(' ');
-  if (type !== 'Bearer' || !token) {
-    return res.status(401).json({ erro: 'Formato inválido. Use: Bearer <token>' });
-  }
+  const payload = lerAccess(token);
+  const papel = payload && (await papelDaSessaoAtiva(payload.sid, payload.sub));
+  if (!payload || !papel) throw new AppError(401, 'NAO_AUTENTICADO', 'Sessão expirada ou encerrada. Faça login novamente.');
 
-  try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET as string);
-    // Tokens anteriores ao D1 (sem `papel`) são recusados: o usuário precisa logar de novo.
-    if (typeof payload !== 'object' || !isPapel(payload.papel) || !Number.isInteger(Number(payload.sub))) {
-      return res.status(401).json({ erro: 'Token inválido ou expirado.' });
-    }
-    req.usuario = { sub: Number(payload.sub), papel: payload.papel, iat: payload.iat, exp: payload.exp };
-    return next();
-  } catch {
-    return res.status(401).json({ erro: 'Token inválido ou expirado.' });
-  }
+  req.usuario = { sub: payload.sub, papel, sid: payload.sid };
+  next();
 }
 
 // `export =` mantém `require('../middlewares/auth.middleware')` funcionando nas rotas .js.
