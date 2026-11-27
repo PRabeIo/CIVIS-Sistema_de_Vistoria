@@ -182,6 +182,12 @@ O sistema utiliza autenticação baseada em JWT com controle de acesso por perfi
 - Rotas críticas protegidas por autenticação e autorização
 - Tratamento de sessão expirada no frontend (auto logout)
 
+### Privacidade (LGPD)
+- Cadastro público exige aceitar os termos de uso e a política de privacidade (`/termos` e `/privacidade`); data e versão do aceite ficam em `cliente.termos_aceitos_em` / `termos_versao`. Os textos são um **modelo**: preencha os trechos entre colchetes e revise com o jurídico antes do lançamento.
+- O cliente baixa os próprios dados (`GET /api/clientes/me/dados`) e exclui a conta (`DELETE /api/clientes/me`, com senha e a palavra `EXCLUIR`) no perfil. Sem vistorias, a conta é apagada; com vistorias concluídas, os dados pessoais são anonimizados e as vistorias ficam com a construtora; com vistoria agendada ou em andamento, a exclusão é recusada (409).
+- Listagens mostram o CPF mascarado (`***.456.789-**`); o CPF completo só aparece no detalhe para o admin e no perfil do próprio usuário.
+- A IA (Gemini) não recebe nome, CPF nem contato: só a avaliação dos cômodos. As observações livres são limitadas a 2000 caracteres e passam por limpeza (caracteres invisíveis, marcadores de prompt e frases que tentam dar ordens ao modelo) antes de ir para o prompt.
+
 Se token expirar:
 - frontend remove token
 - redireciona para login

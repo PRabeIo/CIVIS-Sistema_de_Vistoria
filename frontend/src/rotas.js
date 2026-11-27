@@ -6,6 +6,8 @@ export const ROTAS = {
   login: "/login",
   cadastro: "/cadastro-login",
   home: "/home", // a home muda conforme o papel
+  termos: "/termos", // S11
+  privacidade: "/privacidade", // S11
 
   admin: {
     funcionarios: "/funcionarios",
@@ -48,7 +50,7 @@ export function padroes(grupo) {
   return Object.values(grupo).flatMap((v) => (typeof v === "function" ? [v()] : typeof v === "string" ? [v] : []));
 }
 
-export const ROTAS_PUBLICAS = [ROTAS.inicial, ROTAS.login, ROTAS.cadastro];
+export const ROTAS_PUBLICAS = [ROTAS.inicial, ROTAS.login, ROTAS.cadastro, ROTAS.termos, ROTAS.privacidade];
 export const ROTAS_POR_PAPEL = {
   admin: [ROTAS.home, ...padroes(ROTAS.admin)],
   cliente: [ROTAS.home, ...padroes(ROTAS.cliente)],

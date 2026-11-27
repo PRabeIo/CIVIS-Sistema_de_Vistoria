@@ -7,6 +7,7 @@ const storage = require("./storage.service");
 const { AppError } = require("../domain/erros");
 
 const { gerarRelatorioIA } = require("./relatorioAI.service");
+const { sanitizarTextoParaIA } = require("../domain/textoIA");
 
 const CAMPOS = [
   { key: "Estrutura", label: "Estrutura" },
@@ -254,25 +255,25 @@ async function gerar({ idVistoria, comodos, arquivos, idVistoriadorToken }) {
         Piso: v?.Piso || null,
         Telhado: v?.Telhado || null,
       },
-      observacoes:
-        v?.observacoes && String(v.observacoes).trim() !== ""
-          ? String(v.observacoes).trim()
-          : null,
+      // S12: só a IA recebe a versão limpa; o PDF usa o texto original (já limitado pelo schema).
+      observacoes: sanitizarTextoParaIA(v?.observacoes),
       severidade,
       fotos: { qtd: fotosResumo?.[k]?.qtd || 0 },
     };
   }
 
+  // S12: campos cadastrados também passam pela limpeza (são texto livre de outros usuários).
+  // S11: minimização — nenhum dado pessoal (nome, CPF) vai para a IA; o nome do vistoriador entra só no PDF.
+  const curto = (v) => sanitizarTextoParaIA(v, 150);
   const contextIA = {
     dataVistoria,
     horaVistoria,
     local: {
-      empreendimento: detalhes.nomeempreendimento,
-      cep: detalhes.cep,
-      bloco: detalhes.bloco,
-      numero: detalhes.numero,
+      empreendimento: curto(detalhes.nomeempreendimento),
+      cep: curto(detalhes.cep),
+      bloco: curto(detalhes.bloco),
+      numero: curto(detalhes.numero),
     },
-    vistoriador: { nome: detalhes.nomevistoriador },
     comodos: comodosParaIA,
   };
 

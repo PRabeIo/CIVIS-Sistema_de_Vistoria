@@ -67,7 +67,7 @@ describe('login unificado', () => {
 });
 
 describe('cadastro de cliente', () => {
-  const novo = { nome: 'Novo Cliente', cpf: comMascara(gerarCpf()), email: 'novo.cliente@civis.test', senha: 'senhaForte1' };
+  const novo = { nome: 'Novo Cliente', cpf: comMascara(gerarCpf()), email: 'novo.cliente@civis.test', senha: 'senhaForte1', aceiteTermos: true };
 
   it('cadastro público cria usuário + perfil e permite login', async () => {
     const res = await request(app).post('/api/clientes/cadastro').send(novo);

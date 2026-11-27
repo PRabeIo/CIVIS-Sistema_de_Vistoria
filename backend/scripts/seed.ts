@@ -8,6 +8,7 @@
 import 'dotenv/config';
 import bcrypt from 'bcrypt';
 import type postgres from 'postgres';
+import { TERMOS_VERSAO } from '../src/domain/lgpd';
 import type { Papel } from '../src/domain/papel';
 
 export const SENHA_PADRAO = 'Civis@teste123';
@@ -50,7 +51,7 @@ export async function seed(
       `;
       ids[chave] = id;
       if (u.papel === 'cliente') {
-        await tx`INSERT INTO cliente (idcliente, nome, cpf) VALUES (${id}, ${u.nome}, ${u.cpf})`;
+        await tx`INSERT INTO cliente (idcliente, nome, cpf, termos_aceitos_em, termos_versao) VALUES (${id}, ${u.nome}, ${u.cpf}, now(), ${TERMOS_VERSAO})`;
       } else {
         await tx`INSERT INTO funcionario (id, nome, cpf) VALUES (${id}, ${u.nome}, ${u.cpf})`;
       }

@@ -1,5 +1,6 @@
 // S9: schemas de entrada por rota. Os controllers chamam `validar(schema, req.body | req.params | req.query)`.
 import { z } from 'zod';
+import { OBSERVACAO_MAX } from '../domain/textoIA';
 import { cpf, email, id, opcional, senha, telefone, texto } from './comum';
 
 // ---------- Auth / usuários ----------
@@ -27,7 +28,21 @@ const dadosPessoais = {
   telefone: opcional(telefone),
 };
 
-export const clienteCadastro = z.object({ ...dadosPessoais, senha });
+/** Admin cadastra cliente (sem aceite: a base legal é o contrato com a construtora). */
+export const clienteCriacaoAdmin = z.object({ ...dadosPessoais, senha });
+
+/** S11: o cadastro público exige aceitar os termos de uso e a política de privacidade. */
+export const clienteCadastro = clienteCriacaoAdmin.extend({
+  aceiteTermos: z.literal(true, { error: 'É preciso aceitar os termos de uso e a política de privacidade.' }),
+});
+
+/** S11: exclusão da própria conta exige a senha e a confirmação digitada. */
+export const exclusaoPropriaConta = z.object({
+  senha: z.string({ error: 'Informe sua senha.' }).min(1, { error: 'Informe sua senha.' }),
+  confirmacao: z
+    .string({ error: 'Digite "EXCLUIR" para confirmar.' })
+    .refine((v) => v.trim().toUpperCase() === 'EXCLUIR', { error: 'Digite "EXCLUIR" para confirmar.' }),
+});
 
 /** Edição de dados pessoais (admin ou o próprio cliente): tudo opcional. */
 export const clienteAtualizacao = z.object({
@@ -132,10 +147,47 @@ export const empreendimentoAtualizacao = empreendimentoCriacao.partial().extend(
 
 // ---------- Relatório ----------
 
+export const ESTADOS_ITEM = ['Péssimo', 'Ruim', 'Razoável', 'Bom', 'Excelente'] as const;
+export const COMODOS_RELATORIO = ['quartos', 'banheiros', 'sala', 'cozinha', 'varanda'] as const;
+
+const estadoItem = z
+  .union([z.enum(ESTADOS_ITEM), z.literal(''), z.null()], { error: 'Estado inválido. Use Péssimo, Ruim, Razoável, Bom ou Excelente.' })
+  .optional();
+
+/** S12: cada cômodo do formulário; o texto livre tem limite de tamanho antes de ir para a IA. */
+const comodoRelatorio = z.object({
+  Quantidade: z.coerce
+    .number({ error: 'Quantidade inválida.' })
+    .int({ error: 'Quantidade inválida.' })
+    .min(0, { error: 'Quantidade inválida.' })
+    .max(50, { error: 'Quantidade inválida.' })
+    .transform(String)
+    .default('0'),
+  Estrutura: estadoItem,
+  Pintura: estadoItem,
+  InstalacaoEletrica: estadoItem,
+  InstalacaoHidraulica: estadoItem,
+  Piso: estadoItem,
+  Telhado: estadoItem,
+  observacoes: z
+    .string({ error: 'Observações inválidas.' })
+    .max(OBSERVACAO_MAX, { error: `As observações de cada cômodo devem ter no máximo ${OBSERVACAO_MAX} caracteres.` })
+    .nullish(),
+});
+
+const comodosRelatorio = z.strictObject(
+  Object.fromEntries(COMODOS_RELATORIO.map((c) => [c, comodoRelatorio.optional()])) as Record<
+    (typeof COMODOS_RELATORIO)[number],
+    z.ZodOptional<typeof comodoRelatorio>
+  >,
+  { error: 'Cômodo inválido.' },
+);
+
 export const relatorioGeracao = z.object({
   idVistoria: id('Vistoria'),
   comodos: z
     .string()
+    .max(100_000, { error: 'Dados do relatório muito grandes.' })
     .default('{}')
     .transform((v, ctx) => {
       try {
@@ -146,5 +198,6 @@ export const relatorioGeracao = z.object({
       }
       ctx.addIssue({ code: 'custom', message: "Campo 'comodos' não é um JSON válido." });
       return z.NEVER;
-    }),
+    })
+    .pipe(comodosRelatorio),
 });

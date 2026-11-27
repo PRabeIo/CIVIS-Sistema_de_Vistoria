@@ -4,6 +4,7 @@ import { apiFetch, logoutNoServidor } from "../../../services/api";
 import "../../styles/perfil.css";
 import Navbar from "../../components/Navbar/Navbar"; 
 import { SERVER_URL } from "../../../config";
+import MeusDadosCard from "./MeusDadosCard";
 
 /* ===== helpers (máscaras / normalização) ===== */
 const onlyDigits = (v = "") => String(v).replace(/\D/g, "");
@@ -150,6 +151,8 @@ function PerfilCliente({ onLogout }) {
             </div>
           </div>
         )}
+
+        {perfil ? <MeusDadosCard /> : null}
       </main>
     </div>
   );

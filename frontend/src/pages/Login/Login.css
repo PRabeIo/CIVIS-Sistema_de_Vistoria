@@ -327,3 +327,21 @@ html, body, #root {
   color: black ;            /* texto branco */
   font-size: 1rem ;
 }
+
+/* S11: aceite dos termos no cadastro */
+.login-form .cadastro-aceite {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 12px 0 4px;
+  font-weight: normal;
+  line-height: 1.4;
+}
+
+.login-form .cadastro-aceite input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  margin: 2px 0 0;
+  padding: 0;
+}

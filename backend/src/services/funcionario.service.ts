@@ -4,6 +4,7 @@ import path from 'path';
 import db from '../config/db';
 import { emTransacao } from '../config/transacao';
 import { AppError } from '../domain/erros';
+import { comCpfMascarado } from '../domain/lgpd';
 import { papelDoCargo, type Cargo, type PapelFuncionario } from '../domain/papel';
 import { safeUnlink } from '../utils/file.util';
 import * as usuarioService from './usuario.service';
@@ -57,8 +58,10 @@ async function buscar(id: number): Promise<Funcionario | undefined> {
   return f;
 }
 
+/** S11: listagem com CPF mascarado; o CPF completo só aparece no detalhe (GET /funcionarios/:id). */
 export async function listarComCargo(): Promise<Funcionario[]> {
-  return db<Funcionario[]>`${SELECT_FUNCIONARIO} ORDER BY f.id DESC`;
+  const linhas = await db<Funcionario[]>`${SELECT_FUNCIONARIO} ORDER BY f.id DESC`;
+  return comCpfMascarado(linhas as unknown as Record<string, unknown>[]) as unknown as Funcionario[];
 }
 
 export async function buscarPorIdComCargo(id: unknown): Promise<Funcionario | undefined> {

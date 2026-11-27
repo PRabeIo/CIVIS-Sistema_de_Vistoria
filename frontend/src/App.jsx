@@ -6,6 +6,7 @@ import "./pages/styles/navbar.css";
 import Inicial from "./pages/Inicial/Inicial";
 import Login from "./pages/Login/login";
 import CadastroLogin from "./pages/Cadastro/CadastroLogin";
+import Legal from "./pages/Legal/Legal";
 
 // Home de cada tipo de usuário
 import HomeAdm from "./pages/HomeAdm/Home";
@@ -102,6 +103,8 @@ function App() {
         <Route path={ROTAS.inicial} element={<Inicial />} />
         <Route path={ROTAS.login} element={<Login onLogin={login} />} />
         <Route path={ROTAS.cadastro} element={<CadastroLogin />} />
+        <Route path={ROTAS.termos} element={<Legal tipo="termos" />} />
+        <Route path={ROTAS.privacidade} element={<Legal tipo="privacidade" />} />
 
         {/* Rotas protegidas */}
         {isAuthenticated ? (

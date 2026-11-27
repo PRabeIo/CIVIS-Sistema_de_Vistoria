@@ -73,7 +73,7 @@ describe('S7 – tratamento central de erros', () => {
 });
 
 describe('S9 – validação e normalização', () => {
-  const base = () => ({ nome: 'Pessoa Teste', cpf: gerarCpf(), email: gerarEmail(), senha: 'senhaForte1' });
+  const base = () => ({ nome: 'Pessoa Teste', cpf: gerarCpf(), email: gerarEmail(), senha: 'senhaForte1', aceiteTermos: true });
 
   it('CPF inválido → 400 com erro no campo', async () => {
     const res = await request(app)

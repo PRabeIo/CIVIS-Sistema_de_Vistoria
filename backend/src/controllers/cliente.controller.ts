@@ -3,18 +3,23 @@ import { AppError } from '../domain/erros';
 import * as clienteService from '../services/cliente.service';
 import { paramsId, validar } from '../validacao/comum';
 import * as schemas from '../validacao/schemas';
+import { limparCookiesSessao } from './_cookies';
 import { limparUploadsSeFalhar, ou404, usuarioDe } from './_http';
 
 const NAO_ENCONTRADO = 'Cliente não encontrado.';
 const params = paramsId('id', 'ID do cliente');
 
-/** POST /clientes/cadastro (público) e POST /clientes (admin). */
+/** POST /clientes/cadastro (público): exige o aceite dos termos (S11). */
 export async function cadastroPublico(req: Request, res: Response) {
   const dados = validar(schemas.clienteCadastro, req.body);
   return res.status(201).json(await clienteService.criarCliente(dados));
 }
 
-export const criar = cadastroPublico;
+/** POST /clientes (admin). */
+export async function criar(req: Request, res: Response) {
+  const dados = validar(schemas.clienteCriacaoAdmin, req.body);
+  return res.status(201).json(await clienteService.criarCliente(dados));
+}
 
 export async function listar(_req: Request, res: Response) {
   return res.status(200).json(await clienteService.listarClientes());
@@ -70,4 +75,28 @@ export async function atualizarMinhaSenha(req: Request, res: Response) {
   const { senhaAtual, senhaNova } = validar(schemas.trocaSenha, req.body);
   await clienteService.trocarMinhaSenha(sub, senhaAtual, senhaNova, sid);
   return res.status(200).json({ message: 'Senha alterada com sucesso.' });
+}
+
+/** GET /clientes/me/dados (S11): baixa os próprios dados em JSON. */
+export async function exportarMeusDados(req: Request, res: Response) {
+  const { sub } = usuarioDe(req);
+  const dados = await clienteService.exportarMeusDados(sub);
+  res.setHeader('Cache-Control', 'private, no-store');
+  res.setHeader('Content-Disposition', 'attachment; filename="meus-dados-civis.json"');
+  return res.status(200).json(dados);
+}
+
+/** DELETE /clientes/me (S11): exclui ou anonimiza a própria conta e encerra a sessão. */
+export async function excluirMinhaConta(req: Request, res: Response) {
+  const { sub } = usuarioDe(req);
+  const { senha } = validar(schemas.exclusaoPropriaConta, req.body);
+  const { modo } = await clienteService.excluirMinhaConta(sub, senha);
+  limparCookiesSessao(res);
+  return res.status(200).json({
+    modo,
+    message:
+      modo === 'excluida'
+        ? 'Sua conta e seus dados foram excluídos.'
+        : 'Sua conta foi encerrada e seus dados pessoais foram apagados. As vistorias ficam com a construtora, sem identificação.',
+  });
 }

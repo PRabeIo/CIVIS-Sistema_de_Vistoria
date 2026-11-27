@@ -1,3 +1,4 @@
+const { mascararCpf } = require("../domain/lgpd");
 const db = require('../config/db');
 
 /** Admin: todas as vistorias com cliente, imóvel, empreendimento e vistoriador (B7). */
@@ -84,8 +85,9 @@ async function buscarPorIdComAcesso(idvistoria, usuario) {
     return Number(vistoria.idcliente) === Number(usuario.sub) ? vistoria : null;
   }
 
-  // Vistoriador
+  // Vistoriador (S11: vê o CPF do cliente mascarado)
   if (usuario?.papel === "vistoriador") {
+    vistoria.cpfcliente = mascararCpf(vistoria.cpfcliente);
     // se já for dele
     if (Number(vistoria.idvistoriador) === Number(usuario.sub)) return vistoria;
 

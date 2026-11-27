@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../Login/Login.css";
 import { apiFetch } from "../../services/api";
+import { ROTAS } from "../../rotas";
 
 function CadastroLogin() {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ function CadastroLogin() {
     confirmarSenha: "",
     telefone: "",
   });
+  const [aceiteTermos, setAceiteTermos] = useState(false); // S11
 
   // erros visíveis embaixo do campo
   const [nomeErro, setNomeErro] = useState("");
@@ -170,6 +172,7 @@ function CadastroLogin() {
           email: formData.email.trim().toLowerCase(),
           senha: formData.senha,
           telefone: somenteDigitos(formData.telefone), // opcional (pode ser "")
+          aceiteTermos, // S11: o backend recusa o cadastro sem o aceite
         }),
       });
 
@@ -180,7 +183,7 @@ function CadastroLogin() {
     }
   };
 
-  const cadastrarDesabilitado = !!nomeErro || !!cpfErro || !!emailErro || !!senhaErro;
+  const cadastrarDesabilitado = !aceiteTermos || !!nomeErro || !!cpfErro || !!emailErro || !!senhaErro;
 
   return (
     <div className="login-page">
@@ -288,6 +291,27 @@ function CadastroLogin() {
             {touched.confirmarSenha && senhaErro && (
               <small className="cadastro-hint cadastro-hint--erro">{senhaErro}</small>
             )}
+
+            <label className="cadastro-aceite" htmlFor="aceiteTermos">
+              <input
+                id="aceiteTermos"
+                type="checkbox"
+                checked={aceiteTermos}
+                onChange={(e) => setAceiteTermos(e.target.checked)}
+                required
+              />
+              <span>
+                Li e aceito os{" "}
+                <Link to={ROTAS.termos} target="_blank" rel="noopener noreferrer">
+                  termos de uso
+                </Link>{" "}
+                e a{" "}
+                <Link to={ROTAS.privacidade} target="_blank" rel="noopener noreferrer">
+                  política de privacidade
+                </Link>
+                .
+              </span>
+            </label>
 
             <button type="submit" className="login-button" disabled={cadastrarDesabilitado}>
               Cadastrar

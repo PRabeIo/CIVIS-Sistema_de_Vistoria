@@ -5,6 +5,7 @@ import "./CriarRelatorioPage.css";
 import { apiFetch, IMAGENS_PDF } from "../../../services/api";
 
 const opcoesEstado = ["Péssimo", "Ruim", "Razoável", "Bom", "Excelente"];
+const OBSERVACAO_MAX = 2000; // S12: mesmo limite do backend (domain/textoIA.ts)
 const comodos = ["quartos", "banheiros", "sala", "cozinha", "varanda"];
 
 const COMODO_LABEL = {
@@ -425,10 +426,14 @@ function CriarRelatorioPage() {
               <label>Observações sobre {COMODO_LABEL[comodo] || comodo}</label>
               <textarea
                 rows={4}
+                maxLength={OBSERVACAO_MAX}
                 value={form.comodos[comodo].observacoes || ""}
                 onChange={(e) => handleComodoChange(comodo, "observacoes", e.target.value)}
                 placeholder="Descreva detalhes relevantes, desgastes, irregularidades, etc."
               />
+              <small className="hint">
+                {(form.comodos[comodo].observacoes || "").length}/{OBSERVACAO_MAX} caracteres
+              </small>
             </div>
 
             <div className="form-group">

@@ -142,7 +142,7 @@ describe('S2 – relatório privado', () => {
       .post('/api/relatorio/gerar')
       .set(bearer(vistoriador))
       .field('idVistoria', String(idVistoria))
-      .field('comodos', JSON.stringify({ sala: { Quantidade: '1', Estrutura: 'Bom', Pintura: 'Regular' } }))
+      .field('comodos', JSON.stringify({ sala: { Quantidade: '1', Estrutura: 'Bom', Pintura: 'Razoável' } }))
       .attach('anexos_sala', PNG, { filename: 'sala.png', contentType: 'image/png' });
 
     expect(res.status).toBe(200);
@@ -169,7 +169,7 @@ describe('S2 – relatório privado', () => {
   });
 
   it('outro cliente não acessa (404) e sem sessão é 401', async () => {
-    const outro = { nome: 'Outro Cliente', cpf: gerarCpf(), email: gerarEmail('outro'), senha: 'senhaForte1' };
+    const outro = { nome: 'Outro Cliente', cpf: gerarCpf(), email: gerarEmail('outro'), senha: 'senhaForte1', aceiteTermos: true };
     await request(app).post('/api/clientes/cadastro').send(outro);
     const login = await request(app).post('/api/auth/login').send({ email: outro.email, senha: outro.senha });
     const tokenOutro = cookieDe(login, 'civis_at') as string;

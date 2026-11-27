@@ -16,6 +16,8 @@ router.get('/me', auth, apenasCliente, clienteController.me);
 router.patch('/me', auth, apenasCliente, clienteController.atualizarMe);
 router.put('/me/avatar', auth, apenasCliente, ...avatar, clienteController.atualizarMeAvatar);
 router.put('/me/senha', auth, apenasCliente, clienteController.atualizarMinhaSenha);
+router.get('/me/dados', auth, apenasCliente, clienteController.exportarMeusDados); // S11
+router.delete('/me', auth, apenasCliente, clienteController.excluirMinhaConta); // S11
 
 // Administração
 router.post('/', auth, apenasAdmin, clienteController.criar);

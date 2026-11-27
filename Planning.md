@@ -4,7 +4,7 @@
 >
 > Baseado na análise completa do código feita em 25/11/2026 (branch `main`, commit `7924985`).
 >
-> **Progresso:** Fase 0 concluída · T1 (setup TypeScript) · D1 (usuário único) · S1–S10 · B1–B14. Próximo: S11 e S12 (LGPD e sanitização do texto enviado à IA), que fecham a Fase 1. Detalhes no [checklist](#checklist-de-acompanhamento).
+> **Progresso:** Fase 0 concluída · T1 (setup TypeScript) · D1 (usuário único) · **Fase 1 concluída** (S1–S12 · B1–B14). Próximo: Fase 2, começando por F1 (máquina de estados) e D5 (auditoria). Detalhes no [checklist](#checklist-de-acompanhamento).
 
 ---
 
@@ -361,7 +361,7 @@ stateDiagram-v2
 
 ### Fase 1
 - [x] D1
-- [x] S1 · [x] S2 · [x] S3 · [x] S4 · [x] S5 · [x] S6 · [x] S7 · [x] S8 · [x] S9 · [x] S10 · [ ] S11 · [ ] S12
+- [x] S1 · [x] S2 · [x] S3 · [x] S4 · [x] S5 · [x] S6 · [x] S7 · [x] S8 · [x] S9 · [x] S10 · [x] S11 · [x] S12
 - [x] B1 · [x] B2 · [x] B3 · [x] B4 · [x] B5 · [x] B6 · [x] B7 · [x] B8 · [x] B9 · [x] B10 · [x] B11 · [x] B12 · [x] B13 · [x] B14
 
 - Notas do D1:
@@ -414,6 +414,11 @@ stateDiagram-v2
   - **B14:** coberto pelo S9 + `COALESCE`; testes garantem que editar só o nome não apaga telefone e que campo vazio não altera. O `PUT /clientes/:id` do admin passou a aceitar redefinir a senha (o formulário pedia e o backend ignorava).
   - Testes: `backend/tests/bugs.test.ts` (17 novos, 111 no total) e `frontend/src/rotas.test.js` (16 no total).
   - Verificado no navegador: lista de vistorias e detalhes como admin, editar cliente (id certo, telefone salvo), admin tentando se rebaixar (mensagem do S8), editar imóvel (salva e a exclusão é bloqueada com vistoria em andamento), assinatura enviada e exibida no perfil do vistoriador, navbar padrão nas telas do vistoriador e do cliente.
+- Notas de S11 e S12 (adiantados a pedido, apesar de pós-MVP):
+  - **S11:** migration `0006_lgpd.sql` (`cliente.termos_aceitos_em`, `termos_versao`, `anonimizado_em`). O cadastro público exige `aceiteTermos: true` (checkbox com links para `/termos` e `/privacidade`, páginas públicas novas); cliente criado pelo admin fica sem aceite (base legal: contrato com a construtora). `TERMOS_VERSAO` em `backend/src/domain/lgpd.ts` e `frontend/src/utils/lgpd.js`. `GET /clientes/me/dados` devolve um JSON (perfil, imóveis, vistorias, sessões) como anexo; `DELETE /clientes/me` exige senha + "EXCLUIR": sem vistorias apaga, com vistorias concluídas anonimiza (nome, CPF `anon-<id>`, telefone, foto, e-mail, senha, `ativo = false`, sessões revogadas) e some da listagem do admin, com vistoria agendada/em curso responde 409 `VISTORIA_EM_ABERTO`. Card "Privacidade e dados" no perfil do cliente. CPF mascarado nas listagens de clientes e funcionários e no detalhe da vistoria visto pelo vistoriador.
+  - **S12:** `schemas.relatorioGeracao` valida os cômodos (só os 5 conhecidos, quantidade 0–50, estados da lista, observações até 2000 caracteres → 400). `domain/textoIA.ts` limpa o texto antes do prompt (caracteres invisíveis, marcadores como ``` e `<|...|>`, linhas com instruções óbvias viram `[trecho removido]`, corte no limite); o PDF usa o texto original. O prompt delimita os dados e manda ignorar instruções dentro deles. A resposta da IA é recusada se a severidade sair de 0–3 ou o formato não bater, e textos/listas longos são cortados. O nome do vistoriador deixou de ir para a IA (minimização).
+  - Pendente: textos legais são modelo (preencher empresa, contato do encarregado e prazo de retenção, revisar com jurídico); clientes criados pelo admin ainda não aceitam os termos no primeiro acesso.
+  - Testes: `backend/tests/lgpd-ia.test.ts` (21 novos, 132 no total). Verificado no navegador: cadastro com o checkbox, download dos dados, exclusão da conta (sai e some do banco), lista de clientes com CPF mascarado e página de privacidade.
 
 ### Fase 2
 - [ ] D2 · [ ] D3 · [ ] D4 · [ ] D5 · [ ] D6
