@@ -1,4 +1,7 @@
 const { mascararCpf } = require("../domain/lgpd");
+const { AppError } = require("../domain/erros");
+const { STATUS } = require("../domain/vistoriaStatus");
+const { transicionar, listarEventos } = require("./transicao.service");
 const db = require('../config/db');
 
 /** Admin: todas as vistorias com cliente, imóvel, empreendimento e vistoriador (B7). */
@@ -165,117 +168,47 @@ async function listarMinhasVistoriador(idvistoriador) {
   `;
 }
 
-/**
- * Cliente agenda (somente se for dele)
- * Aguardando Agendamento -> Vistoria Agendada
- */
-async function agendar(idvistoria, idcliente, { dataagendada, horaagendada }) {
-  const id = Number(idvistoria);
-  const idc = Number(idcliente);
-
-  if (Number.isNaN(id) || Number.isNaN(idc)) {
-    const err = new Error("ID inválido.");
-    err.statusCode = 400;
-    throw err;
-  }
-
-  if (!dataagendada || !horaagendada) {
-    const err = new Error("Data e hora são obrigatórias.");
-    err.statusCode = 400;
-    throw err;
-  }
-
-  // normaliza hora: "HH:mm" -> "HH:mm:00"
+/** Monta o timestamp do agendamento (fuso -03:00) e exige data futura. */
+function dataDoAgendamento({ dataagendada, horaagendada }) {
   const hora = String(horaagendada).length === 5 ? `${horaagendada}:00` : String(horaagendada);
-
-  // valida formato básico (evita "99:99")
-  const hhmmssOk = /^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/.test(hora);
-  if (!hhmmssOk) {
-    const err = new Error("Hora inválida. Use HH:mm ou HH:mm:ss.");
-    err.statusCode = 400;
-    throw err;
-  }
-
-  // monta timestamp com timezone -03:00 (seu padrão)
   const ts = `${dataagendada}T${hora}-03:00`;
-
-  // ✅ valida no backend: não pode agendar no passado/igual agora
   const dt = new Date(ts);
-  if (Number.isNaN(dt.getTime())) {
-    const err = new Error("Data/hora inválida.");
-    err.statusCode = 400;
-    throw err;
-  }
-
-  if (dt.getTime() <= Date.now()) {
-    const err = new Error("Escolha uma data e hora no futuro.");
-    err.statusCode = 400;
-    throw err;
-  }
-
-  // status que podem agendar (se quiser só 1, deixe só o primeiro)
-  const statusPermitidos = [
-    "Aguardando Agendamento da Vistoria",
-    // "Vistoria Reagendada",
-  ];
-
-  const [vistoriaAtualizada] = await db`
-    UPDATE vistoria
-    SET dataagendada = ${ts}::timestamptz,
-        status = 'Vistoria Agendada'
-    WHERE idvistoria = ${id}
-      AND idcliente = ${idc}
-      AND status = ANY(${statusPermitidos}::text[])
-    RETURNING *
-  `;
-
-  return vistoriaAtualizada;
+  if (Number.isNaN(dt.getTime())) throw new AppError(400, "VALIDACAO", "Data/hora inválida.");
+  if (dt.getTime() <= Date.now()) throw new AppError(400, "VALIDACAO", "Escolha uma data e hora no futuro.");
+  return dt;
 }
 
+/** F1: cliente dono agenda (Aguardando Agendamento → Agendada). */
+async function agendar(idvistoria, ator, dados) {
+  return transicionar({
+    idvistoria: Number(idvistoria),
+    acao: "agendar",
+    ator,
+    campos: { dataagendada: dataDoAgendamento(dados) },
+  });
+}
 
 /**
- * Atualização genérica (admin)
+ * Admin corrige dados da vistoria. F1: o status NÃO muda por aqui (só pelas ações da máquina de estados).
  */
 async function atualizar(idvistoria, payload) {
   const id = Number(idvistoria);
-  if (Number.isNaN(id)) {
-    const err = new Error('ID inválido.');
-    err.statusCode = 400;
-    throw err;
-  }
+  const [atual] = await db`SELECT * FROM vistoria WHERE idvistoria = ${id}`;
+  if (!atual) return null;
 
-  const {
-    dataagendada,
-    datahorainicio,
-    datahorafim,
-    condicoesclimaticas,
-    imprevistos,
-    observacoes,
-    observacoesgerais,
-    status,
-  } = payload;
-
-  const [vistoriaExistente] = await db`
-    SELECT * FROM vistoria WHERE idvistoria = ${id}
-  `;
-
-  if (!vistoriaExistente) return null;
-
-  const observacoesFinal =
-    observacoes ?? observacoesgerais ?? vistoriaExistente.observacoes;
+  const { dataagendada, datahorainicio, datahorafim, condicoesclimaticas, imprevistos, observacoes, observacoesgerais } =
+    payload;
 
   await db`
     UPDATE vistoria SET
-      dataagendada = ${dataagendada ?? vistoriaExistente.dataagendada},
-      datahorainicio = ${datahorainicio ?? vistoriaExistente.datahorainicio},
-      datahorafim = ${datahorafim ?? vistoriaExistente.datahorafim},
-      condicoesclimaticas = ${condicoesclimaticas ?? vistoriaExistente.condicoesclimaticas},
-      imprevistos = ${imprevistos ?? vistoriaExistente.imprevistos},
-      observacoes = ${observacoesFinal},
-      status = ${status ?? vistoriaExistente.status}
+      dataagendada = ${dataagendada ?? atual.dataagendada},
+      datahorainicio = ${datahorainicio ?? atual.datahorainicio},
+      datahorafim = ${datahorafim ?? atual.datahorafim},
+      condicoesclimaticas = ${condicoesclimaticas ?? atual.condicoesclimaticas},
+      imprevistos = ${imprevistos ?? atual.imprevistos},
+      observacoes = ${observacoes ?? observacoesgerais ?? atual.observacoes}
     WHERE idvistoria = ${id}
   `;
-
   return true;
 }
 
@@ -297,41 +230,25 @@ async function deletar(idvistoria) {
 }
 
 /**
- * Vistoriador inicia
+ * F1: vistoriador inicia (Agendada/Reagendada → Em Andamento). Se a vistoria estava no pool, ele a assume.
+ * Chamar de novo numa vistoria que já é dele e está em andamento só devolve a vistoria (sem novo evento).
  */
-async function iniciar(idvistoria, idvistoriador) {
+async function iniciar(idvistoria, ator) {
   const id = Number(idvistoria);
-  const idv = Number(idvistoriador);
-
-  if (Number.isNaN(id) || Number.isNaN(idv)) {
-    const err = new Error('ID inválido.');
-    err.statusCode = 400;
-    throw err;
+  const [atual] = await db`SELECT * FROM vistoria WHERE idvistoria = ${id}`;
+  if (atual && atual.status === STATUS.emAndamento && Number(atual.idvistoriador) === Number(ator.sub)) {
+    return atual;
   }
-
-  const now = new Date().toISOString();
-
-  const [vistoriaAtualizada] = await db`
-    UPDATE vistoria
-    SET 
-      idvistoriador = COALESCE(idvistoriador, ${idv}),
-      datahorainicio = COALESCE(datahorainicio, ${now}),
-      status = CASE
-        WHEN status IN ('Vistoria Agendada', 'Vistoria Reagendada') THEN 'Em Andamento'
-        ELSE status
-      END
-    WHERE idvistoria = ${id}
-      AND (
-        (status IN ('Vistoria Agendada', 'Vistoria Reagendada') AND (idvistoriador IS NULL OR idvistoriador = ${idv}))
-        OR
-        (status = 'Em Andamento' AND idvistoriador = ${idv})
-      )
-    RETURNING *
-  `;
-
-  return vistoriaAtualizada;
+  return transicionar({
+    idvistoria: id,
+    acao: "iniciar",
+    ator,
+    campos: (v) => ({
+      idvistoriador: v.idvistoriador ?? ator.sub,
+      datahorainicio: v.datahorainicio ?? new Date(),
+    }),
+  });
 }
-
 
 /**
  * Cliente - pendentes agendamento
@@ -400,110 +317,52 @@ async function aguardandoValidacaoCliente(idcliente) {
   `;
 }
 
-// Cliente Valida
-async function validar(idvistoria, idcliente) {
-  const id = Number(idvistoria);
-  const idc = Number(idcliente);
-
-  if (Number.isNaN(id) || Number.isNaN(idc)) {
-    const err = new Error('ID inválido.');
-    err.statusCode = 400;
-    throw err;
-  }
-
-  const [ok] = await db`
-    UPDATE vistoria
-    SET status = 'Vistoria Validada'
-    WHERE idvistoria = ${id}
-      AND idcliente = ${idc}
-      AND status = 'Aguardando Validação'
-    RETURNING idvistoria
-  `;
-
-  return !!ok;
+/** F1: cliente dono valida o relatório (Aguardando Validação → Validada). */
+async function validar(idvistoria, ator) {
+  return transicionar({ idvistoria: Number(idvistoria), acao: "validar", ator });
 }
 
-
-async function reagendar(idvistoria, idcliente, { dataagendada, horaagendada }) {
-  const id = Number(idvistoria);
-  const idc = Number(idcliente);
-
-  if (Number.isNaN(id) || Number.isNaN(idc)) {
-    const err = new Error('ID inválido.');
-    err.statusCode = 400;
-    throw err;
-  }
-
-  if (!dataagendada || !horaagendada) {
-    const err = new Error('Data e hora são obrigatórias.');
-    err.statusCode = 400;
-    throw err;
-  }
-
-  const hora = horaagendada.length === 5 ? `${horaagendada}:00` : horaagendada;
-  const ts = `${dataagendada}T${hora}-03:00`;
-
-  const [vistoriaAtualizada] = await db`
-    UPDATE vistoria
-    SET dataagendada = ${ts}::timestamptz,
-        status = 'Vistoria Reagendada'
-    WHERE idvistoria = ${id}
-      AND idcliente = ${idc}
-      AND status IN ('Aguardando Validação', 'Vistoria Rejeitada')
-    RETURNING *
-  `;
-
-  return vistoriaAtualizada;
+/** F1: cliente pede nova visita depois de rejeitar (Rejeitada → Reagendada). O F3 refaz esta regra. */
+async function reagendar(idvistoria, ator, dados) {
+  return transicionar({
+    idvistoria: Number(idvistoria),
+    acao: "reagendar",
+    ator,
+    motivo: dados.motivo,
+    campos: { dataagendada: dataDoAgendamento(dados) },
+  });
 }
 
-async function rejeitar(idvistoria, idcliente) {
-  const id = Number(idvistoria);
-  const idc = Number(idcliente);
-
-  if (Number.isNaN(id) || Number.isNaN(idc)) {
-    const err = new Error('ID inválido.');
-    err.statusCode = 400;
-    throw err;
-  }
-
-  const now = new Date().toISOString();
-
-  const [vistoriaAtualizada] = await db`
-    UPDATE vistoria
-    SET status = 'Vistoria Rejeitada',
-        datahorafim = ${now}
-    WHERE idvistoria = ${id}
-      AND idcliente = ${idc}
-      AND status = 'Aguardando Validação'
-    RETURNING *
-  `;
-
-  return vistoriaAtualizada;
+/** F1: cliente rejeita o relatório (Aguardando Validação → Rejeitada). O F2 exige motivo e cria a revisão. */
+async function rejeitar(idvistoria, ator, motivo) {
+  return transicionar({
+    idvistoria: Number(idvistoria),
+    acao: "rejeitar",
+    ator,
+    motivo,
+    campos: { datahorafim: new Date() },
+  });
 }
 
-async function finalizar(idvistoria, idvistoriador) {
-  const id = Number(idvistoria);
-  const idv = Number(idvistoriador);
+/** F1: vistoriador da vistoria finaliza (Validada → Finalizada). */
+async function finalizar(idvistoria, ator) {
+  return transicionar({
+    idvistoria: Number(idvistoria),
+    acao: "finalizar",
+    ator,
+    campos: (v) => ({ datahorafim: v.datahorafim ?? new Date() }),
+  });
+}
 
-  if (Number.isNaN(id) || Number.isNaN(idv)) {
-    const err = new Error('ID inválido.');
-    err.statusCode = 400;
-    throw err;
-  }
+/** F1/F7: admin cancela antes do início, com motivo (→ Vistoria Cancelada). */
+async function cancelar(idvistoria, ator, motivo) {
+  return transicionar({ idvistoria: Number(idvistoria), acao: "cancelar", ator, motivo });
+}
 
-  const now = new Date().toISOString();
-
-  const [atualizada] = await db`
-    UPDATE vistoria
-    SET status = 'Vistoria Finalizada',
-        datahorafim = COALESCE(datahorafim, ${now})
-    WHERE idvistoria = ${id}
-      AND idvistoriador = ${idv}
-      AND status = 'Vistoria Validada'
-    RETURNING *
-  `;
-
-  return atualizada;
+/** D5: linha do tempo, para quem pode ver a vistoria. */
+async function eventos(idvistoria, usuario) {
+  const v = await buscarPorIdComAcesso(idvistoria, usuario);
+  return v ? listarEventos(Number(idvistoria)) : null;
 }
 
 // Vistorias disponíveis para qualquer vistoriador assumir
@@ -556,4 +415,6 @@ module.exports = {
   reagendar,
   rejeitar,
   finalizar,
+  cancelar,
+  eventos,
 };

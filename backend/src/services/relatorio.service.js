@@ -7,6 +7,8 @@ const storage = require("./storage.service");
 const { AppError } = require("../domain/erros");
 
 const { gerarRelatorioIA } = require("./relatorioAI.service");
+const { verificarTransicao } = require("../domain/vistoriaStatus");
+const { transicionar } = require("./transicao.service");
 const { sanitizarTextoParaIA } = require("../domain/textoIA");
 
 const CAMPOS = [
@@ -185,6 +187,7 @@ function renderizarRelatorioIAPdf(doc, rel) {
 }
 
 async function gerar({ idVistoria, comodos, arquivos, idVistoriadorToken }) {
+  const ator = { sub: Number(idVistoriadorToken), papel: "vistoriador" };
   const idVistoriaNum = Number(idVistoria);
 
   if (!idVistoriaNum) throw { statusCode: 400, message: "idVistoria inválido." };
@@ -212,8 +215,11 @@ async function gerar({ idVistoria, comodos, arquivos, idVistoriadorToken }) {
     LIMIT 1
   `;
 
-  if (!detalhes) throw { statusCode: 404, message: "Vistoria não encontrada ou sem permissão." };
-  if (detalhes.status !== "Em Andamento") throw { statusCode: 400, message: `Status atual: ${detalhes.status}` };
+  if (!detalhes) throw new AppError(404, "NAO_ENCONTRADO", "Vistoria não encontrada ou sem permissão.");
+  // F1: confere antes de gastar IA e PDF; a transição de verdade (com trava) acontece no fim.
+  if (!verificarTransicao("gerarRelatorio", { ...detalhes, idcliente: null }, ator).ok) {
+    throw new AppError(409, "TRANSICAO_INVALIDA", `Não é possível gerar o relatório de uma vistoria com status "${detalhes.status}".`);
+  }
 
   // B12: a data do relatório é a do início da vistoria (não a da geração do PDF).
   const data = detalhes.datahorainicio ? new Date(detalhes.datahorainicio) : new Date();
@@ -363,18 +369,8 @@ async function gerar({ idVistoria, comodos, arquivos, idVistoriadorToken }) {
     throw new AppError(502, "STORAGE_INDISPONIVEL", "Não foi possível salvar o relatório agora. Tente novamente em instantes.");
   }
 
-  const atualizadas = await db`
-    UPDATE vistoria
-    SET relatorio_arquivo = ${chave},
-        status = 'Aguardando Validação'
-    WHERE idvistoria = ${idVistoriaNum}
-      AND idvistoriador = ${idVistoriadorToken}
-      AND status = 'Em Andamento'
-    RETURNING idvistoria
-  `;
-  if (atualizadas.length === 0) {
-    throw { statusCode: 409, message: "A vistoria mudou de status enquanto o relatório era gerado." };
-  }
+  // F1: Em Andamento → Aguardando Validação pela máquina de estados (409 se mudou durante a geração).
+  await transicionar({ idvistoria: idVistoriaNum, acao: "gerarRelatorio", ator, campos: { relatorio_arquivo: chave } });
 
   return {
     mensagem: "Relatório gerado com sucesso",

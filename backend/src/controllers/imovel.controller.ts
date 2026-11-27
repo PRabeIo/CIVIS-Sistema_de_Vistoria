@@ -7,7 +7,7 @@ import { comNulos, ou404, usuarioDe } from './_http';
 /** POST /imoveis: cria o imóvel e a vistoria inicial. */
 export async function criar(req: Request, res: Response) {
   const dados = validar(schemas.imovelCriacao, req.body);
-  return res.status(201).json(await imovelService.criarImovelComVistoria(comNulos(dados, ['bloco'])));
+  return res.status(201).json(await imovelService.criarImovelComVistoria(comNulos(dados, ['bloco']), usuarioDe(req)));
 }
 
 /** GET /imoveis?empreendimentoid=123 */

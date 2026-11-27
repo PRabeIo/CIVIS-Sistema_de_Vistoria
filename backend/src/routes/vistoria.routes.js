@@ -29,6 +29,7 @@ router.put('/:idvistoria/finalizar', apenasVistoriador, vistoriaController.final
  * ADMIN
  */
 router.get('/', apenasAdmin, vistoriaController.listar);
+router.put('/:idvistoria/cancelar', apenasAdmin, vistoriaController.cancelar);
 router.put('/:idvistoria', apenasAdmin, vistoriaController.atualizar);
 router.delete('/:idvistoria', apenasAdmin, vistoriaController.deletar);
 
@@ -37,6 +38,8 @@ router.delete('/:idvistoria', apenasAdmin, vistoriaController.deletar);
  */
 // S2: relatório privado (cliente dono, vistoriador da vistoria ou admin)
 router.get('/:idvistoria/relatorio', vistoriaController.relatorio);
+// D5: histórico de status (mesma regra de acesso do detalhe)
+router.get('/:idvistoria/eventos', vistoriaController.eventos);
 router.get('/:idvistoria', vistoriaController.buscarPorId);
 
 

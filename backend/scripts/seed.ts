@@ -67,7 +67,10 @@ export async function seed(
       VALUES ('Apartamento 2 quartos', 'A', '101', ${emp.idempreendimento}, ${ids.cliente})
       RETURNING idimovel`;
 
-    await tx`INSERT INTO vistoria (idcliente, idimovel) VALUES (${ids.cliente}, ${imo.idimovel})`;
+    const [vis] = await tx`INSERT INTO vistoria (idcliente, idimovel) VALUES (${ids.cliente}, ${imo.idimovel}) RETURNING idvistoria, status`;
+    await tx`
+      INSERT INTO vistoria_evento (idvistoria, acao, status_para, usuario_id, papel)
+      VALUES (${vis.idvistoria}, 'criar', ${vis.status}, ${ids.admin}, 'admin')`;
   });
 
   log('seed aplicado (admin, vistoriador, cliente, empreendimento, imóvel, vistoria)');

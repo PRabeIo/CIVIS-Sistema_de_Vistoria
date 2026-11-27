@@ -1,0 +1,65 @@
+.historico-vistoria {
+  margin-top: 28px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 20px;
+}
+
+.historico-vistoria h2 {
+  margin: 0 0 12px;
+  font-size: 1.2rem;
+  color: #004080;
+}
+
+.historico-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 16px;
+  border-left: 2px solid #cbd5e1;
+}
+
+.historico-item {
+  position: relative;
+  padding: 0 0 16px 12px;
+}
+
+.historico-item::before {
+  content: "";
+  position: absolute;
+  left: -23px;
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #1f5d99;
+}
+
+.historico-cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+
+.historico-cabecalho time {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.historico-detalhe {
+  color: #475569;
+  font-size: 0.92rem;
+  margin-top: 2px;
+}
+
+.historico-motivo {
+  margin-top: 4px;
+  font-size: 0.92rem;
+  color: #1f2933;
+  background: #f8fafc;
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.historico-vazio {
+  color: #64748b;
+}

@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const { AppError } = require('../domain/erros');
+const { criarVistoria } = require('./transicao.service');
 
 function badRequest(msg) {
   const err = new Error(msg);
@@ -12,7 +13,8 @@ function badRequest(msg) {
  * Cria um imóvel e imediatamente cria uma vistoria vinculada a ele
  * com status "Aguardando Agendamento da Vistoria".
  */
-async function criarImovelComVistoria({ descricao, bloco, numero, idcliente, idempreendimento }) {
+/** @param {any} dados @param {{ sub: number, papel: any } | null} [ator] quem criou (vai para o histórico) */
+async function criarImovelComVistoria({ descricao, bloco, numero, idcliente, idempreendimento }, ator = null) {
   if (!descricao || !numero || !idcliente || !idempreendimento) {
     throw badRequest('Campos obrigatórios faltando.');
   }
@@ -35,11 +37,8 @@ async function criarImovelComVistoria({ descricao, bloco, numero, idcliente, ide
       RETURNING *
     `;
 
-    const [novaVistoria] = await tx`
-      INSERT INTO vistoria (idimovel, idcliente, status)
-      VALUES (${novoImovel.idimovel}, ${idClienteNum}, 'Aguardando Agendamento da Vistoria')
-      RETURNING *
-    `;
+    // D5: a criação já entra no histórico da vistoria
+    const novaVistoria = await criarVistoria(tx, { idimovel: novoImovel.idimovel, idcliente: idClienteNum }, ator);
 
     return { imovel: novoImovel, vistoria: novaVistoria };
   });

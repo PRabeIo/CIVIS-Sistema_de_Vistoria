@@ -1,5 +1,6 @@
-// Regras de status continuam no vistoria.service (máquina de estados vem na Fase 2).
+// F1: as ações de status passam pela máquina de estados (domain/vistoriaStatus + transicao.service).
 import type { Request, Response } from 'express';
+import { acoesDisponiveis, type VistoriaEstado } from '../domain/vistoriaStatus';
 import * as storage from '../services/storage.service';
 import * as vistoriaService from '../services/vistoria.service';
 import { paramsId, validar } from '../validacao/comum';
@@ -13,9 +14,20 @@ export async function listar(_req: Request, res: Response) {
   return res.status(200).json(await vistoriaService.listarTodas());
 }
 
+/** Detalhe da vistoria + `acoes`: o que o usuário pode fazer agora (a tela mostra só esses botões). */
 export async function buscarPorId(req: Request, res: Response) {
-  const vistoria = await vistoriaService.buscarPorIdComAcesso(idDe(req), usuarioDe(req));
-  return res.status(200).json(ou404(vistoria, 'Vistoria não encontrada ou sem permissão.'));
+  const usuario = usuarioDe(req);
+  const vistoria = ou404(
+    await vistoriaService.buscarPorIdComAcesso(idDe(req), usuario),
+    'Vistoria não encontrada ou sem permissão.',
+  );
+  return res.status(200).json({ ...vistoria, acoes: acoesDisponiveis(vistoria as unknown as VistoriaEstado, usuario) });
+}
+
+/** GET /vistorias/:id/eventos (D5): linha do tempo, para quem pode ver a vistoria. */
+export async function eventos(req: Request, res: Response) {
+  const lista = await vistoriaService.eventos(idDe(req), usuarioDe(req));
+  return res.status(200).json(ou404(lista, 'Vistoria não encontrada ou sem permissão.'));
 }
 
 /**
@@ -62,30 +74,23 @@ export async function aguardandoValidacaoMe(req: Request, res: Response) {
 // ---------- Cliente: ações ----------
 
 export async function agendar(req: Request, res: Response) {
-  const id = idDe(req);
   const dados = validar(schemas.agendamento, req.body);
-  const v = await vistoriaService.agendar(id, usuarioDe(req).sub, dados);
-  return res.status(200).json(ou404(v, 'Vistoria não encontrada ou status inválido para agendar.'));
+  return res.status(200).json(await vistoriaService.agendar(idDe(req), usuarioDe(req), dados));
 }
 
 export async function reagendar(req: Request, res: Response) {
-  const id = idDe(req);
-  const dados = validar(schemas.agendamento, req.body);
-  const v = await vistoriaService.reagendar(id, usuarioDe(req).sub, dados);
-  return res.status(200).json(ou404(v, 'Vistoria não encontrada ou status inválido para reagendamento.'));
+  const dados = validar(schemas.reagendamento, req.body);
+  return res.status(200).json(await vistoriaService.reagendar(idDe(req), usuarioDe(req), dados));
 }
 
 export async function validarVistoria(req: Request, res: Response) {
-  ou404(
-    await vistoriaService.validar(idDe(req), usuarioDe(req).sub),
-    'Vistoria não encontrada ou status inválido para validar.',
-  );
+  await vistoriaService.validar(idDe(req), usuarioDe(req));
   return res.status(200).json({ message: 'Vistoria validada com sucesso.' });
 }
 
 export async function rejeitar(req: Request, res: Response) {
-  const v = await vistoriaService.rejeitar(idDe(req), usuarioDe(req).sub);
-  return res.status(200).json(ou404(v, 'Vistoria não encontrada ou status inválido para rejeitar.'));
+  const { motivo } = validar(schemas.acaoComMotivo, req.body);
+  return res.status(200).json(await vistoriaService.rejeitar(idDe(req), usuarioDe(req), motivo));
 }
 
 // ---------- Vistoriador ----------
@@ -99,13 +104,11 @@ export async function minhasVistoriador(req: Request, res: Response) {
 }
 
 export async function iniciar(req: Request, res: Response) {
-  const v = await vistoriaService.iniciar(idDe(req), usuarioDe(req).sub);
-  return res.status(200).json(ou404(v, 'Vistoria não encontrada ou indisponível para iniciar.'));
+  return res.status(200).json(await vistoriaService.iniciar(idDe(req), usuarioDe(req)));
 }
 
 export async function finalizar(req: Request, res: Response) {
-  const v = await vistoriaService.finalizar(idDe(req), usuarioDe(req).sub);
-  return res.status(200).json(ou404(v, 'Vistoria não encontrada, status inválido ou você não tem permissão.'));
+  return res.status(200).json(await vistoriaService.finalizar(idDe(req), usuarioDe(req)));
 }
 
 // ---------- Admin ----------
@@ -115,6 +118,12 @@ export async function atualizar(req: Request, res: Response) {
   const dados = validar(schemas.vistoriaAtualizacaoAdmin, req.body);
   ou404(await vistoriaService.atualizar(id, dados), 'Vistoria não encontrada.');
   return res.status(200).json({ message: 'Vistoria atualizada com sucesso.' });
+}
+
+/** PUT /vistorias/:id/cancelar (admin, F1/F7): exige motivo. */
+export async function cancelar(req: Request, res: Response) {
+  const { motivo } = validar(schemas.acaoComMotivo, req.body);
+  return res.status(200).json(await vistoriaService.cancelar(idDe(req), usuarioDe(req), motivo));
 }
 
 export async function deletar(req: Request, res: Response) {

@@ -15,11 +15,11 @@ function SolicitarNovaVistoria() {
   useEffect(() => {
     const fetchVistorias = async () => {
       try {
-        // ✅ rota nova (token), sem precisar idcliente no storage
-        const data = await apiFetch("/vistorias/minhas/aguardando-validacao", { method: "GET" });
-        setVistoriasPendentes(Array.isArray(data) ? data : []);
+        // F1: só vistorias rejeitadas podem pedir nova visita (máquina de estados: Rejeitada → Reagendada)
+        const data = await apiFetch("/vistorias/minhas", { method: "GET" });
+        setVistoriasPendentes(Array.isArray(data) ? data.filter((v) => v.status === "Vistoria Rejeitada") : []);
       } catch (err) {
-        console.error("Erro ao carregar vistorias aguardando validação:", err);
+        console.error("Erro ao carregar vistorias rejeitadas:", err);
 
         if (String(err.message).toLowerCase().includes("token")) {
           alert("Sessão expirada. Faça login novamente.");
@@ -89,6 +89,12 @@ function SolicitarNovaVistoria() {
             boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
           }}
         >
+          <p style={{ marginTop: 0 }}>
+            {vistoriasPendentes.length === 0
+              ? "Nenhuma vistoria rejeitada. Para pedir uma nova visita, rejeite antes o relatório em Validar Vistoria."
+              : "Escolha a vistoria rejeitada e a data da nova visita."}
+          </p>
+
           <label htmlFor="vistoria">Selecione a Vistoria:</label>
 
           <select

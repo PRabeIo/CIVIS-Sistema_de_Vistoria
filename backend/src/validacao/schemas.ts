@@ -72,17 +72,6 @@ export const meuPerfilAtualizacao = clienteAtualizacao;
 
 // ---------- Vistoria ----------
 
-export const STATUS_VISTORIA = [
-  'Aguardando Agendamento da Vistoria',
-  'Vistoria Agendada',
-  'Em Andamento',
-  'Aguardando Validação',
-  'Vistoria Reagendada',
-  'Vistoria Finalizada',
-  'Vistoria Validada',
-  'Vistoria Rejeitada',
-] as const;
-
 export const agendamento = z.object({
   dataagendada: z
     .string({ error: 'Data e hora são obrigatórias.' })
@@ -94,7 +83,19 @@ export const agendamento = z.object({
 
 const dataHora = z.iso.datetime({ offset: true, error: 'Data/hora inválida (use ISO 8601).' });
 
+const motivo = z.string({ error: 'Motivo inválido.' }).trim().max(1000, { error: 'O motivo deve ter no máximo 1000 caracteres.' });
+
+/** F1: ações com motivo (opcional ou obrigatório conforme a máquina de estados). */
+export const acaoComMotivo = z.object({ motivo: opcional(motivo) });
+
+/** Reagendar: nova data/hora e motivo. */
+export const reagendamento = agendamento.extend({ motivo: opcional(motivo) });
+
+/** F1: admin corrige dados; o status só muda pelas ações (agendar, iniciar, cancelar...). */
 export const vistoriaAtualizacaoAdmin = z.object({
+  status: z
+    .undefined({ error: 'O status não pode ser alterado diretamente. Use as ações da vistoria (ex.: cancelar).' })
+    .optional(),
   dataagendada: opcional(dataHora),
   datahorainicio: opcional(dataHora),
   datahorafim: opcional(dataHora),
@@ -102,7 +103,6 @@ export const vistoriaAtualizacaoAdmin = z.object({
   imprevistos: opcional(z.string().max(5000)),
   observacoes: opcional(z.string().max(5000)),
   observacoesgerais: opcional(z.string().max(5000)),
-  status: opcional(z.enum(STATUS_VISTORIA, { error: 'Status inválido.' })),
 });
 
 // ---------- Imóvel ----------

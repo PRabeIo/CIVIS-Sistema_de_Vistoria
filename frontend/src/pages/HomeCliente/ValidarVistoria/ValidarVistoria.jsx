@@ -75,12 +75,15 @@ function ValidarVistoria() {
     if (!podeAcao) return;
 
     if (!window.confirm("Tem certeza que deseja rejeitar esta vistoria?")) return;
+    // F1/D5: o motivo fica no histórico da vistoria (o F2 o torna obrigatório)
+    const motivo = window.prompt("Motivo da rejeição (opcional):") ?? "";
 
     try {
       await apiFetch(`/vistorias/${vistoriaSelecionada}/rejeitar`, {
         method: "PUT",
+        body: JSON.stringify({ motivo }),
       });
-      alert("Vistoria rejeitada com sucesso!");
+      alert("Vistoria rejeitada. Se quiser uma nova visita, use Reagendar Vistoria.");
       navigate("/home");
     } catch (err) {
       alert(err.message || "Erro ao rejeitar vistoria.");

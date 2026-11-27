@@ -110,7 +110,29 @@ CLIENTE
 7. Sistema aguarda validação do cliente  
 8. Cliente valida ou rejeita  
 9. Se validar → vistoriador finaliza  
-10. Se rejeitar → vistoria é encerrada como rejeitada
+10. Se rejeitar → o cliente pode pedir uma nova visita (Reagendar Vistoria)
+11. Antes do início, o administrador pode cancelar a vistoria (com motivo)
+
+Todas as mudanças de status passam pela **máquina de estados** (`backend/src/domain/vistoriaStatus.ts`),
+que define a transição permitida para cada ação e quem pode executá-la (papel + dono/vistoriador
+atribuído). Ação fora de ordem responde **409 `TRANSICAO_INVALIDA`**. Cada transição grava uma linha
+em `vistoria_evento` (quem, quando, de qual status para qual, motivo), exibida como **Histórico** na
+tela de detalhes. No banco, um gatilho recusa qualquer `UPDATE` de status feito por fora da máquina.
+
+| Ação (rota `PUT /api/vistorias/:id/...`) | Quem | De → Para |
+|---|---|---|
+| `agendar` | cliente dono | Aguardando Agendamento → Agendada |
+| `iniciar` | vistoriador atribuído ou do pool | Agendada / Reagendada → Em Andamento |
+| `POST /api/relatorio/gerar` | vistoriador atribuído | Em Andamento → Aguardando Validação |
+| `validar` | cliente dono | Aguardando Validação → Validada |
+| `rejeitar` (motivo opcional) | cliente dono | Aguardando Validação → Rejeitada |
+| `reagendar` | cliente dono | Rejeitada → Reagendada |
+| `finalizar` | vistoriador atribuído | Validada → Finalizada |
+| `cancelar` (motivo obrigatório) | admin | Aguardando Agendamento / Agendada / Reagendada → Cancelada |
+
+`GET /api/vistorias/:id` devolve também `acoes` (o que o usuário logado pode fazer agora) e
+`GET /api/vistorias/:id/eventos` devolve o histórico. O `PUT /api/vistorias/:id` do admin edita
+datas e observações, mas não o status.
 
 ---
 
@@ -118,12 +140,13 @@ CLIENTE
 
 - **Aguardando Agendamento da Vistoria**: aguardando agendamento do cliente
 - **Vistoria Agendada** : vistoria marcada pelo cliente.
-- **Vistoria Reagendada**: (fluxo de reagendamento temporariamente desativado).
+- **Vistoria Reagendada**: nova visita pedida pelo cliente depois de rejeitar o relatório.
 - **Em Andamento**: vistoriador iniciou e está coletando dados.
 - **Aguardando Validação**: relatório técnico gerado e enviado ao cliente.
 - **Vistoria Validada**: cliente aprovou; vistoriador pode finalizar.
 - **Vistoria Finalizada**: vistoria concluída pelo vistoriador.
-- **Vistoria Rejeitada**: atualmente também encerra o ciclo da vistoria.
+- **Vistoria Rejeitada**: cliente rejeitou o relatório (pode pedir nova visita).
+- **Vistoria Cancelada**: cancelada pelo administrador antes do início.
 
 ---
 

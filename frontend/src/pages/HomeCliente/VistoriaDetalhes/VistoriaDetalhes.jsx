@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { apiFetch, logoutNoServidor, urlDaApi } from "../../../services/api";
 import "../../styles/vistoriaDetalhes.css";
 import { SERVER_URL } from "../../../config";
+import HistoricoVistoria from "../../components/HistoricoVistoria/HistoricoVistoria";
 
 function VistoriaDetalhes() {
   const { id } = useParams();
@@ -12,6 +13,7 @@ function VistoriaDetalhes() {
   const [vistoriaDetalhes, setVistoriaDetalhes] = useState(null);
   const [loading, setLoading] = useState(true);
   const [relatorioUrl, setRelatorioUrl] = useState(null);
+  const [versao, setVersao] = useState(0); // recarrega detalhe e histórico depois de uma ação
 
   // formatadores (iguais)
   const somenteDigitos = (v) => String(v ?? "").replace(/\D/g, "");
@@ -79,7 +81,23 @@ function VistoriaDetalhes() {
     };
 
     fetchVistoria();
-  }, [id, location.state, navigate]);
+  }, [id, location.state, navigate, versao]);
+
+  // F1/F7: admin cancela antes do início (o botão só aparece se a máquina de estados permitir)
+  const cancelar = async () => {
+    const motivo = window.prompt("Motivo do cancelamento (obrigatório):");
+    if (motivo === null) return;
+    if (!motivo.trim()) {
+      alert("Informe o motivo do cancelamento.");
+      return;
+    }
+    try {
+      await apiFetch(`/vistorias/${id}/cancelar`, { method: "PUT", body: JSON.stringify({ motivo }) });
+      setVersao((v) => v + 1);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
 
   if (loading) return <div>Carregando vistoria...</div>;
   if (!vistoriaDetalhes) return <div>Vistoria não encontrada.</div>;
@@ -95,6 +113,7 @@ function VistoriaDetalhes() {
     "Vistoria Rejeitada": "status--rejeitada",
     "Vistoria Finalizada": "status--finalizada",
     "Aguardando Agendamento da Vistoria": "status--aguardando-agendamento",
+    "Vistoria Cancelada": "status--rejeitada",
   };
 
   const statusBadgeClass = statusClassMap[status] || "status--finalizada";
@@ -215,11 +234,17 @@ function VistoriaDetalhes() {
           ) : null}
         </div>
 
-        {}
+        <HistoricoVistoria idvistoria={id} versao={versao} />
+
         <div className="bottom-actions">
           <button onClick={() => navigate("/home")} className="btn btn--neutral">
             Voltar
           </button>
+          {vistoriaDetalhes.acoes?.includes("cancelar") ? (
+            <button onClick={cancelar} className="btn btn--danger">
+              Cancelar vistoria
+            </button>
+          ) : null}
         </div>
       </div>
     </div>

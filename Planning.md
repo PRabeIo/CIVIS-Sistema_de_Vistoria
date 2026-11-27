@@ -4,7 +4,7 @@
 >
 > Baseado na análise completa do código feita em 25/11/2026 (branch `main`, commit `7924985`).
 >
-> **Progresso:** Fase 0 concluída · T1 (setup TypeScript) · D1 (usuário único) · **Fase 1 concluída** (S1–S12 · B1–B14). Próximo: Fase 2, começando por F1 (máquina de estados) e D5 (auditoria). Detalhes no [checklist](#checklist-de-acompanhamento).
+> **Progresso:** Fase 0 concluída · T1 (setup TypeScript) · D1 (usuário único) · **Fase 1 concluída** (S1–S12 · B1–B14). Fase 2: F1 · D5 · F7. Próximo: F2 (rejeição com motivo e revisões). Detalhes no [checklist](#checklist-de-acompanhamento).
 
 ---
 
@@ -421,8 +421,16 @@ stateDiagram-v2
   - Testes: `backend/tests/lgpd-ia.test.ts` (21 novos, 132 no total). Verificado no navegador: cadastro com o checkbox, download dos dados, exclusão da conta (sai e some do banco), lista de clientes com CPF mascarado e página de privacidade.
 
 ### Fase 2
-- [ ] D2 · [ ] D3 · [ ] D4 · [ ] D5 · [ ] D6
-- [ ] F1 · [ ] F2 · [ ] F3 · [ ] F4 · [ ] F5 · [ ] F6 · [ ] F7 · [ ] F8
+- [ ] D2 · [ ] D3 · [ ] D4 · [x] D5 · [ ] D6
+- [x] F1 · [ ] F2 · [ ] F3 · [ ] F4 · [ ] F5 · [ ] F6 · [x] F7 · [ ] F8
+
+- Notas de F1, D5 e F7:
+  - **F1:** `backend/src/domain/vistoriaStatus.ts` tem a tabela `TRANSICOES` (ação → papéis, responsável, status de origem, destino e se exige motivo) e funções puras (`verificarTransicao`, `acoesDisponiveis`). `services/transicao.service.ts` aplica a regra com `SELECT ... FOR UPDATE`, muda o status e grava o evento na mesma transação. Erros: 404 se não existe ou o usuário não é o responsável (não revela a vistoria), 403 se o papel não pode, 409 `TRANSICAO_INVALIDA` se o status não permite. Agendar, reagendar, iniciar, gerar relatório, validar, rejeitar, finalizar e cancelar passam por ela; o relatório confere a transição antes de chamar IA/PDF. `PUT /vistorias/:id` (admin) não aceita mais `status` (400). `GET /vistorias/:id` devolve `acoes` para a tela mostrar só os botões válidos.
+  - Comportamento mantido até as próximas tarefas: `reagendar` agora só sai de `Rejeitada` (antes aceitava também `Aguardando Validação`, que pulava a validação); a tela "Reagendar Vistoria" lista as vistorias rejeitadas. F2 refaz a rejeição (motivo obrigatório, `Em Revisão`, limite de revisões), F3 troca o reagendamento por "Agendada → Agendada com motivo" e F5 adiciona a atribuição pelo admin — todos mudam só a tabela e as telas.
+  - **D5:** migration `0007_vistoria_evento.sql`: tabela `vistoria_evento` (ação, status de/para, usuário, papel, motivo, data), evento `importar` para as vistorias que já existiam e evento `criar` na criação do imóvel. Um gatilho recusa `UPDATE` de status sem a marca `civis.transicao` posta pela máquina (migrations futuras que corrijam status precisam de `set_config('civis.transicao','on',true)`). `GET /vistorias/:id/eventos` com a mesma regra de acesso do detalhe. Componente `HistoricoVistoria` nas telas de detalhe (admin/cliente) e do vistoriador.
+  - **F7** (adiantado, era P2): status `Vistoria Cancelada` no CHECK, `PUT /vistorias/:id/cancelar` (admin, motivo obrigatório, só antes do início) e botão "Cancelar vistoria" no detalhe do admin.
+  - Rejeição aceita `motivo` opcional (a tela pergunta); fica no histórico.
+  - Testes: `backend/tests/vistoria-status.test.ts` (21 novos, 153 no total): cada ação × cada status × cada papel, fluxo completo pela API com o histórico esperado, 409/404/403, PUT do admin sem status, gatilho do banco e cancelamento. Verificado no navegador: histórico e cancelamento como admin.
 - [ ] R1 · [ ] R2 · [ ] R3 · [ ] R4 · [ ] R5
 - [ ] E1 · [ ] E2 · [ ] E3 · [ ] E4 · [ ] E5 · [ ] E6
 

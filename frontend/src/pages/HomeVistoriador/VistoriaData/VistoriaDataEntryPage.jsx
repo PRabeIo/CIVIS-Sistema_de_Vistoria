@@ -4,6 +4,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { apiFetch, logoutNoServidor, urlDaApi } from "../../../services/api";
 import "../../styles/vistoriaDetalhes.css";
 import { SERVER_URL } from "../../../config";
+import HistoricoVistoria from "../../components/HistoricoVistoria/HistoricoVistoria";
 
 function VistoriaDataEntryPage() {
   const { id } = useParams();
@@ -282,6 +283,9 @@ function VistoriaDataEntryPage() {
             </div>
           )}
         </div>
+
+        {/* D5: recarrega quando o status muda (iniciar/finalizar) */}
+        <HistoricoVistoria idvistoria={id} versao={vistoriaDetalhes.status} />
 
         <div className="bottom-actions">
           <button onClick={() => navigate("/home")} className="btn btn--neutral">
