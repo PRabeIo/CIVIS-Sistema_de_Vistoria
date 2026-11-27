@@ -120,6 +120,18 @@ export async function atualizar(req: Request, res: Response) {
   return res.status(200).json({ message: 'Vistoria atualizada com sucesso.' });
 }
 
+/** PUT /vistorias/:id/pedir-revisao (admin, F2): motivo obrigatório, `idvistoriador` opcional (reatribuir). */
+export async function pedirRevisao(req: Request, res: Response) {
+  const dados = validar(schemas.pedidoRevisao, req.body);
+  return res.status(200).json(await vistoriaService.pedirRevisao(idDe(req), usuarioDe(req), dados));
+}
+
+/** PUT /vistorias/:id/encerrar (admin, F2): encerra com parecer (motivo obrigatório). */
+export async function encerrar(req: Request, res: Response) {
+  const { motivo } = validar(schemas.acaoComMotivo, req.body);
+  return res.status(200).json(await vistoriaService.encerrar(idDe(req), usuarioDe(req), motivo));
+}
+
 /** PUT /vistorias/:id/cancelar (admin, F1/F7): exige motivo. */
 export async function cancelar(req: Request, res: Response) {
   const { motivo } = validar(schemas.acaoComMotivo, req.body);

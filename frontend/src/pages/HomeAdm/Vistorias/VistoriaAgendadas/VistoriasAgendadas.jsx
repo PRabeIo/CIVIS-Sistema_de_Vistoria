@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../../Clientes/Clientes.css"; // mesmo layout de tabela das outras listagens do admin
 import Navbar from "../../../components/Navbar/Navbar";
 import { apiFetch } from "../../../../services/api";
@@ -17,9 +17,10 @@ function unidade(v) {
 
 function VistoriasAgendadas() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [vistorias, setVistorias] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState(location.state?.status ?? ""); // a Home pode abrir já filtrada
 
   useEffect(() => {
     apiFetch("/vistorias")

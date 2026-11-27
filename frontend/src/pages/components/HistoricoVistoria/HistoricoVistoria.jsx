@@ -7,13 +7,15 @@ const ROTULO_ACAO = {
   criar: "Vistoria criada",
   importar: "Situação registrada",
   agendar: "Vistoria agendada",
-  reagendar: "Nova visita solicitada",
+  reagendar: "Vistoria reagendada",
   iniciar: "Vistoria iniciada",
   gerarRelatorio: "Relatório enviado",
   validar: "Relatório validado",
   rejeitar: "Relatório rejeitado",
   finalizar: "Vistoria finalizada",
   cancelar: "Vistoria cancelada",
+  pedirRevisao: "Devolvida para revisão",
+  encerrar: "Encerrada pelo administrador",
 };
 
 const ROTULO_PAPEL = { admin: "administrador", vistoriador: "vistoriador", cliente: "cliente" };

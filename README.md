@@ -110,8 +110,8 @@ CLIENTE
 7. Sistema aguarda validação do cliente  
 8. Cliente valida ou rejeita  
 9. Se validar → vistoriador finaliza  
-10. Se rejeitar → o cliente pode pedir uma nova visita (Reagendar Vistoria)
-11. Antes do início, o administrador pode cancelar a vistoria (com motivo)
+10. Se rejeitar (com motivo) → a vistoria volta para **Em Revisão**: o vistoriador vê o motivo, corrige e reenvia o relatório. Depois de `MAX_REVISOES` rejeições (padrão 2), a seguinte vai para **Em Análise do Admin**, que devolve para revisão (podendo trocar o vistoriador), encerra com parecer ou cancela
+11. Antes do início, cliente, vistoriador ou admin podem reagendar (nova data futura + motivo), e o admin pode cancelar (com motivo)
 
 Todas as mudanças de status passam pela **máquina de estados** (`backend/src/domain/vistoriaStatus.ts`),
 que define a transição permitida para cada ação e quem pode executá-la (papel + dono/vistoriador
@@ -122,13 +122,15 @@ tela de detalhes. No banco, um gatilho recusa qualquer `UPDATE` de status feito 
 | Ação (rota `PUT /api/vistorias/:id/...`) | Quem | De → Para |
 |---|---|---|
 | `agendar` | cliente dono | Aguardando Agendamento → Agendada |
-| `iniciar` | vistoriador atribuído ou do pool | Agendada / Reagendada → Em Andamento |
-| `POST /api/relatorio/gerar` | vistoriador atribuído | Em Andamento → Aguardando Validação |
+| `reagendar` (motivo obrigatório) | cliente dono, vistoriador atribuído ou admin | Agendada → Agendada (nova data) |
+| `iniciar` | vistoriador atribuído ou do pool | Agendada → Em Andamento |
+| `POST /api/relatorio/gerar` | vistoriador atribuído | Em Andamento / Em Revisão → Aguardando Validação |
 | `validar` | cliente dono | Aguardando Validação → Validada |
-| `rejeitar` (motivo opcional) | cliente dono | Aguardando Validação → Rejeitada |
-| `reagendar` | cliente dono | Rejeitada → Reagendada |
+| `rejeitar` (motivo obrigatório) | cliente dono | Aguardando Validação → Em Revisão (ou Em Análise do Admin depois de `MAX_REVISOES`) |
+| `pedir-revisao` (motivo; `idvistoriador` opcional) | admin | Em Análise do Admin → Em Revisão |
+| `encerrar` (parecer obrigatório) | admin | Em Análise do Admin → Finalizada |
 | `finalizar` | vistoriador atribuído | Validada → Finalizada |
-| `cancelar` (motivo obrigatório) | admin | Aguardando Agendamento / Agendada / Reagendada → Cancelada |
+| `cancelar` (motivo obrigatório) | admin | Aguardando Agendamento / Agendada / Em Análise do Admin → Cancelada |
 
 `GET /api/vistorias/:id` devolve também `acoes` (o que o usuário logado pode fazer agora) e
 `GET /api/vistorias/:id/eventos` devolve o histórico. O `PUT /api/vistorias/:id` do admin edita
@@ -140,12 +142,12 @@ datas e observações, mas não o status.
 
 - **Aguardando Agendamento da Vistoria**: aguardando agendamento do cliente
 - **Vistoria Agendada** : vistoria marcada pelo cliente.
-- **Vistoria Reagendada**: nova visita pedida pelo cliente depois de rejeitar o relatório.
 - **Em Andamento**: vistoriador iniciou e está coletando dados.
 - **Aguardando Validação**: relatório técnico gerado e enviado ao cliente.
+- **Em Revisão**: cliente rejeitou com motivo; o vistoriador corrige e reenvia o relatório.
+- **Em Análise do Admin**: o cliente rejeitou além do limite de revisões; o admin decide.
 - **Vistoria Validada**: cliente aprovou; vistoriador pode finalizar.
 - **Vistoria Finalizada**: vistoria concluída pelo vistoriador.
-- **Vistoria Rejeitada**: cliente rejeitou o relatório (pode pedir nova visita).
 - **Vistoria Cancelada**: cancelada pelo administrador antes do início.
 
 ---

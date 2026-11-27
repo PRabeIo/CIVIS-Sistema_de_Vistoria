@@ -10,6 +10,7 @@ function ValidarVistoria() {
   const [vistoriaSelecionada, setVistoriaSelecionada] = useState("");
   const [relatorioUrl, setRelatorioUrl] = useState("");
   const [pendentes, setPendentes] = useState([]);
+  const [motivo, setMotivo] = useState(""); // F2: obrigatório para rejeitar
 
   const handleLogout = () => {
     logoutNoServidor();
@@ -74,16 +75,23 @@ function ValidarVistoria() {
   const handleRejeitar = async () => {
     if (!podeAcao) return;
 
-    if (!window.confirm("Tem certeza que deseja rejeitar esta vistoria?")) return;
-    // F1/D5: o motivo fica no histórico da vistoria (o F2 o torna obrigatório)
-    const motivo = window.prompt("Motivo da rejeição (opcional):") ?? "";
+    if (!motivo.trim()) {
+      alert("Descreva o que precisa ser corrigido no relatório.");
+      return;
+    }
+    if (!window.confirm("Rejeitar o relatório e enviar para correção?")) return;
 
     try {
-      await apiFetch(`/vistorias/${vistoriaSelecionada}/rejeitar`, {
+      // F2: volta para o vistoriador corrigir (ou para o administrador, se as revisões acabaram)
+      const v = await apiFetch(`/vistorias/${vistoriaSelecionada}/rejeitar`, {
         method: "PUT",
         body: JSON.stringify({ motivo }),
       });
-      alert("Vistoria rejeitada. Se quiser uma nova visita, use Reagendar Vistoria.");
+      alert(
+        v?.status === "Em Análise do Admin"
+          ? "Relatório rejeitado. Como o limite de correções foi atingido, a construtora vai analisar o caso."
+          : "Relatório rejeitado. O vistoriador vai corrigir e enviar uma nova versão."
+      );
       navigate("/home");
     } catch (err) {
       alert(err.message || "Erro ao rejeitar vistoria.");
@@ -140,6 +148,18 @@ function ValidarVistoria() {
             </div>
           ) : null}
 
+          <div className="form-group">
+            <label htmlFor="motivo">Se for rejeitar, o que precisa ser corrigido?</label>
+            <textarea
+              id="motivo"
+              rows={3}
+              maxLength={1000}
+              value={motivo}
+              onChange={(e) => setMotivo(e.target.value)}
+              placeholder="Ex.: faltou registrar a infiltração no banheiro"
+            />
+          </div>
+
           <div className="actions">
             <button type="submit" className="btn btn-primary" disabled={!podeAcao}>
               Validar Vistoria
@@ -149,7 +169,7 @@ function ValidarVistoria() {
               type="button"
               className="btn btn-danger"
               onClick={handleRejeitar}
-              disabled={!podeAcao}
+              disabled={!podeAcao || !motivo.trim()}
             >
               Rejeitar Vistoria
             </button>

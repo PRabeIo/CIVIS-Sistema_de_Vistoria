@@ -62,6 +62,7 @@
 
 /* Inputs */
 .validar-vistoria-page .form-group select,
+.validar-vistoria-page .form-group textarea,
 .validar-vistoria-page .form-group input {
   width: 100%;
   box-sizing: border-box;
@@ -78,6 +79,7 @@
 }
 
 .validar-vistoria-page .form-group select:focus,
+.validar-vistoria-page .form-group textarea:focus,
 .validar-vistoria-page .form-group input:focus {
   border-color: rgba(19, 94, 165, 0.70);
   box-shadow: 0 0 0 4px rgba(11, 79, 148, 0.14);

@@ -39,6 +39,9 @@ const schema = z
     RATE_LIMIT_CADASTRO_MAX: inteiro(1, 10_000),
     RATE_LIMIT_REFRESH_MAX: inteiro(1, 10_000),
 
+    // F2: rejeições do cliente antes de a vistoria ir para a análise do admin
+    MAX_REVISOES: inteiro(0, 10),
+
     STORAGE_DRIVER: z.enum(['local', 'supabase'], { error: 'use local ou supabase' }).default('local'),
     SUPABASE_URL: z.url({ error: 'deve ser uma URL (https://seu-projeto.supabase.co)' }).optional(),
     SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),

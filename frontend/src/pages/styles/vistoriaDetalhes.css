@@ -346,3 +346,54 @@
     min-width: 200px;
   }
 }
+
+/* F2: análise do administrador e aviso de revisão */
+.vistoria-detalhes-page .analise-admin {
+  margin-top: 24px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  display: grid;
+  gap: 8px;
+}
+
+.vistoria-detalhes-page .analise-admin h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #7c2d12;
+}
+
+.vistoria-detalhes-page .analise-admin p {
+  margin: 0;
+}
+
+.vistoria-detalhes-page .analise-admin label {
+  font-weight: 600;
+  color: #334155;
+}
+
+.vistoria-detalhes-page .analise-admin textarea,
+.vistoria-detalhes-page .analise-admin select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font: inherit;
+}
+
+.vistoria-detalhes-page .analise-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.vistoria-detalhes-page .aviso-revisao {
+  margin: 20px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1e3a8a;
+}

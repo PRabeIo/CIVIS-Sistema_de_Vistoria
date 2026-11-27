@@ -279,7 +279,7 @@ async function buscarPorId(idimovel) {
 }
 
 // Status em que a vistoria ainda não começou: o imóvel pode sair junto com elas.
-const STATUS_SEM_HISTORICO = ['Aguardando Agendamento da Vistoria', 'Vistoria Agendada', 'Vistoria Reagendada'];
+const STATUS_SEM_HISTORICO = ['Aguardando Agendamento da Vistoria', 'Vistoria Agendada', 'Vistoria Cancelada'];
 
 /**
  * B6: exclui o imóvel (e as vistorias que ainda não começaram).

@@ -68,14 +68,14 @@ function VistoriaDataEntryPage() {
     try {
       const status = (vistoriaDetalhes?.status || "").trim();
 
-      // Se já está em andamento, não chama backend: só continua fluxo
-      if (status === "Em Andamento") {
+      // Em andamento ou em revisão (F2): não chama backend, só continua o fluxo
+      if (status === "Em Andamento" || status === "Em Revisão") {
         navigate(`/vistoriador/iniciar-vistoria-detalhes/${id}`);
         return;
       }
 
-      // Só chama /iniciar se estiver agendada/reagendada
-      if (status === "Vistoria Agendada" || status === "Vistoria Reagendada") {
+      // Só chama /iniciar se estiver agendada
+      if (status === "Vistoria Agendada") {
         await apiFetch(`/vistorias/${id}/iniciar`, { method: "PUT" });
         navigate(`/vistoriador/iniciar-vistoria-detalhes/${id}`);
         return;
@@ -140,27 +140,27 @@ function VistoriaDataEntryPage() {
 
   const statusClassMap = {
     "Vistoria Agendada": "status--agendada",
-    "Vistoria Reagendada": "status--reagendada",
     "Em Andamento": "status--andamento",
     "Aguardando Validação": "status--aguardando-validacao",
+    "Em Revisão": "status--reagendada",
+    "Em Análise do Admin": "status--rejeitada",
     "Vistoria Validada": "status--validada",
-    "Vistoria Rejeitada": "status--rejeitada",
     "Vistoria Finalizada": "status--finalizada",
   };
   const statusBadgeClass = statusClassMap[status] || "status--finalizada";
 
   const podeIniciarOuContinuar =
-    status === "Vistoria Agendada" ||
-    status === "Vistoria Reagendada" ||
-    status === "Em Andamento";
+    status === "Vistoria Agendada" || status === "Em Andamento" || status === "Em Revisão";
 
-  const labelIniciar = status === "Em Andamento" ? "Continuar Vistoria" : "Iniciar Vistoria";
+  const labelIniciar =
+    status === "Em Revisão" ? "Corrigir Relatório" : status === "Em Andamento" ? "Continuar Vistoria" : "Iniciar Vistoria";
   const podeFinalizar = status === "Vistoria Validada";
 
   const semAcoesVistoriador =
     status === "Aguardando Validação" ||
-    status === "Vistoria Rejeitada" ||
-    status === "Vistoria Finalizada";
+    status === "Em Análise do Admin" ||
+    status === "Vistoria Finalizada" ||
+    status === "Vistoria Cancelada";
 
   // ✅ Nome do vistoriador (igual ao cliente)
   const vistoriadorTexto =
@@ -265,6 +265,14 @@ function VistoriaDataEntryPage() {
             <span className="label">{labelData}</span>
             <span className="value">{valorData}</span>
           </div>
+
+          {/* F2: o que o cliente (ou o admin) pediu para corrigir */}
+          {status === "Em Revisão" && vistoriaDetalhes.motivo_revisao ? (
+            <div className="info-line" style={{ gridColumn: "1 / -1" }}>
+              <span className="label">Correção pedida:</span>
+              <span className="value">{vistoriaDetalhes.motivo_revisao}</span>
+            </div>
+          ) : null}
 
           {/* BOTÕES DO VISTORIADOR */}
           {!isCliente && !semAcoesVistoriador && (

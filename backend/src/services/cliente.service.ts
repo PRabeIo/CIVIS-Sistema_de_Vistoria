@@ -222,7 +222,13 @@ export async function exportarMeusDados(idcliente: unknown) {
   return { geradoEm: new Date().toISOString(), perfil, imoveis, vistorias, sessoes };
 }
 
-const STATUS_QUE_BLOQUEIAM_EXCLUSAO = ['Vistoria Agendada', 'Vistoria Reagendada', 'Em Andamento', 'Aguardando Validação'];
+const STATUS_QUE_BLOQUEIAM_EXCLUSAO = [
+  'Vistoria Agendada',
+  'Em Andamento',
+  'Aguardando Validação',
+  'Em Revisão',
+  'Em Análise do Admin',
+];
 
 /**
  * Exclusão da própria conta (exige a senha).

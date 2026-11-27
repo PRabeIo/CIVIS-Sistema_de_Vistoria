@@ -88,6 +88,9 @@ const motivo = z.string({ error: 'Motivo inválido.' }).trim().max(1000, { error
 /** F1: ações com motivo (opcional ou obrigatório conforme a máquina de estados). */
 export const acaoComMotivo = z.object({ motivo: opcional(motivo) });
 
+/** F2: admin pede nova revisão (motivo) e pode trocar o vistoriador. */
+export const pedidoRevisao = z.object({ motivo: opcional(motivo), idvistoriador: opcional(id('Vistoriador')) });
+
 /** Reagendar: nova data/hora e motivo. */
 export const reagendamento = agendamento.extend({ motivo: opcional(motivo) });
 

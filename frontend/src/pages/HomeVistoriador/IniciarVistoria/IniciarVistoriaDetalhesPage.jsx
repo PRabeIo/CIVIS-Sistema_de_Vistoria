@@ -63,7 +63,7 @@ function IniciarVistoriaDetalhesPage() {
   }, [id, navigate]);
 
   const status = (vistoria?.status || "").trim();
-  const podeEditar = status === "Em Andamento";
+  const podeEditar = status === "Em Andamento" || status === "Em Revisão"; // F2: correção do relatório
 
   const handleChange = (e) => {
     const { name, value } = e.target;

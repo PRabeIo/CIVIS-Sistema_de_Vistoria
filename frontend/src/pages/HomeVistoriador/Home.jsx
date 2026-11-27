@@ -64,12 +64,12 @@ function HomeVistoriador({ onLogout }) {
     return `${data} às ${hora}`;
   };
 
-  // prioridade: Validada > Agendada/Reagendada > Finalizada > outros
+  // prioridade: Em Revisão > Validada > Agendada > Finalizada > outros
   const prioridadeStatus = (statusRaw) => {
     const s = String(statusRaw || "").toLowerCase();
 
+    if (s.includes("revis")) return 0; // F2: Em Revisão (correção pendente)
     if (s.includes("validad")) return 1; // Validada / Validado
-    if (s.includes("reagend")) return 2; // Reagendada
     if (s.includes("agend")) return 2; // Agendada
     if (s.includes("aguard")) return 3; // Aguardando Validação
     if (s.includes("final")) return 99; // Finalizada

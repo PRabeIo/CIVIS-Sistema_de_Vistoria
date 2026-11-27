@@ -4,7 +4,7 @@
 >
 > Baseado na análise completa do código feita em 25/11/2026 (branch `main`, commit `7924985`).
 >
-> **Progresso:** Fase 0 concluída · T1 (setup TypeScript) · D1 (usuário único) · **Fase 1 concluída** (S1–S12 · B1–B14). Fase 2: F1 · D5 · F7. Próximo: F2 (rejeição com motivo e revisões). Detalhes no [checklist](#checklist-de-acompanhamento).
+> **Progresso:** Fase 0 concluída · T1 (setup TypeScript) · D1 (usuário único) · **Fase 1 concluída** (S1–S12 · B1–B14). Fase 2: F1 · F2 · F3 · D5 · F7. Próximo: F5 (atribuição de vistoriador pelo admin) e F4 (nova vistoria para imóvel existente). Detalhes no [checklist](#checklist-de-acompanhamento).
 
 ---
 
@@ -422,8 +422,15 @@ stateDiagram-v2
 
 ### Fase 2
 - [ ] D2 · [ ] D3 · [ ] D4 · [x] D5 · [ ] D6
-- [x] F1 · [ ] F2 · [ ] F3 · [ ] F4 · [ ] F5 · [ ] F6 · [x] F7 · [ ] F8
+- [x] F1 · [x] F2 · [x] F3 · [ ] F4 · [ ] F5 · [ ] F6 · [x] F7 · [ ] F8
 
+- Notas de F2 e F3:
+  - Migration `0008_revisao_reagendamento.sql`: status novos `Em Revisão` e `Em Análise do Admin`, coluna `vistoria.revisoes`; `Vistoria Rejeitada` e `Vistoria Reagendada` saem do CHECK (linhas antigas convertidas, com evento no histórico).
+  - **F2:** `rejeitar` exige motivo e soma 1 em `revisoes`; até `MAX_REVISOES` (env, padrão 2, validado no `env.ts`) vai para `Em Revisão`, depois para `Em Análise do Admin`. Destino calculado pela própria máquina (`para` pode ser função). `gerarRelatorio` aceita `Em Revisão` (o PDF novo substitui o anterior; versões ficam para o R1). O detalhe traz `motivo_revisao` (último motivo de rejeição/pedido de revisão). Decisões do admin: `PUT /vistorias/:id/pedir-revisao` (motivo, `idvistoriador` opcional para reatribuir — valida que é vistoriador ativo), `PUT /vistorias/:id/encerrar` (parecer) e `cancelar` (agora também a partir da análise).
+  - **F3:** `PUT /vistorias/:id/reagendar` liberado para cliente dono, vistoriador da vistoria e admin; só `Agendada → Agendada`, data futura e motivo obrigatório. `PUT /reagendar` em `Aguardando Validação` → 409 (critério do Planning).
+  - Telas: Validar Vistoria tem o campo do motivo (botão Rejeitar só habilita com ele) e diz para onde a vistoria foi; tela do vistoriador mostra "Correção pedida" e o botão "Corrigir Relatório"; Home do vistoriador põe as vistorias em revisão no topo; detalhe do admin tem o painel "Análise do administrador" (parecer, troca de vistoriador, devolver/encerrar); Home do admin avisa quantas vistorias aguardam análise e abre a lista já filtrada; "Reagendar Vistoria" do cliente lista as agendadas e pede o motivo.
+  - Pendente: a "notificação" da 3ª rejeição e do reagendamento é só na tela (aviso na Home do admin); e-mail entra no E2. Reagendar pelo vistoriador/admin está na API, sem botão próprio ainda.
+  - Testes: 11 novos em `vistoria-status.test.ts` (164 no total). Verificado no navegador: cliente rejeita com motivo, vistoriador vê a correção pedida e consegue editar, 3ª rejeição gera o aviso na Home do admin, painel de análise devolve para revisão.
 - Notas de F1, D5 e F7:
   - **F1:** `backend/src/domain/vistoriaStatus.ts` tem a tabela `TRANSICOES` (ação → papéis, responsável, status de origem, destino e se exige motivo) e funções puras (`verificarTransicao`, `acoesDisponiveis`). `services/transicao.service.ts` aplica a regra com `SELECT ... FOR UPDATE`, muda o status e grava o evento na mesma transação. Erros: 404 se não existe ou o usuário não é o responsável (não revela a vistoria), 403 se o papel não pode, 409 `TRANSICAO_INVALIDA` se o status não permite. Agendar, reagendar, iniciar, gerar relatório, validar, rejeitar, finalizar e cancelar passam por ela; o relatório confere a transição antes de chamar IA/PDF. `PUT /vistorias/:id` (admin) não aceita mais `status` (400). `GET /vistorias/:id` devolve `acoes` para a tela mostrar só os botões válidos.
   - Comportamento mantido até as próximas tarefas: `reagendar` agora só sai de `Rejeitada` (antes aceitava também `Aguardando Validação`, que pulava a validação); a tela "Reagendar Vistoria" lista as vistorias rejeitadas. F2 refaz a rejeição (motivo obrigatório, `Em Revisão`, limite de revisões), F3 troca o reagendamento por "Agendada → Agendada com motivo" e F5 adiciona a atribuição pelo admin — todos mudam só a tabela e as telas.

@@ -6,6 +6,7 @@ import sql from '../src/config/db.js';
 import {
   ACOES,
   acoesDisponiveis,
+  destino,
   STATUS,
   STATUS_VISTORIA,
   TRANSICOES,
@@ -67,13 +68,13 @@ describe('F1: tabela de transições (unitário)', () => {
   // Cada ação × cada status × cada papel: só a combinação da tabela passa.
   for (const acao of ACOES) {
     const regra = TRANSICOES[acao];
-    it(`${acao}: ${regra.de.join(' / ')} → ${regra.para} (${regra.papeis.join(', ')})`, () => {
+    it(`${acao}: ${regra.de.join(' / ')} (${regra.papeis.join(', ')})`, () => {
       for (const status of STATUS_VISTORIA) {
         for (const [nome, ator] of Object.entries(atores)) {
           const r = verificarTransicao(acao, vistoria(status), ator);
           const esperado = regra.papeis.includes(ator.papel) && regra.de.includes(status);
           expect(r.ok, `${acao} por ${nome} em "${status}"`).toBe(esperado);
-          if (r.ok) expect(r.para).toBe(regra.para);
+          if (r.ok) expect(r.para).toBe(destino(acao, vistoria(status)));
         }
       }
     });
@@ -254,6 +255,141 @@ describe('F1/F7: cancelamento pelo admin', () => {
   });
 });
 
+describe('F2: rejeição com revisões', () => {
+  const rejeitar = (id: number, motivo?: string) =>
+    request(app).put(`/api/vistorias/${id}/rejeitar`).set(bearer(cliente)).send(motivo ? { motivo } : {});
+  const enviarRelatorio = (id: number) =>
+    request(app)
+      .post('/api/relatorio/gerar')
+      .set(bearer(vistoriador))
+      .field('idVistoria', String(id))
+      .field('comodos', JSON.stringify({ sala: { Quantidade: '1', Estrutura: 'Bom' } }));
+
+  it('motivo é obrigatório', async () => {
+    const id = await vistoriaEm(STATUS.aguardandoValidacao, true);
+    const res = await rejeitar(id);
+    expect(res.status).toBe(400);
+    expect(res.body.erro.campos.motivo).toBeDefined();
+    expect(await statusDe(id)).toBe(STATUS.aguardandoValidacao);
+  });
+
+  it('2 revisões; a 3ª rejeição vai para o admin, que pede nova revisão trocando o vistoriador', async () => {
+    const id = await vistoriaEm(STATUS.aguardandoValidacao, true);
+
+    for (const n of [1, 2]) {
+      const r = await rejeitar(id, `Problema ${n}`);
+      expect(r.status).toBe(200);
+      expect(r.body).toMatchObject({ status: STATUS.emRevisao, revisoes: n });
+
+      // o vistoriador vê o motivo e reenvia o relatório
+      const det = await request(app).get(`/api/vistorias/${id}`).set(bearer(vistoriador));
+      expect(det.body).toMatchObject({ motivo_revisao: `Problema ${n}`, acoes: ['gerarRelatorio'] });
+      expect((await enviarRelatorio(id)).status).toBe(200);
+      expect(await statusDe(id)).toBe(STATUS.aguardandoValidacao);
+    }
+
+    const terceira = await rejeitar(id, 'Ainda errado');
+    expect(terceira.body).toMatchObject({ status: STATUS.emAnaliseAdmin, revisoes: 3 });
+    const doAdmin = await request(app).get(`/api/vistorias/${id}`).set(bearer(admin));
+    expect(doAdmin.body.acoes).toEqual(['cancelar', 'pedirRevisao', 'encerrar']);
+
+    // o vistoriador não pode mais reenviar enquanto o admin analisa
+    expect((await enviarRelatorio(id)).status).toBe(409);
+
+    // admin devolve para revisão com outro vistoriador
+    const [{ id: outro }] = await sql`
+      INSERT INTO usuario (email, senha_hash, papel) VALUES (${gerarEmail('vist')}, 'x', 'vistoriador') RETURNING id`;
+    await sql`INSERT INTO funcionario (id, nome, cpf) VALUES (${outro}, 'Outro Vistoriador', ${gerarCpf()})`;
+    const semMotivo = await request(app).put(`/api/vistorias/${id}/pedir-revisao`).set(bearer(admin)).send({});
+    expect(semMotivo.status).toBe(400);
+    const pedido = await request(app)
+      .put(`/api/vistorias/${id}/pedir-revisao`)
+      .set(bearer(admin))
+      .send({ motivo: 'Refazer com outro profissional', idvistoriador: outro });
+    expect(pedido.status).toBe(200);
+    expect(pedido.body).toMatchObject({ status: STATUS.emRevisao, idvistoriador: outro });
+
+    const acoes = (await eventosDe(id)).map((e) => e.acao);
+    expect(acoes).toEqual(['rejeitar', 'gerarRelatorio', 'rejeitar', 'gerarRelatorio', 'rejeitar', 'pedirRevisao']);
+  });
+
+  it('pedir revisão com vistoriador inválido → 400', async () => {
+    const id = await vistoriaEm(STATUS.emAnaliseAdmin, true);
+    const res = await request(app)
+      .put(`/api/vistorias/${id}/pedir-revisao`)
+      .set(bearer(admin))
+      .send({ motivo: 'x', idvistoriador: idCliente });
+    expect(res.status).toBe(400);
+  });
+
+  it('admin encerra com parecer', async () => {
+    const id = await vistoriaEm(STATUS.emAnaliseAdmin, true);
+    expect((await request(app).put(`/api/vistorias/${id}/encerrar`).set(bearer(admin)).send({})).status).toBe(400);
+    const res = await request(app)
+      .put(`/api/vistorias/${id}/encerrar`)
+      .set(bearer(admin))
+      .send({ motivo: 'Relatório aceito pela construtora após análise' });
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe(STATUS.finalizada);
+    expect(res.body.datahorafim).toBeTruthy();
+  });
+
+  it('MAX_REVISOES=0 manda a 1ª rejeição direto para o admin', async () => {
+    const antes = process.env.MAX_REVISOES;
+    process.env.MAX_REVISOES = '0';
+    try {
+      const id = await vistoriaEm(STATUS.aguardandoValidacao, true);
+      expect((await rejeitar(id, 'x')).body.status).toBe(STATUS.emAnaliseAdmin);
+    } finally {
+      if (antes === undefined) delete process.env.MAX_REVISOES;
+      else process.env.MAX_REVISOES = antes;
+    }
+  });
+});
+
+describe('F3: reagendamento', () => {
+  const reagendar = (id: number, token: string, body: object) =>
+    request(app).put(`/api/vistorias/${id}/reagendar`).set(bearer(token)).send(body);
+  const dados = () => ({ dataagendada: amanha(), horaagendada: '15:30', motivo: 'Imprevisto' });
+
+  it('cliente dono, vistoriador da vistoria e admin reagendam (motivo obrigatório)', async () => {
+    const id = await vistoriaEm(STATUS.agendada, true);
+    expect((await reagendar(id, cliente, { ...dados(), motivo: '' })).status).toBe(400);
+    for (const token of [cliente, vistoriador, admin]) {
+      const res = await reagendar(id, token, dados());
+      expect(res.status).toBe(200);
+      expect(res.body.status).toBe(STATUS.agendada);
+    }
+    const [v] = await sql`SELECT dataagendada FROM vistoria WHERE idvistoria = ${id}`;
+    expect(new Date(v.dataagendada).toISOString()).toBe(new Date(`${amanha()}T15:30:00-03:00`).toISOString());
+    const ev = await eventosDe(id);
+    expect(ev.map((e) => e.papel)).toEqual(['cliente', 'vistoriador', 'admin']);
+    expect(ev[0]).toMatchObject({
+      acao: 'reagendar',
+      status_de: STATUS.agendada,
+      status_para: STATUS.agendada,
+      motivo: 'Imprevisto',
+    });
+  });
+
+  it('data no passado → 400', async () => {
+    const id = await vistoriaEm(STATUS.agendada, true);
+    expect((await reagendar(id, cliente, { ...dados(), dataagendada: '2020-01-01' })).status).toBe(400);
+  });
+
+  it('depois do início ou aguardando validação → 409', async () => {
+    for (const status of [STATUS.emAndamento, STATUS.aguardandoValidacao]) {
+      const id = await vistoriaEm(status, true);
+      expect((await reagendar(id, cliente, dados())).status).toBe(409);
+    }
+  });
+
+  it('vistoriador que não é o da vistoria não reagenda (404)', async () => {
+    const id = await vistoriaEm(STATUS.agendada, false);
+    expect((await reagendar(id, vistoriador, dados())).status).toBe(404);
+  });
+});
+
 describe('D5: histórico', () => {
   it('rejeição guarda o motivo informado', async () => {
     const id = await vistoriaEm(STATUS.aguardandoValidacao, true);
@@ -277,5 +413,7 @@ const _todas: Record<AcaoVistoria, true> = {
   rejeitar: true,
   finalizar: true,
   cancelar: true,
+  pedirRevisao: true,
+  encerrar: true,
 };
 void _todas;

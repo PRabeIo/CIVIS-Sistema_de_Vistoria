@@ -37,6 +37,11 @@ async function buscarPorId(idvistoria) {
       v.*,
       CASE WHEN v.relatorio_arquivo IS NOT NULL THEN '/vistorias/' || v.idvistoria || '/relatorio' END AS relatorio_url,
 
+      -- F2: motivo da última rejeição / pedido de revisão (o vistoriador vê o que corrigir)
+      (SELECT e.motivo FROM vistoria_evento e
+        WHERE e.idvistoria = v.idvistoria AND e.acao IN ('rejeitar', 'pedirRevisao')
+        ORDER BY e.id DESC LIMIT 1) AS motivo_revisao,
+
       -- dados do imóvel
       i.observacoes,
       i.descricao,
@@ -97,7 +102,7 @@ async function buscarPorIdComAcesso(idvistoria, usuario) {
     // se estiver disponível (sem vistoriador)
     if (
       vistoria.idvistoriador == null &&
-      ["Vistoria Agendada", "Vistoria Reagendada"].includes(vistoria.status)
+      vistoria.status === STATUS.agendada
     ) {
       return vistoria;
     }
@@ -230,7 +235,7 @@ async function deletar(idvistoria) {
 }
 
 /**
- * F1: vistoriador inicia (Agendada/Reagendada → Em Andamento). Se a vistoria estava no pool, ele a assume.
+ * F1: vistoriador inicia (Agendada → Em Andamento). Se a vistoria estava no pool, ele a assume.
  * Chamar de novo numa vistoria que já é dele e está em andamento só devolve a vistoria (sem novo evento).
  */
 async function iniciar(idvistoria, ator) {
@@ -322,7 +327,7 @@ async function validar(idvistoria, ator) {
   return transicionar({ idvistoria: Number(idvistoria), acao: "validar", ator });
 }
 
-/** F1: cliente pede nova visita depois de rejeitar (Rejeitada → Reagendada). O F3 refaz esta regra. */
+/** F3: cliente dono, vistoriador da vistoria ou admin muda a data antes do início (Agendada → Agendada). */
 async function reagendar(idvistoria, ator, dados) {
   return transicionar({
     idvistoria: Number(idvistoria),
@@ -333,14 +338,47 @@ async function reagendar(idvistoria, ator, dados) {
   });
 }
 
-/** F1: cliente rejeita o relatório (Aguardando Validação → Rejeitada). O F2 exige motivo e cria a revisão. */
+/**
+ * F2: cliente rejeita com motivo. Volta para "Em Revisão" (o vistoriador corrige e reenvia) até
+ * MAX_REVISOES vezes; a rejeição seguinte vai para "Em Análise do Admin".
+ */
 async function rejeitar(idvistoria, ator, motivo) {
   return transicionar({
     idvistoria: Number(idvistoria),
     acao: "rejeitar",
     ator,
     motivo,
-    campos: { datahorafim: new Date() },
+    campos: (v) => ({ revisoes: (v.revisoes ?? 0) + 1 }),
+  });
+}
+
+/**
+ * F2: admin manda de volta para revisão; pode trocar o vistoriador (`idvistoriador`).
+ * @param {number} idvistoria @param {any} ator @param {{ motivo?: string, idvistoriador?: number }} dados
+ */
+async function pedirRevisao(idvistoria, ator, { motivo, idvistoriador }) {
+  if (idvistoriador) {
+    const [f] = await db`
+      SELECT 1 FROM usuario WHERE id = ${idvistoriador} AND papel = 'vistoriador' AND ativo`;
+    if (!f) throw new AppError(400, "VALIDACAO", "Vistoriador inválido ou inativo.", { idvistoriador: "Inválido." });
+  }
+  return transicionar({
+    idvistoria: Number(idvistoria),
+    acao: "pedirRevisao",
+    ator,
+    motivo,
+    campos: idvistoriador ? { idvistoriador } : {},
+  });
+}
+
+/** F2: admin encerra com parecer (Em Análise do Admin → Finalizada). */
+async function encerrar(idvistoria, ator, motivo) {
+  return transicionar({
+    idvistoria: Number(idvistoria),
+    acao: "encerrar",
+    ator,
+    motivo,
+    campos: (v) => ({ datahorafim: v.datahorafim ?? new Date() }),
   });
 }
 
@@ -387,7 +425,7 @@ async function listarDisponiveisVistoriador() {
     FROM vistoria v
     JOIN imovel i ON v.idimovel = i.idimovel
     LEFT JOIN empreendimento e ON i.idempreendimento = e.idempreendimento
-    WHERE v.status IN ('Vistoria Agendada', 'Vistoria Reagendada')
+    WHERE v.status = 'Vistoria Agendada'
       AND v.idvistoriador IS NULL
     ORDER BY v.dataagendada ASC NULLS LAST, v.idvistoria DESC
   `;
@@ -416,5 +454,7 @@ module.exports = {
   rejeitar,
   finalizar,
   cancelar,
+  pedirRevisao,
+  encerrar,
   eventos,
 };

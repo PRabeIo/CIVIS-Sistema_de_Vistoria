@@ -10,16 +10,17 @@ function SolicitarNovaVistoria() {
   const [vistoriaSelecionada, setVistoriaSelecionada] = useState("");
   const [dataDesejada, setDataDesejada] = useState("");
   const [horaDesejada, setHoraDesejada] = useState("");
+  const [motivo, setMotivo] = useState("");
   const [vistoriasPendentes, setVistoriasPendentes] = useState([]);
 
   useEffect(() => {
     const fetchVistorias = async () => {
       try {
-        // F1: só vistorias rejeitadas podem pedir nova visita (máquina de estados: Rejeitada → Reagendada)
+        // F3: só vistorias agendadas (antes do início) podem mudar de data
         const data = await apiFetch("/vistorias/minhas", { method: "GET" });
-        setVistoriasPendentes(Array.isArray(data) ? data.filter((v) => v.status === "Vistoria Rejeitada") : []);
+        setVistoriasPendentes(Array.isArray(data) ? data.filter((v) => v.status === "Vistoria Agendada") : []);
       } catch (err) {
-        console.error("Erro ao carregar vistorias rejeitadas:", err);
+        console.error("Erro ao carregar vistorias agendadas:", err);
 
         if (String(err.message).toLowerCase().includes("token")) {
           alert("Sessão expirada. Faça login novamente.");
@@ -39,7 +40,7 @@ function SolicitarNovaVistoria() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!vistoriaSelecionada || !dataDesejada || !horaDesejada) {
+    if (!vistoriaSelecionada || !dataDesejada || !horaDesejada || !motivo.trim()) {
       alert("Por favor, preencha todos os campos obrigatórios.");
       return;
     }
@@ -51,10 +52,11 @@ function SolicitarNovaVistoria() {
         body: JSON.stringify({
           dataagendada: dataDesejada,
           horaagendada: horaDesejada,
+          motivo,
         }),
       });
 
-      alert("Sua solicitação de reagendamento foi enviada com sucesso!");
+      alert("Vistoria reagendada com sucesso!");
       navigate("/home");
     } catch (err) {
       alert(err.message || "Erro ao reagendar vistoria.");
@@ -91,8 +93,8 @@ function SolicitarNovaVistoria() {
         >
           <p style={{ marginTop: 0 }}>
             {vistoriasPendentes.length === 0
-              ? "Nenhuma vistoria rejeitada. Para pedir uma nova visita, rejeite antes o relatório em Validar Vistoria."
-              : "Escolha a vistoria rejeitada e a data da nova visita."}
+              ? "Nenhuma vistoria agendada. Só é possível mudar a data antes de a vistoria começar."
+              : "Escolha a vistoria, a nova data e o motivo da mudança."}
           </p>
 
           <label htmlFor="vistoria">Selecione a Vistoria:</label>
@@ -131,6 +133,17 @@ function SolicitarNovaVistoria() {
             id="hora"
             value={horaDesejada}
             onChange={(e) => setHoraDesejada(e.target.value)}
+            required
+            style={{ width: "100%", padding: "10px", border: "1px solid #ccc", borderRadius: "5px", marginBottom: "10px" }}
+          />
+
+          <label htmlFor="motivo">Motivo:</label>
+          <textarea
+            id="motivo"
+            rows={3}
+            maxLength={1000}
+            value={motivo}
+            onChange={(e) => setMotivo(e.target.value)}
             required
             style={{ width: "100%", padding: "10px", border: "1px solid #ccc", borderRadius: "5px", marginBottom: "25px" }}
           />

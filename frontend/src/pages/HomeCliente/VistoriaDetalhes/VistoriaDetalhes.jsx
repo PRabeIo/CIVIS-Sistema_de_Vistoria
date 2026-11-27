@@ -4,6 +4,7 @@ import { apiFetch, logoutNoServidor, urlDaApi } from "../../../services/api";
 import "../../styles/vistoriaDetalhes.css";
 import { SERVER_URL } from "../../../config";
 import HistoricoVistoria from "../../components/HistoricoVistoria/HistoricoVistoria";
+import AnaliseAdmin from "./AnaliseAdmin";
 
 function VistoriaDetalhes() {
   const { id } = useParams();
@@ -106,11 +107,11 @@ function VistoriaDetalhes() {
 
   const statusClassMap = {
     "Vistoria Agendada": "status--agendada",
-    "Vistoria Reagendada": "status--reagendada",
     "Em Andamento": "status--andamento",
     "Aguardando Validação": "status--aguardando-validacao",
+    "Em Revisão": "status--reagendada",
+    "Em Análise do Admin": "status--rejeitada",
     "Vistoria Validada": "status--validada",
-    "Vistoria Rejeitada": "status--rejeitada",
     "Vistoria Finalizada": "status--finalizada",
     "Aguardando Agendamento da Vistoria": "status--aguardando-agendamento",
     "Vistoria Cancelada": "status--rejeitada",
@@ -233,6 +234,17 @@ function VistoriaDetalhes() {
             </div>
           ) : null}
         </div>
+
+        {vistoriaDetalhes.acoes?.includes("pedirRevisao") ? (
+          <AnaliseAdmin vistoria={vistoriaDetalhes} aoConcluir={() => setVersao((v) => v + 1)} />
+        ) : null}
+
+        {/* F2: cliente e admin veem o que foi pedido para corrigir */}
+        {status === "Em Revisão" && vistoriaDetalhes.motivo_revisao ? (
+          <p className="aviso-revisao">
+            Em correção pelo vistoriador. Motivo: <em>{vistoriaDetalhes.motivo_revisao}</em>
+          </p>
+        ) : null}
 
         <HistoricoVistoria idvistoria={id} versao={versao} />
 

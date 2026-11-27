@@ -1,14 +1,40 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./home.css";
 import Navbar from "../components/Navbar/Navbar";
+import { apiFetch } from "../../services/api";
+import { ROTAS } from "../../rotas";
+
+const EM_ANALISE = "Em Análise do Admin";
 
 function HomeAdm({ onLogout }) {
   const navigate = useNavigate();
+  const [emAnalise, setEmAnalise] = useState(0);
+
+  // F2: avisa quando há vistorias esperando decisão do admin (rejeitadas além do limite de revisões)
+  useEffect(() => {
+    apiFetch("/vistorias")
+      .then((lista) => setEmAnalise(Array.isArray(lista) ? lista.filter((v) => v.status === EM_ANALISE).length : 0))
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="home-container">
       {/* ✅ NAVBAR REUTILIZÁVEL */}
       <Navbar onLogout={onLogout} />
+
+      {emAnalise > 0 ? (
+        <div className="aviso-analise" role="status">
+          <span>
+            {emAnalise === 1
+              ? "1 vistoria aguarda sua análise (o cliente rejeitou o relatório além do limite de correções)."
+              : `${emAnalise} vistorias aguardam sua análise (o cliente rejeitou o relatório além do limite de correções).`}
+          </span>
+          <button type="button" onClick={() => navigate(ROTAS.admin.vistorias, { state: { status: EM_ANALISE } })}>
+            Ver vistorias
+          </button>
+        </div>
+      ) : null}
 
       <main className="main-content">
         <div className="texto">
